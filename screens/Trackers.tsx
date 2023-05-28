@@ -2,10 +2,8 @@
 import { StyleSheet, FlatList, View, Text } from 'react-native';
 import TrackerCell from '../components/TrackerCell';
 
-
 function Trackers () {
 
-  
   const data = Array.from({ length: 31 }, (_, index) => index + 1);
   const renderItem = ({item}: {item: number}) => (
     <TrackerCell item={item} />
