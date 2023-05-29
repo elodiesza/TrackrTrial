@@ -4,7 +4,7 @@ import * as SQLite from 'expo-sqlite';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 
-const db = SQLite.openDatabase('indicator1cells.db');
+//const db = SQLite.openDatabase('indicator1cells.db');
 
 function TrackerCell({item}: {item: number}) {
 
