@@ -12,6 +12,7 @@ export default function App() {
   const [names, setNames] = useState([]);
   const [currentName, setCurrentName] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
+  const [load, loadx] = useState(false);
   
   //for states
   const [states, setStates] = useState([]);
@@ -32,7 +33,7 @@ export default function App() {
       // start state transaction
 
       db2.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, state INTEGER)')
+        tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER)')
       });
 
       db2.transaction(tx => {
@@ -43,7 +44,7 @@ export default function App() {
       });
 
       setIsLoading(false);
-    },[]);
+    },[load]);
 
     if (isLoading) {
       return (
@@ -60,6 +61,7 @@ export default function App() {
           (txObj, error) => console.log('error selecting states')
         );
       });
+      loadx(!load);
     }
 
     const addName = () => {
@@ -110,17 +112,22 @@ export default function App() {
 
     // for State 
     const addState = () => {
+      setIsLoading(true);
+      for (let i=0; i<4; i++) {
       db2.transaction(tx => {
-        tx.executeSql('INSERT INTO states (name,state) values (?,?)',['SPORT',0],
+        tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',['SPORT',2023,6,i,0],
           (txtObj,resultSet)=> {
-            let existingStates = [...states];
-            existingStates.push({ id: resultSet.insertId, name: 'SPORT', state:0});
+            let existingStates = [...states];    
+            existingStates.push({ id: resultSet.insertId, name: 'SPORT', year:2023, month:6, day:i, state:0});
             setStates(existingStates);
             console.log('Data inserted susccesfully');
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
         );
       });
+      setIsLoading(false);
+    }
+    loadx(!load);
     }
 
     const deleteState = (id) => {
@@ -175,7 +182,6 @@ export default function App() {
             <TouchableOpacity onPress={()=> updateState(state.id)}>
               <View style={[styles.cell, { backgroundColor : states[index].state==1 ? 'black' : 'white' }]} />
             </TouchableOpacity>
-            <Button title='Delete' onPress={()=> deleteState(state.id)} />
           </View>
         )
       })
@@ -192,11 +198,20 @@ export default function App() {
         )
       })
     }
-
+    const showTitle = () => {
+      return states.filter(name => name.id ==1).map((name) => {
+        return (
+          <View>
+            <Text>{name.name}</Text>
+          </View>
+        )
+      })
+    }
 
   return (
     <View style={styles.container}>
       <Button title='create State' onPress={addState} />
+      {showTitle(0)}
       {showStates()}
       <Button title='remove Table' onPress={removeDb2} />
       {/*
