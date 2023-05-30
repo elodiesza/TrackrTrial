@@ -1,15 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
-
 import React, { useState, useCallback, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
-//import * as Sharing from 'expo-sharing';
-//import * as FileSystem from 'expo-file-system';
-//import * as DocumentPicker from 'expo-document-picker';
 
 export default function App() {
-  const [db, setDb] = useState(SQLite.openDatabase('example.db'));
-  const [db2, setDb2] = useState(SQLite.openDatabase('example2.db'));
-  const [names, setNames] = useState([]);
+  const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [currentName, setCurrentName] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [load, loadx] = useState(false);
@@ -19,11 +13,11 @@ export default function App() {
 
     useEffect(() => {
 
-      db2.transaction(tx => {
+      db.transaction(tx => {
         tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, UNIQUE(name,year,month,day))')
       });
 
-      db2.transaction(tx => {
+      db.transaction(tx => {
         tx.executeSql('SELECT * FROM states', null,
         (txObj, resultSet) => setStates(resultSet.rows._array),
         (txObj, error) => console.log('error selecting states')
@@ -42,7 +36,7 @@ export default function App() {
     }
 
     const removeDb2 = () => {
-      db2.transaction(tx => {
+      db.transaction(tx => {
         tx.executeSql('DROP TABLE IF EXISTS states', null,
           (txObj, resultSet) => setStates([]),
           (txObj, error) => console.log('error selecting states')
@@ -56,7 +50,7 @@ export default function App() {
       setIsLoading(true);
       let existingStates = [...states];    
       for (let i=1; i<5; i++) {
-      db2.transaction(tx => {
+      db.transaction(tx => {
         tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',[currentName,2023,6,i,0],
           (txtObj,resultSet)=> {    
             existingStates.push({ id: resultSet.insertId, name: currentName, year:2023, month:6, day:i, state:0});
@@ -73,7 +67,7 @@ export default function App() {
     }
 
     const deleteState = (id) => {
-      db2.transaction(tx=> {
+      db.transaction(tx=> {
         tx.executeSql('DELETE FROM states WHERE id = ?', [id],
           (txObj, resultSet) => {
             if (resultSet.rowsAffected > 0) {
@@ -90,7 +84,7 @@ export default function App() {
       let existingStates=[...states];
       const indexToUpdate = existingStates.findIndex(state => state.id === id);
       if (existingStates[indexToUpdate].state==0){
-        db2.transaction(tx=> {
+        db.transaction(tx=> {
           tx.executeSql('UPDATE states SET state = ? WHERE id = ?', [1, id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
@@ -103,7 +97,7 @@ export default function App() {
         });
       }
       else {
-        db2.transaction(tx=> {
+        db.transaction(tx=> {
           tx.executeSql('UPDATE states SET state = ? WHERE id = ?', [0, id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
