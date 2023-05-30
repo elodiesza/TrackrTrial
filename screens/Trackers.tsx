@@ -1,9 +1,8 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
-import Trackers from './screens/Trackers';
 
-const Tracker = () => {
+const Trackers = () => {
   const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [currentName, setCurrentName] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,7 +54,6 @@ const Tracker = () => {
             existingStates.push({ id: resultSet.insertId, name: currentName, year:2023, month:6, day:i, state:0});
             setStates(existingStates);
             console.log('Data inserted susccesfully');
-            console.warn(existingStates);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
         );
@@ -147,13 +145,13 @@ const Tracker = () => {
       <View style={styles.minicontainer}>
         <Text>Insert new Indicator</Text>
         <TextInput value={currentName} placeholder='name' onChangeText={setCurrentName} />
-        <Button title="Add Name" onPress={addState}/>
+        <Button title="Add Name" onPress={(currentName !== (null || ''))&&(!currentName.includes(' '))? addState : console.warn('please enter a name')}/>
       </View> 
     </View>
   );
 }
 
-export default Tracker;
+export default Trackers;
 
 const styles = StyleSheet.create({
   container: {

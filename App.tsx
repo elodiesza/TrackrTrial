@@ -1,21 +1,27 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
-import React, { useState, useCallback, useEffect } from 'react';
+import * as React from 'react';
+import { Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Trackers from './screens/Trackers';
 
-export default function App() {
-
+function HomeScreen() {
   return (
-    <View style={{flex:1}}>
-        <Trackers/>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Home!</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    backgroundColor: 'lightgray',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Trackers" component={Trackers} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
