@@ -5,18 +5,17 @@ import Trackers from './screens/Trackers';
 export default function App() {
 
   return (
-    <View style={styles.container}>
-      <Trackers/>
+    <View style={{flex:1}}>
+        <Trackers/>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    backgroundColor: '#fff',
+  body: {
+    flex: 1,
+    backgroundColor: 'lightgray',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 100,
   },
 });
