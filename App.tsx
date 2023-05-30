@@ -57,9 +57,9 @@ export default function App() {
       let existingStates = [...states];    
       for (let i=1; i<5; i++) {
       db2.transaction(tx => {
-        tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',['SPORT',2023,6,i,0],
+        tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',[currentName,2023,6,i,0],
           (txtObj,resultSet)=> {    
-            existingStates.push({ id: resultSet.insertId, name: 'SPORT', year:2023, month:6, day:i, state:0});
+            existingStates.push({ id: resultSet.insertId, name: currentName, year:2023, month:6, day:i, state:0});
             setStates(existingStates);
             console.log('Data inserted susccesfully');
             console.warn(existingStates);
@@ -69,25 +69,6 @@ export default function App() {
       });
       }
       setIsLoading(false);
-    loadx(!load);
-    }
-
-    const addState2 = () => {
-      setIsLoading(true);
-      let existingStates = [...states];    
-      for (let i=1; i<5; i++) {
-      db2.transaction(tx => {
-        tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',['YOGA',2023,6,i,0],
-          (txtObj,resultSet)=> {          
-            existingStates.push({ id: resultSet.insertId, name: 'YOGA', year:2023, month:6, day:i, state:0});
-            setStates(existingStates);
-            console.log('Data inserted susccesfully');
-          },
-          (txtObj, error) => console.warn('Error inserting data:', error)
-        );
-      });
-      setIsLoading(false);
-    }
     loadx(!load);
     }
 
@@ -163,8 +144,6 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Button title='create State' onPress={addState} />
-      <Button title='create State2' onPress={addState2} />
       <FlatList
         data={uniqueNames}
         renderItem={(name)=>showTitle(name)}
@@ -172,12 +151,11 @@ export default function App() {
         horizontal={true}
       />
       <Button title='remove Table' onPress={removeDb2} />
-      {/*
       <View style={styles.minicontainer}>
         <Text>Insert new Indicator</Text>
         <TextInput value={currentName} placeholder='name' onChangeText={setCurrentName} />
         <Button title="Add Name" onPress={addState}/>
-  </View> */}
+      </View> 
     </View>
   );
 }
