@@ -18,22 +18,9 @@ export default function App() {
   const [states, setStates] = useState([]);
 
     useEffect(() => {
-      // start names transactions
-      db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)')
-      });
-
-      db.transaction(tx => {
-        tx.executeSql('SELECT * FROM names', null,
-        (txObj, resultSet) => setNames(resultSet.rows._array),
-        (txObj, error) => console.log('error selecting names')
-        );
-      });
-
-      // start state transaction
 
       db2.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER)')
+        tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, UNIQUE(name,year,month,day))')
       });
 
       db2.transaction(tx => {
@@ -64,61 +51,35 @@ export default function App() {
       loadx(!load);
     }
 
-    const addName = () => {
-      db.transaction(tx => {
-        tx.executeSql('INSERT INTO names (name) values (?)',[currentName],
-          (txtObj,resultSet)=> {
-            let existingNames = [...names];
-            existingNames.push({ id: resultSet.insertId, name:currentName});
-            setNames(existingNames);
-            setCurrentName(undefined);
-            console.log('Data inserted susccesfully');
-          },
-          (txtObj,error) => console.log('Error inserting data:', error)
-        );
-      });
-    }
 
-    const deleteName = (id) => {
-      db.transaction(tx=> {
-        tx.executeSql('DELETE FROM names WHERE id = ?', [id],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              let existingNames = [...names].filter(name => name.id !==id);
-              setNames(existingNames);
-            }
-          },
-          (txObj, error) => console.log(error)
-        );
-      });
-    };
-
-    const updateName = (id) => {
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE names SET name = ? WHERE id = ?', [currentName, id],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              let existingNames=[...names];
-              const indexToUpdate = existingNames.findIndex(name => name.id === id);
-              existingNames[indexToUpdate].name = currentName;
-              setNames(existingNames);
-              setCurrentName(undefined);
-            }
-          },
-          (txObj, error) => console.log(error)
-        );
-      });
-    };
-
-    // for State 
     const addState = () => {
       setIsLoading(true);
-      for (let i=0; i<4; i++) {
+      let existingStates = [...states];    
+      for (let i=1; i<5; i++) {
       db2.transaction(tx => {
         tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',['SPORT',2023,6,i,0],
-          (txtObj,resultSet)=> {
-            let existingStates = [...states];    
+          (txtObj,resultSet)=> {    
             existingStates.push({ id: resultSet.insertId, name: 'SPORT', year:2023, month:6, day:i, state:0});
+            setStates(existingStates);
+            console.log('Data inserted susccesfully');
+            console.warn(existingStates);
+          },
+          (txtObj, error) => console.warn('Error inserting data:', error)
+        );
+      });
+      }
+      setIsLoading(false);
+    loadx(!load);
+    }
+
+    const addState2 = () => {
+      setIsLoading(true);
+      let existingStates = [...states];    
+      for (let i=1; i<5; i++) {
+      db2.transaction(tx => {
+        tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',['YOGA',2023,6,i,0],
+          (txtObj,resultSet)=> {          
+            existingStates.push({ id: resultSet.insertId, name: 'YOGA', year:2023, month:6, day:i, state:0});
             setStates(existingStates);
             console.log('Data inserted susccesfully');
           },
@@ -140,8 +101,8 @@ export default function App() {
             }
           },
           (txObj, error) => console.log(error)
-        );
-      });
+        );       
+      });      
     };
 
     const updateState = (id) => {
@@ -175,52 +136,48 @@ export default function App() {
       }
     };
 
-    const showStates = () =>{
-      return states.map((state,index) => {
-        return (
+    const showStates = (ind) => {
+      const filteredStates = states.filter(c=>c.name==ind);
+      return filteredStates.map((state,index) => {
+        return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=> updateState(state.id)}>
-              <View style={[styles.cell, { backgroundColor : states[index].state==1 ? 'black' : 'white' }]} />
+              <View style={[styles.cell, { backgroundColor : filteredStates[index].state==1 ? 'black' : 'white' }]} />
             </TouchableOpacity>
           </View>
         )
       })
     }
 
-    const showNames = () =>{
-      return names.map((name,index) => {
-        return (
-          <View key={index}>
-            <Text>{name.name}</Text>
-            <Button title='Delete' onPress={()=> deleteName(name.id)} />
-            <Button title='Update' onPress={()=> updateName(name.id)} />
-          </View>
-        )
-      })
-    }
-    const showTitle = () => {
-      return states.filter(name => name.id ==1).map((name) => {
-        return (
+    const showTitle = (ind) => {
+      return  (
           <View>
-            <Text>{name.name}</Text>
+            <Text>{ind.item}</Text>
+            {showStates(ind.item)}
           </View>
-        )
-      })
+        )   
     }
+
+    const allNames = states.filter(c => c.day==1).map((c) => c.name);
+    const uniqueNames = [...new Set (allNames)];
 
   return (
     <View style={styles.container}>
       <Button title='create State' onPress={addState} />
-      {showTitle(0)}
-      {showStates()}
+      <Button title='create State2' onPress={addState2} />
+      <FlatList
+        data={uniqueNames}
+        renderItem={(name)=>showTitle(name)}
+        keyExtractor={(_, index) => index.toString()}
+        horizontal={true}
+      />
       <Button title='remove Table' onPress={removeDb2} />
       {/*
       <View style={styles.minicontainer}>
+        <Text>Insert new Indicator</Text>
         <TextInput value={currentName} placeholder='name' onChangeText={setCurrentName} />
-        <Button title="Add Name" onPress={addName}/>
-        {showNames()}
-      </View>
-      */}
+        <Button title="Add Name" onPress={addState}/>
+  </View> */}
     </View>
   );
 }
@@ -232,6 +189,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 100,
+  },
+  row: {
+    flex:1,
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   minicontainer: {
     flex:1,
