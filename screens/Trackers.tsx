@@ -145,7 +145,7 @@ const Trackers = () => {
       <View style={styles.minicontainer}>
         <Text>Insert new Indicator</Text>
         <TextInput value={currentName} placeholder='name' onChangeText={setCurrentName} />
-        <Button title="Add Name" onPress={(currentName !== (null || ''))&&(!currentName.includes(' '))? addState : console.warn('please enter a name')}/>
+        <Button title="Add Name" onPress={(currentName!==undefined ? (currentName!==(null||'')? (currentName.includes(' ')? false: true):false):false) ? addState : console.warn('please enter a name')}/>
       </View> 
     </View>
   );
