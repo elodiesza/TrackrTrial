@@ -8,12 +8,23 @@ import Settings from './screens/Settings';
 import Statistics from './screens/Statistics';
 import Today from './screens/Today';
 import Feather from '@expo/vector-icons/Feather';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
+
 
 function HomeScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Today/>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={Settings}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="Settings" component={Settings} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -23,7 +34,7 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator>
+      <Tab.Navigator initialRouteName="Today">
         <Tab.Screen name="Statistics" component={Statistics} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
@@ -38,7 +49,7 @@ export default function App() {
             <Feather name="check-square" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" component={HomeScreen} 
+        <Tab.Screen name="Today" component={Today} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

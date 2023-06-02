@@ -1,9 +1,17 @@
 import { FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { useState } from 'react';
+import Feather from '@expo/vector-icons/Feather';
+import moment from 'moment';
+import Swiper from 'react-native-swiper'
+import MonthlyTasks from '../components/MonthlyTasks';
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
 export default function App() {
+
+  const [addTodoVisible, setAddTodoVisible] = useState(false);
+  const [statex, setStatex] = useState(false);
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -75,8 +83,11 @@ export default function App() {
 
   const CalendarCell = (date) => {
     return(
-      <View style={styles.calendarCell}>
-        <Text>{date}</Text>
+      <View style={[styles.calendarCell,{backgroundColor: date==0? 'lightgray' : 'white'}]}>
+        <View style={{height:15, flex:1}}>
+          <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
+        </View>
+        
       </View>
     )
   }
@@ -89,6 +100,7 @@ export default function App() {
             renderItem={({item}) => CalendarCell(item)}
             keyExtractor={item => item.id}
             horizontal={true}
+            bounces={false}
           />
       </View>
     )
@@ -96,19 +108,23 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={{alignContent:'center', justifyContent:'center', flex:1}}>
-          <Text>JUNE</Text>  
-        </View> 
+       <View style={styles.header}>
+        <Feather name='chevron-left' size={40} style={{right:30}}/>
+        <View>
+          <Text style={{fontSize:10, textAlign:'center'}}>{moment(new Date(2023,5,1)).format('YYYY')}</Text>
+          <Text style={{fontSize:22, textAlign:'center'}}>{moment(new Date(0,5,1)).format('MMMM')}</Text>
+        </View>
+        <Feather name='chevron-right' size={40} style={{left: 30}}/>
       </View>
-      <View style={styles.calendarContainer}></View>
-      <FlatList
-        data={daysLines}
-        renderItem={({item}) => CalendarLine(item)}
-        keyExtractor={item => item.id}
-      />
-      <View style={styles.footer}>
-        <Text>HEY</Text>
+      <View style={styles.calendarContainer}>
+        <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
+          <FlatList
+            data={daysLines}
+            renderItem={({item}) => CalendarLine(item)}
+            keyExtractor={item => item.id}
+          />
+          <MonthlyTasks/>
+        </Swiper>
       </View>
     </View>
   );
@@ -124,25 +140,23 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     justifyContent: 'center',
     flex:1,
-    height: (windowHeight*8/10)/6,
-    borderWidth:1,
-    borderColor: 'black',
+    borderWidth:0.5,
+    borderColor: 'gray',
     backgroundColor: 'white',
-    width: windowWidth/7,
+    width: width/7,
+    height: (8/10)*(height/6),
   },
   header: {
     flex:1,
+    marginTop: 48,
     alignContent: 'center',
     justifyContent: 'center',
+    width: width,
+    flexDirection: 'row',
   },
   calendarContainer: {
-    flex:8,
+    flex:14,
     alignContent: 'center',
     justifyContent: 'center',
   },
-  footer: {
-    flex:1,
-    alignContent: 'center',
-    justifyContent: 'center',
-  }
 });

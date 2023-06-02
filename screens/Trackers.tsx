@@ -1,8 +1,19 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
+import { StyleSheet, ScrollView, SafeAreaView, Dimensions, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
+import DaysInMonth from '../components/DaysInMonth';
+import IndicatorTableTitle from '../components/IndicatorTableTitle';
+import Feather from '@expo/vector-icons/Feather';
+import moment from 'moment';
+
+
+const width = Dimensions.get('window').width;
 
 const Trackers = () => {
+
+  var today = new Date();
+  var nbDaysThisMonth = DaysInMonth(today);
+
   const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [currentName, setCurrentName] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +58,7 @@ const Trackers = () => {
     const addState = () => {
       setIsLoading(true);
       let existingStates = [...states];    
-      for (let i=1; i<5; i++) {
+      for (let i=1; i<=nbDaysThisMonth; i++) {
       db.transaction(tx => {
         tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',[currentName,2023,6,i,0],
           (txtObj,resultSet)=> {    
@@ -120,12 +131,22 @@ const Trackers = () => {
         )
       })
     }
-
+//<Text>{ind.item}</Text>
     const showTitle = (ind) => {
       return  (
-          <View>
-            <Text>{ind.item}</Text>
+          <View style={{flex:1}}>
+            <View style={{height: 87,transform: [{skewX: '-45deg'}]}}>
+              <IndicatorTableTitle name={ind.item}/>
+            </View>
             {showStates(ind.item)}
+          </View>
+        )   
+    }
+
+    const showNumber = (day) => {
+      return  (
+          <View style={{width:25,height:25, justifyContent:'center'}}>
+            <Text style={{textAlign:'right', marginRight: 3, textAlignVertical:'center'}}>{day.item}</Text>
           </View>
         )   
     }
@@ -133,21 +154,51 @@ const Trackers = () => {
     const allNames = states.filter(c => c.day==1).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
 
+    const listDays = () => {
+      var arr= [];
+      for (let i=1; i<=nbDaysThisMonth;i++) {
+        arr.push(i);
+      }
+      return (arr);
+    }
+
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={uniqueNames}
-        renderItem={(name)=>showTitle(name)}
-        keyExtractor={(_, index) => index.toString()}
-        horizontal={true}
-      />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Feather name='chevron-left' size={40} style={{right:30}}/>
+        <View>
+          <Text style={{fontSize:10, textAlign:'center'}}>{moment(new Date(2023,5,1)).format('YYYY')}</Text>
+          <Text style={{fontSize:22, textAlign:'center'}}>{moment(new Date(0,5,1)).format('MMMM')}</Text>
+        </View>
+        <Feather name='chevron-right' size={40} style={{left: 30}}/>
+      </View>
+      <View style={[styles.container,{width: width}]}>
+      <ScrollView nestedScrollEnabled  bounces={false} showsVerticalScrollIndicator={false} style={{flex:1,width:width}}>
+        <View style={{flex:1,flexDirection:'row'}}>
+          <View>
+          <FlatList
+            data={listDays()}
+            renderItem={(item)=>showNumber(item)}
+            keyExtractor={(_, index) => index.toString()}
+            style={{marginTop:90,width:25,flexDirection:'row'}}
+            />
+          </View>
+          <FlatList
+            horizontal
+            data={uniqueNames}
+            renderItem={(name)=>showTitle(name)}
+            keyExtractor={(_, index) => index.toString()}
+          />
+        </View>
+      </ScrollView >
+      </View>
       <Button title='remove Table' onPress={removeDb2} />
       <View style={styles.minicontainer}>
         <Text>Insert new Indicator</Text>
         <TextInput value={currentName} placeholder='name' onChangeText={setCurrentName} />
-        <Button title="Add Name" onPress={(currentName!==undefined ? (currentName!==(null||'')? (currentName.includes(' ')? false: true):false):false) ? addState : console.warn('please enter a name')}/>
+        <Button title="Add Name" onPress={(currentName!==undefined ? (currentName!==(null||'')? (currentName.includes(' ')? false: true):false):false) ? addState : console.log('please enter a name')}/>
       </View> 
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -155,22 +206,28 @@ export default Trackers;
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex:16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 100,
+  },
+  header: {
+    flex: 1,
+    width: width,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   minicontainer: {
-    flex:1,
+    flex:2,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 100,
+    marginTop: 0,
   },
   cell: {
     width: 25,
     height: 25,
     borderColor: 'black',
-    borderWidth: 1,
+    borderWidth: 0.5,
     alignItems: 'center',
     justifyContent: 'center',
   },

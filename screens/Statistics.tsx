@@ -6,7 +6,7 @@ const Statistics = () => {
 
   return (
     <View style={styles.container}>
-
+      <Text>Statistics</Text>
     </View>
   );
 }
