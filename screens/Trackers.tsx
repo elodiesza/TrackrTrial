@@ -5,34 +5,32 @@ import DaysInMonth from '../components/DaysInMonth';
 import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
-
+import NewIndicator from '../modal/NewIndicator';
 
 const width = Dimensions.get('window').width;
 
 const Trackers = () => {
 
   var today = new Date();
+  var month = today.getMonth();
+  var year = today.getFullYear();
   var nbDaysThisMonth = DaysInMonth(today);
 
   const [db,setDb] = useState(SQLite.openDatabase('example.db'));
-  const [currentName, setCurrentName] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [load, loadx] = useState(false);
   const [states, setStates] = useState([]);
+  const [addModalVisible, setAddModalVisible] = useState(false);
 
+  
     useEffect(() => {
-
-      db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, UNIQUE(name,year,month,day))')
-      });
-
+      setIsLoading(true);
       db.transaction(tx => {
         tx.executeSql('SELECT * FROM states', null,
         (txObj, resultSet) => setStates(resultSet.rows._array),
         (txObj, error) => console.log('error selecting states')
         );
       });
-
       setIsLoading(false);
     },[load]);
 
@@ -44,7 +42,7 @@ const Trackers = () => {
       )
     }
 
-    const removeDb2 = () => {
+    const removeDb = () => {
       db.transaction(tx => {
         tx.executeSql('DROP TABLE IF EXISTS states', null,
           (txObj, resultSet) => setStates([]),
@@ -54,25 +52,6 @@ const Trackers = () => {
       loadx(!load);
     }
 
-
-    const addState = () => {
-      setIsLoading(true);
-      let existingStates = [...states];    
-      for (let i=1; i<=nbDaysThisMonth; i++) {
-      db.transaction(tx => {
-        tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',[currentName,2023,6,i,0],
-          (txtObj,resultSet)=> {    
-            existingStates.push({ id: resultSet.insertId, name: currentName, year:2023, month:6, day:i, state:0});
-            setStates(existingStates);
-            console.log('Data inserted susccesfully');
-          },
-          (txtObj, error) => console.warn('Error inserting data:', error)
-        );
-      });
-      }
-      setIsLoading(false);
-    loadx(!load);
-    }
 
     const deleteState = (id) => {
       db.transaction(tx=> {
@@ -131,16 +110,17 @@ const Trackers = () => {
         )
       })
     }
-//<Text>{ind.item}</Text>
+    
+
     const showTitle = (ind) => {
       return  (
-          <View style={{flex:1}}>
-            <View style={{height: 87,transform: [{skewX: '-45deg'}]}}>
-              <IndicatorTableTitle name={ind.item}/>
-            </View>
-            {showStates(ind.item)}
+        <View style={{flex:1}}>
+          <View style={{height: 87,transform: [{skewX: '-45deg'}]}}>
+            <IndicatorTableTitle name={ind.item}/>
           </View>
-        )   
+          {showStates(ind.item)}
+        </View>
+      )   
     }
 
     const showNumber = (day) => {
@@ -187,17 +167,24 @@ const Trackers = () => {
             horizontal
             data={uniqueNames}
             renderItem={(name)=>showTitle(name)}
-            keyExtractor={(_, index) => index.toString()}
+            keyExtractor={(name) => name.toString()} //{(_, index) => index.toString()}
           />
         </View>
       </ScrollView >
       </View>
-      <Button title='remove Table' onPress={removeDb2} />
-      <View style={styles.minicontainer}>
-        <Text>Insert new Indicator</Text>
-        <TextInput value={currentName} placeholder='name' onChangeText={setCurrentName} />
-        <Button title="Add Name" onPress={(currentName!==undefined ? (currentName!==(null||'')? (currentName.includes(' ')? false: true):false):false) ? addState : console.log('please enter a name')}/>
-      </View> 
+      <Button title='remove Table' onPress={removeDb} />
+      <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
+        <Feather name='plus-circle' size={50} />
+      </ TouchableOpacity> 
+      <NewIndicator
+        addModalVisible={addModalVisible===true}
+        setAddModalVisible={setAddModalVisible}
+        load={load}
+        loadx={loadx}
+        db={db}
+        states={states}
+        setStates={setStates}
+      />
     </SafeAreaView>
   );
 }
@@ -216,12 +203,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-  },
-  minicontainer: {
-    flex:2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 0,
   },
   cell: {
     width: 25,
