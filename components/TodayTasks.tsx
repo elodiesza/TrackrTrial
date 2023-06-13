@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
 import NewTask from '../modal/NewTask';
@@ -135,7 +135,7 @@ export default function TodayTasks() {
     <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
       <Pressable onPress={ () =>
         db.transaction(tx=> {
-          tx.executeSql('DELETE FROM states WHERE id = ?', [id],
+          tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
                 let existingTasks = [...tasks].filter(task => task.id !==id);
