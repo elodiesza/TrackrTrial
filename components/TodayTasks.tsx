@@ -1,101 +1,88 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { View, Pressable, Text, TouchableOpacity } from 'react-native';
-import { SwipeListView } from 'react-native-swipe-list-view';
-import moment from 'moment';
-import TaskItem from './TaskItem';
+import { FlatList, StyleSheet, Text, View, Dimensions, Pressable } from 'react-native';
+import { useState } from 'react';
+import StateIcon from './StateIcon';
 
-const today = moment(new Date()).format('YYYY-MM-DD');
-
-function TodoToday({addTodoVisible, setAddTodoVisible, month, year, monthly, statex, setStatex}) {
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
 
-  //sort by time and then by date
-  const sortByTime = todo => {
-    const sorter1 = (a, b) => {
-      return new Date(a.time) - new Date(b.time)
-    }
-    todo.sort(sorter1);
+export default function TodayTasks() {
+  const today = new Date();
+  const thisMonth = today.getMonth();
+  const thisYear = today.getFullYear();
+  const thisDay = today.getDate();
+
+  const [taskState, setTaskState] = useState<number>(0);
+
+  const Task = ({item}) => {
+    return(
+      <View style={styles.taskcontainer}>
+        <StateIcon taskState={taskState} setTaskState={setTaskState} item={item}/>
+        <View style={styles.tasktext}>
+          <Text style={styles.tasktext}>
+            {item}
+          </Text>
+        </View>
+      </View>
+    )
   };
-  sortByTime(todo);
-  const sortByDate = todo => {
-    const sorter = (a, b) => {
-      return new Date(a.date) - new Date(b.date) 
-    }
-    todo.sort(sorter);
-  };
-  sortByDate(todo);
-  const distantFuture = new Date(8640000000000000)
-  const sorted = todo.sort((a, b) => {
-    const dateA = a.date ? new Date(a.date) : distantFuture
-    const dateB = b.date ? new Date(b.date) : distantFuture
-    return dateA.getTime() - dateB.getTime()
-  })
 
-    //Keep only this month non recurring tasks
-    const thisMonthTodo = (todo) => {
-        var filteredTodo = todo.filter(
-          (task) => task.recurrence === false
-        ).filter(
-          (task) => task.month === month
-        ).filter(
-          (task) => task.year === year
-        );
-      if(monthly===false){
-        filteredTodo = filteredTodo.filter(
-          (task) => task.date === today
-        );        
-      }
-      return filteredTodo;
-    };
-
-
-  const renderTaskItem = ({ item }) => (
-    <TaskItem update={true} addTodoVisible={addTodoVisible} setAddTodoVisible={setAddTodoVisible} monthly={false} statex={statex} setStatex={setStatex} task={item.task} year={item.year} month={item.month} state={item.state} id={item.id} date={item.date} time={item.time} color={item.color} tag={item.tag} />
-  );
-  const DeleteItem = ({ id }) => (
-    <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
-          <Feather name="trash-2" size={25} color={'white'}/>
-    </View>
-  );
-  const renderDeleteItem = ({ item }) => (
-    <DeleteItem id={item.id} />
-  );
-
+  const data = ['Task 1', 'Task 2', 'Task 3', 'Task 4'];
 
   return (
-                <SwipeListView data={[]} scrollEnabled={true} renderItem={renderTaskItem} 
-                renderHiddenItem={renderDeleteItem} bounces={false} 
-                rightOpenValue={-80}
-                disableRightSwipe={true}
-                closeOnRowBeginSwipe={true}/>
+    <View style={styles.container}>
+      <View style={styles.tasktitle}>
+        <Text style={styles.titletext}>
+          TODAY'S TASKS
+        </Text>
+      </View>
+      <FlatList
+        data={data}
+        renderItem={({ item }) => <Task item={item} />}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    </View>
   );
-};
-
-export default TodoToday;
-
+}
 
 const styles = StyleSheet.create({
-  task: {
-    height: 40,
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: 'lightgray',
+  container: {
+    flex:1,
+    alignContent: 'center',
+    justifyContent: 'center',
   },
-  datetime: {
-    textAlign: 'left',
-    color: 'lightgray',
-  },
-  color: {
-    width: 20,
-    height: 20,
+  checkbox: {
+    width: 25,
+    height: 25,
     borderWidth: 1,
-    borderRadius: 10,
-    borderColor: 'lightgray',
-    margin: 10,
+    borderColor: 'black',
+    marginLeft: 30,
   },
+  taskcontainer: {
+    width: width,
+    flexDirection: 'row',
+    height: 45,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginLeft: 20,
+  },
+  tasktext: {
+    textAlign:'left',
+    marginLeft: 5,
+  },
+  tasktitle: {
+    width: width,
+    height: 45,
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray',
+    justifyContent: 'center',
+  },
+  titletext: {
+    marginLeft: 20,
+    fontSize: 20,
+    color: 'gray',
+    fontWeight: 'bold',
+    textAlignVertical: 'center',
+  }
 });

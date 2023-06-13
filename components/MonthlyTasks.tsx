@@ -2,7 +2,6 @@ import { FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
 import RecurringTasks from './RecurringTasks';
-import TodoToday from './TodayTasks';
 
 
 const width = Dimensions.get('window').width;
