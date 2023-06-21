@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, Pressable,TouchableOpacity, Dimensions } from '
 
 const width = Dimensions.get('window').width;
 
-const IndicatorTableTitle = ({name}) => {
+const IndicatorTableTitle = ({name, modalVisible, setModalVisible}) => {
 
     return (
-        <TouchableOpacity style={{width:1, height:1, margin:12}}>
-            <View style={[styles.polygon, {backgroundColor: 'white'}]} /><Text numberOfLines={1} style={styles.indText}>{name}</Text>
-        </TouchableOpacity>
-    );
+            <TouchableOpacity onPress={()=>setModalVisible(true)} style={{width:1, height:1, margin:12, left:-43}}>
+                <View style={[styles.polygon, {backgroundColor: 'white'}]} /><Text numberOfLines={1} style={styles.indText}>{name}</Text>
+            </TouchableOpacity>
+       );     
 };
 
 const styles = StyleSheet.create({

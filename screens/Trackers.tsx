@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, SafeAreaView, Dimensions, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
+import { StyleSheet, Modal, TouchableWithoutFeedback, Alert, Pressable, ScrollView, SafeAreaView, Dimensions, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
 import DaysInMonth from '../components/DaysInMonth';
@@ -6,6 +6,7 @@ import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
 import NewIndicator from '../modal/NewIndicator';
+import IndicatorMenu from '../modal/IndicatorMenu';
 
 const width = Dimensions.get('window').width;
 
@@ -21,6 +22,7 @@ const Trackers = () => {
   const [load, loadx] = useState(false);
   const [states, setStates] = useState([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   
     useEffect(() => {
@@ -52,13 +54,12 @@ const Trackers = () => {
       loadx(!load);
     }
 
-
-    const deleteState = (id) => {
+    const deleteState = (name) => {
       db.transaction(tx=> {
-        tx.executeSql('DELETE FROM states WHERE id = ?', [id],
+        tx.executeSql('DELETE FROM states WHERE name = ?', [name],
           (txObj, resultSet) => {
             if (resultSet.rowsAffected > 0) {
-              let existingStates = [...states].filter(state => state.id !==id);
+              let existingStates = [...states].filter(state => state.name !==name);
               setStates(existingStates);
             }
           },
@@ -115,10 +116,18 @@ const Trackers = () => {
     const showTitle = (ind) => {
       return  (
         <View style={{flex:1}}>
-          <View style={{height: 87,transform: [{skewX: '-45deg'}]}}>
-            <IndicatorTableTitle name={ind.item}/>
-          </View>
+          <Pressable style={{height: 87,transform: [{skewX: '-45deg'}], left:43, backgroundColor:'red'}}>
+            <IndicatorTableTitle name={ind.item} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+          </Pressable>
           {showStates(ind.item)}
+          <IndicatorMenu
+            data={ind.item}
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            index={ind.id}
+            month={month}
+            year={year}
+          />
         </View>
       )   
     }
@@ -191,6 +200,8 @@ const Trackers = () => {
 
 export default Trackers;
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex:16,
@@ -211,5 +222,45 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  dialogBox: {
+    position: 'absolute',
+    flex: 1,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: 'lightgray',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    top: 200,
+  },
+  deleteBox: {
+    flex: 1, 
+    top: 200,
+    position: 'absolute',
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: 'lightgray',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    padding: 15,
+  },
+  button: {
+    width: 100,
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 10,
+    marginTop: 20,
   },
 });

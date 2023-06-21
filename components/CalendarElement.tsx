@@ -1,0 +1,147 @@
+import { FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { useState } from 'react';
+import Feather from '@expo/vector-icons/Feather';
+import moment from 'moment';
+import Swiper from 'react-native-swiper'
+import MonthlyTasks from '../components/MonthlyTasks';
+
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
+
+export default function CalendarElement({year, month, day}) {
+
+  const [addTodoVisible, setAddTodoVisible] = useState(false);
+  const [statex, setStatex] = useState(false);
+  var today = new Date();
+  var thisDay = today.getDate();
+  var thisMonth = today.getMonth();
+  var thisYear = today.getFullYear();
+  var days = [];
+
+  const GetDaysInMonth = (month) => {
+    var date = new Date(year, month, 1);
+    var firstDay = date.getDay();
+    if (firstDay == 0) {
+      for (let i=0; i<6; i++) {
+        days.push(0);
+      }
+      while (date.getMonth() === month) {
+        days.push(new Date(date).getDate());
+        date.setDate(date.getDate() + 1);
+      }
+    }
+    else {
+      for (let i=1; i<firstDay; i++) {
+        days.push(0);
+      }
+      while (date.getMonth() === month) {
+        days.push(new Date(date).getDate());
+        date.setDate(date.getDate() + 1);
+      }
+    }
+
+    return days;
+  }
+
+  var daysLength = GetDaysInMonth(month).length;
+
+  var line1 = GetDaysInMonth(month).slice(0,7);
+  var line2 = GetDaysInMonth(month).slice(7,14);
+  var line3 = GetDaysInMonth(month).slice(14,21);
+  var line4 = GetDaysInMonth(month).slice(21,28);
+  var line5 = () => { 
+    let list=[];
+    if (daysLength>28) {
+        for (let i=0; i<(daysLength-28);i++){
+          list.push(GetDaysInMonth(month)[28+i]);
+        }
+        for (let i=0; i<(35-daysLength);i++){
+            list.push(0);
+          }
+      return(list)
+    }
+    else {
+      list.push(0,0,0,0,0,0,0);
+      return(list)
+    }
+  }
+  var line6 = () => { 
+    let list=[];
+    if (daysLength>35) {
+
+        for (let i=0; i<7;i++){
+          list.push(GetDaysInMonth(month)[34+i]);
+        }
+      return(list)
+    }
+    else {
+      list.push(0,0,0,0,0,0,0);
+      return(list)
+    }
+  }
+
+  var daysLines = [line1,line2,line3,line4,line5(),line6()];
+
+
+  const CalendarCell = (date) => {
+    return(
+      <View style={[styles.calendarCell,{backgroundColor: date==0? 'lightgray' : 'white', borderColor: (date==thisDay && month==thisMonth && year==thisYear)? 'red':'gray', borderWidth: (date==thisDay && month==thisMonth && year==thisYear)? 2:0.5}]}>
+        <View style={{height:15, flex:1}}>
+          <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
+        </View>
+        
+      </View>
+    )
+  }
+
+  const CalendarLine = (line) => {
+    return (
+      <View style={styles.container}>
+          <FlatList
+            data={line}
+            renderItem={({item}) => CalendarCell(item)}
+            keyExtractor={item => item.id}
+            horizontal={true}
+            bounces={false}
+          />
+      </View>
+    )
+  }
+
+  return (
+    <View style={styles.container}>
+        <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
+          <FlatList
+            data={daysLines}
+            renderItem={({item}) => CalendarLine(item)}
+            keyExtractor={item => item.id}
+          />
+          <MonthlyTasks/>
+        </Swiper>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  calendarCell: {
+    alignContent: 'center',
+    justifyContent: 'center',
+    flex:1,
+    backgroundColor: 'white',
+    width: width/7,
+    height: (8/10)*(height/6),
+  },
+  header: {
+    flex:1,
+    marginTop: 48,
+    alignContent: 'center',
+    justifyContent: 'center',
+    width: width,
+    flexDirection: 'row',
+  },
+  container: {
+    flex:14,
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
+});
