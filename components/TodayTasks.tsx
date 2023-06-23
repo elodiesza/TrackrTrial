@@ -5,6 +5,7 @@ import NewTask from '../modal/NewTask';
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import moment from 'moment';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -22,6 +23,7 @@ export default function TodayTasks() {
   const [isLoading, setIsLoading] = useState(true);
   const [load, loadx] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const [date, setDate] = useState(today);
 
   
   useEffect(() => {
@@ -129,7 +131,15 @@ export default function TodayTasks() {
     )
   };
 
-  const data = tasks.filter(c=>c.day==thisDay);
+  const NextDay = () => {
+    setDate(new Date(date.setDate(date.getDate()+1)));
+  };
+
+  const PreviousDay = () => {
+    setDate(new Date(date.setDate(date.getDate()-1)));
+  };
+
+  const data = tasks.filter(c=>c.day==date.getDate());
 
   const DeleteItem = ({ id }) => (
     <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
@@ -155,28 +165,40 @@ export default function TodayTasks() {
   return (
     <>
       <View style={styles.container}>
+        <View style={styles.header}>
+          <Pressable onPress={PreviousDay}>
+            <Feather name='chevron-left' size={40} />
+          </Pressable>
+          <Text>
+            {moment(date).format('dddd, DD MMMM YYYY')}
+          </Text>
+          <Pressable onPress={NextDay}>
+            <Feather name='chevron-right' size={40}/>
+          </Pressable>
+        </View>
         <View style={styles.tasktitle}>
           <Text style={styles.titletext}>
             TODAY'S TASKS
           </Text>
         </View>
         <SwipeListView data={data} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
-                renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
-                rightOpenValue={-80}
-                disableRightSwipe={true}
-                closeOnRowBeginSwipe={true}/>
+          renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
+          rightOpenValue={-80}
+          disableRightSwipe={true}
+          closeOnRowBeginSwipe={true}
+        />
       </View>
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
       </ TouchableOpacity> 
       <NewTask
-      addModalVisible={addModalVisible===true}
-      setAddModalVisible={setAddModalVisible}
-      load={load}
-      loadx={loadx}
-      db={db}
-      tasks={tasks}
-      setTasks={setTasks}
+        addModalVisible={addModalVisible===true}
+        setAddModalVisible={setAddModalVisible}
+        load={load}
+        loadx={loadx}
+        db={db}
+        tasks={tasks}
+        setTasks={setTasks}
       />
     </>
   );
@@ -187,6 +209,16 @@ const styles = StyleSheet.create({
     flex:1,
     alignContent: 'center',
     justifyContent: 'center',
+  },
+  header:{
+    width:width,
+    height:40,
+    borderBottomWidth:1,
+    borderColor:'gray',
+    justifyContent:'center',
+    flexDirection:'row',
+    alignContent:'center',
+    alignItems:'center',
   },
   checkbox: {
     width: 25,

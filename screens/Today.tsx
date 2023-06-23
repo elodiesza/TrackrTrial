@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { FlatList, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
 import Swiper from 'react-native-swiper';
 import TodayTasks from '../components/TodayTasks';
 
@@ -9,14 +9,14 @@ const Today = () => {
 
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
         <View>
           <Text>Hello</Text>
         </View>
         <TodayTasks/>
       </Swiper>
-    </View>
+    </SafeAreaView>
   );
 }
 
