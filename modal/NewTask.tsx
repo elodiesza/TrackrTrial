@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
+import { Switch, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
-import * as SQLite from 'expo-sqlite';
 
 
 function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, setTasks}) {
@@ -13,10 +12,13 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
   var month = today.getMonth();
   var year = today.getFullYear();
 
+  const [recurring, setRecurring] = useState(false);
+  const toggleSwitch = () => setRecurring(previousState => !previousState);
+
 
   useEffect(() => {
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, UNIQUE(task,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, UNIQUE(task,year,month,day))')
     });
 
     db.transaction(tx => {
@@ -25,6 +27,8 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
       (txObj, error) => console.log('error selecting states')
       );
     });
+
+    
 
     setIsLoading(false);
   },[load]);
@@ -39,9 +43,9 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
   const addTask = (data) => {
     let existingTasks = [...tasks];    
       db.transaction(tx => {
-        tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState) values (?,?,?,?,?)',[data.task,year,month,day,0],
+        tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring) values (?,?,?,?,?,?)',[data.task,year,month,day,0,recurring?1:0],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:day, taskState:0});
+            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:day, taskState:0, recurring:recurring?1:0});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
@@ -59,6 +63,7 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
       visible={addModalVisible}
       onRequestClose={() => {
         setAddModalVisible(!addModalVisible);
+        setRecurring(false);
       }}
     > 
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible)}} activeOpacity={1}>
@@ -95,6 +100,7 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
                 },
               }}
               />
+              <Switch onValueChange={toggleSwitch} value={recurring}/>
               <Pressable onPress={handleSubmit(addTask)} style={styles.submit}><Text>CREATE</Text></Pressable>
             </View>
             <Text style={{color: 'lightgray', fontSize: 12, marginBottom:10}}>Must be up to 32 characters</Text>
