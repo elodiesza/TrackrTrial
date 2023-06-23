@@ -1,12 +1,11 @@
 import { FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
-import DaysInMonth from '../components/DaysInMonth';
 import Swiper from 'react-native-swiper';
 import TodayTasks from '../components/TodayTasks';
 
 const Today = () => {
 
   var today = new Date();
-  var nbDays = DaysInMonth(today);
+
 
 
   return (

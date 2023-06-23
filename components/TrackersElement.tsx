@@ -1,7 +1,5 @@
 import { StyleSheet, Modal, TouchableWithoutFeedback, Alert, Pressable, ScrollView, SafeAreaView, Dimensions, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
-import * as SQLite from 'expo-sqlite';
-import DaysInMonth from '../components/DaysInMonth';
 import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
@@ -10,41 +8,19 @@ import IndicatorMenu from '../modal/IndicatorMenu';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({year, month}) {
+export default function TrackersElement({db, year, month}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
   var thisDay = today.getDate();
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
-  console.warn(year,month);
 
-  const [db,setDb] = useState(SQLite.openDatabase('example.db'));
-  const [isLoading, setIsLoading] = useState(true);
   const [load, loadx] = useState(false);
   const [states, setStates] = useState([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  
-    useEffect(() => {
-      setIsLoading(true);
-      db.transaction(tx => {
-        tx.executeSql('SELECT * FROM states', null,
-        (txObj, resultSet) => setStates(resultSet.rows._array),
-        (txObj, error) => console.log('error selecting states')
-        );
-      });
-      setIsLoading(false);
-    },[load]);
-
-    if (isLoading) {
-      return (
-        <View>
-          <Text> Is Loading...</Text>
-        </View>
-      )
-    }
 
     const removeDb = () => {
       db.transaction(tx => {

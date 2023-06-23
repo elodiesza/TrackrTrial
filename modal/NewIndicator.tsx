@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Platform, Modal, Span, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
+import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
-import DaysInMonth from '../components/DaysInMonth';
-import * as SQLite from 'expo-sqlite';
 
 
 function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, states, setStates}) {
@@ -12,7 +10,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
   var today = new Date();
   var month = today.getMonth();
   var year = today.getFullYear();
-  var nbDaysThisMonth = DaysInMonth(today);
+  const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
 
   useEffect(() => {
@@ -40,7 +38,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
 
   const addState = (data) => {
     let existingStates = [...states];    
-    for (let i=1; i<=nbDaysThisMonth; i++) {
+    for (let i=1; i<=DaysInMonth(year,month); i++) {
       db.transaction(tx => {
         tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',[data.name,year,month,i,0],
           (txtObj,resultSet)=> {    

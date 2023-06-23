@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
-import DaysInMonth from '../components/DaysInMonth';
 import * as SQLite from 'expo-sqlite';
 
 
@@ -13,7 +12,6 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
   var day = today.getDate();
   var month = today.getMonth();
   var year = today.getFullYear();
-  var nbDaysThisMonth = DaysInMonth(today);
 
 
   useEffect(() => {
