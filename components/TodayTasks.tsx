@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
+import { StyleSheet, Button, TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
 import NewTask from '../modal/NewTask';
@@ -139,7 +139,8 @@ export default function TodayTasks() {
     setDate(new Date(date.setDate(date.getDate()-1)));
   };
 
-  const data = tasks.filter(c=>c.day==date.getDate());
+  const dailyData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==0));
+  const recurringData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==1));
 
   const DeleteItem = ({ id }) => (
     <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
@@ -181,12 +182,24 @@ export default function TodayTasks() {
             TODAY'S TASKS
           </Text>
         </View>
-        <SwipeListView data={data} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
+        <SwipeListView style={styles.dailyTasks} data={dailyData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-80}
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
+        <View style={styles.tasktitle}>
+          <Text style={styles.titletext}>
+            DAILY RECURRING TASKS
+          </Text>
+        </View>
+        <SwipeListView style={styles.recurringTasks} data={recurringData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
+          renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
+          rightOpenValue={-80}
+          disableRightSwipe={true}
+          closeOnRowBeginSwipe={true}
+        />
+        <Button title='remove Table' onPress={removeDb} />
       </View>
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
@@ -254,5 +267,11 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontWeight: 'bold',
     textAlignVertical: 'center',
+  },
+  dailyTasks:{
+    flex:4,
+  },
+  recurringTasks:{
+    flex:1,
   }
 });
