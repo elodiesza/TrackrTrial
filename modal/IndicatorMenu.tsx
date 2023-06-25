@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,  useEffect } from 'react';
 import { StyleSheet, Modal, Alert, TouchableWithoutFeedback, Pressable, TouchableOpacity, Text, View } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import IsLoading from './IsLoading';
@@ -7,6 +7,22 @@ import IsLoading from './IsLoading';
 const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setStates, states, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [displayLeft, setDisplayLeft] = useState<"none" | "flex" | undefined>('flex');
+    const [displayRight, setDisplayRight] = useState<"none" | "flex" | undefined>('flex');
+
+    useEffect(() => {
+      if([...states].filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
+        setDisplayLeft('none');
+      }
+    },[data]);
+    useEffect(() => {
+      const lastPlace = [...states].filter(c=>c.day==1).map(c=>c.place).length-1;
+      console.warn(lastPlace);
+      if([...states].filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==lastPlace){
+        setDisplayRight('none');
+      }
+    },[data]);
+    
 
     const deleteState = (name) => {
       setIsLoading(true);
@@ -51,18 +67,20 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
     }; 
 
     const moveLeft = (name) => {
-      console.warn(name);
+      setIsLoading(true);
       let existingStates = [...states];
-      const newPlace = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0]-1;
+      const nameList = existingStates.filter(c=>c.day==1).map(c=>c.name);
+      const nameIndex = nameList.indexOf(name);
+      const previousName = nameList[nameIndex-1];
+      const newPlace2 = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
+      const newPlace = existingStates.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
       const impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
-      console.warn('new place ' + newPlace + 'days '+ impactedDays);
       db.transaction(tx=> {
         tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
           (txObj, resultSet) => {
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet.rowsAffected > 0) {
                 const indexToUpdate = existingStates.findIndex(c => (c.name===name && c.day===i));
-                console.warn(indexToUpdate);
                 existingStates[indexToUpdate].place = newPlace;
                 setStates(existingStates);
               }
@@ -71,8 +89,23 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
           (txObj, error) => console.log('Error updating data', error)
         );
       });
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace2, previousName],
+          (txObj, resultSet2) => {
+            for (var i=1; i<impactedDays+1;i++){
+            if (resultSet2.rowsAffected > 0) {
+                const indexToUpdate2 = [...existingStates].findIndex(c => (c.name===previousName && c.day===i));
+                [...existingStates][indexToUpdate2].place = newPlace2;
+                setStates([...existingStates]);
+              }
+            }
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
       setModalVisible(!modalVisible);
       loadx(!loadx);
+      setIsLoading(false);
     };
 
     return(
@@ -88,15 +121,11 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
           <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setModalVisible(!modalVisible)}} activeOpacity={1}>
             <TouchableWithoutFeedback>
               <View style={styles.dialogBox}>
-              <Pressable onPress={()=>moveLeft(data)} >
-                <Feather name="chevron-left" size={25} color={'gray'}
-                  
-                />
+              <Pressable onPress={()=>moveLeft(data)} style={{display: displayLeft}}>
+                <Feather name="chevron-left" size={25} color={'gray'}/>
               </Pressable>
               <Pressable >
-                <Feather name="chevron-right" size={25} color={'gray'}
-  
-                />
+                <Feather name="chevron-right" size={25} color={'gray'} style={{display: displayRight}}/>
               </Pressable>
               <Pressable>
                 <Feather name="edit" size={25}/>
