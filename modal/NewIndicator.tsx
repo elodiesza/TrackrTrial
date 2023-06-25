@@ -1,32 +1,42 @@
 import { useState, useEffect } from 'react';
-import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
+import { Platform, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
+import TagPicker from '../components/TagPicker';
 
 
-function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, states, setStates}) {
+function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, states, setStates, tags, setTags}) {
 
   const [isLoading, setIsLoading] = useState(true);
   const {control, handleSubmit, reset} = useForm();
+  const [tagDisplay, setTagDisplay] = useState<"none" | "flex" | undefined>('none');
+  const [addTag, setAddTag] = useState('Add Tag');
+  const [selectedTag, setSelectedTag] = useState(null)
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([]);    
+  const [tagIndex, setTagIndex] = useState(0); 
+  
+
+  const [type, setType] = useState(0);
   var today = new Date();
   var month = today.getMonth();
   var year = today.getFullYear();
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
+  const existingtag = (tag: string) => selectedTag=== ('Add a new Tag') ? tags.map(c=>c.tag).includes(tag) === false : true || 'this Tag already exists';
+
 
   useEffect(() => {
 
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, UNIQUE(name,year,month,day))')
-    });
-
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM states', null,
-      (txObj, resultSet) => setStates(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting states')
-      );
-    });
-
+    let existingTags = [...tags];
+    let newArray=existingTags.map((item) => {
+      return {label: item.tag, value: item.tag}})
+    setItems(newArray)
     setIsLoading(false);
+
+    console.warn(states.filter(c=>c.day==1));
+    console.warn(tags);
+
   },[load]);
 
 
@@ -36,22 +46,110 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
     }
   }, [addModalVisible, reset]);
 
-  const addState = (data) => {
-    let existingStates = [...states];    
-    for (let i=1; i<=DaysInMonth(year,month); i++) {
-      db.transaction(tx => {
-        tx.executeSql('INSERT INTO states (name,year,month,day,state) values (?,?,?,?,?)',[data.name,year,month,i,0],
-          (txtObj,resultSet)=> {    
-            existingStates.push({ id: resultSet.insertId, name: data.name, year:year, month:month, day:i, state:0});
-            setStates(existingStates);
-          },
-          (txtObj, error) => console.warn('Error inserting data:', error)
-        );
-      });
+
+  const addState = async (data) => {
+    let existingTags = [...tags];
+    let existingStates = [...states]; 
+    var newPlace = existingStates.filter(c => c.day === 1).map(c => c.name).length;
+    if(addTag=='Add Tag' || (selectedTag==null && selectedTag!=='Add a new Tag')){
+      for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
+        db.transaction((tx) => {
+            tx.executeSql(
+              'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              [data.name, year, month, i, 0, type, 0, newPlace],
+              (txtObj, stateResultSet) => {
+                const newStateId = stateResultSet.insertId;
+                const newState = {
+                  id: newStateId,
+                  name: data.name,
+                  year: year,
+                  month: month,
+                  day: i,
+                  state: 0,
+                  type: type,
+                  tag: 0,
+                  place: newPlace,
+                };
+                existingStates.push(newState);
+                setStates(existingStates); // Update the state with the new array of states
+              }
+            );
+        });
+      }
     }
+    else if (addTag=='Delete Tag' && selectedTag!=='Add a new Tag'){
+      const tempTag = existingTags.filter(c=>c.tag==selectedTag).map(c=>c.id)[0];
+      for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
+        db.transaction((tx) => {
+            tx.executeSql(
+              'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              [data.name, year, month, i, 0, type, tempTag, newPlace],
+              (txtObj, stateResultSet) => {
+                const newStateId = stateResultSet.insertId;
+                const newState = {
+                  id: newStateId,
+                  name: data.name,
+                  year: year,
+                  month: month,
+                  day: i,
+                  state: 0,
+                  type: type,
+                  tag: tempTag,
+                  place: newPlace,
+                };
+                existingStates.push(newState);
+                setStates(existingStates); // Update the state with the new array of states
+              }
+            );
+        });
+      }
+    }
+    else {
+      try {
+        // Update the tags table
+        await db.transaction(async (tx) => {
+          tx.executeSql(
+            'INSERT INTO tags (tag, color) VALUES (?, ?)',
+            [data.tag, '#ffffff'],
+            (txtObj, tagResultSet) => {
+              const tagId = tagResultSet.insertId;
+              existingTags.push({ id: tagId, tag: data.tag, color: '#ffffff' });
+              setTags(existingTags); // Update the state with the new array of tags
+              for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
+                db.transaction((tx) => {
+                  tx.executeSql(
+                    'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [data.name, year, month, i, 0, type, tagId, newPlace],
+                    (txtObj, stateResultSet) => {
+                      const newStateId = stateResultSet.insertId;
+                      const newState = {
+                        id: newStateId,
+                        name: data.name,
+                        year: year,
+                        month: month,
+                        day: i,
+                        state: 0,
+                        type: type,
+                        tag: tagId,
+                        place: newPlace,
+                      };
+                      existingStates.push(newState);
+                      setStates(existingStates); // Update the state with the new array of states
+                    }
+                  );
+                });
+              }
+            }
+          );
+        });
+      } catch (error) {
+        console.warn('Error inserting data:', error);
+      }
+    }
+
     setAddModalVisible(false);
     loadx(!load);
-  }
+  };
 
 
   return (
@@ -66,7 +164,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible)}} activeOpacity={1}>
         <TouchableWithoutFeedback>
           <View style={styles.container}>
-            <View style={styles.minicontainer}>
               <Text>Insert new Indicator</Text>
               <Controller
               control= {control}
@@ -104,8 +201,54 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                 }
               }}
               />
+              <View style={styles.typeContainer}>
+                <Pressable onPress={type => setType(2)} style={[styles.type,{borderWidth: type===2 ? 1 : 0, backgroundColor: type===2 ? '#FFD1D1' : 'transparent'}]}>
+                    <Text>Bad</Text>
+                </Pressable>
+                <Pressable onPress={type => setType(0)} style={[styles.type,{borderWidth: type===0 ? 1 : 0, backgroundColor: type===0 ? '#F4F9FA' : 'transparent'}]}>
+                    <Text>Neutral</Text>
+                </Pressable>
+                <Pressable onPress={type => setType(1)} style={[styles.type,{borderWidth: type===1 ? 1 : 0, backgroundColor: type===1 ? 'palegreen' : 'transparent'}]}>
+                    <Text>Good</Text>
+                </Pressable>
+              </View>
+              <Button title={addTag} onPress={() => (setAddTag(addTag==='Add Tag' ? 'Delete Tag': 'Add Tag'), setTagDisplay(tagDisplay==='none' ? 'flex': 'none'))}/>
+              <View style={{display: tagDisplay, width:'70%', justifyContent: 'center'}}>
+                  <Controller
+                    control= {control}
+                    name="tag"
+                    render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
+                      <>
+                      <View style={[styles.input,{width:'100%', marginTop: 5, display: selectedTag == 'Add a new Tag' ? 'flex' : 'none'}]}>
+                        <TextInput
+                          value={selectedTag !== (null || 'Add a new Tag')? selectedTag:value}
+                          onChangeText={onChange}
+                          autoCapitalize = {"characters"}
+                          onBlur={onBlur}
+                          style={[{height:40},{borderColor: error ? 'red' : '#e8e8e8'}]}
+                        />
+                      </View>
+                      {error && (
+                      <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
+                      )}
+                      </>
+                    )}
+                    rules={{
+                      required: (selectedTag==='Add a new Tag' && addTag==='Delete Tag') ? 'Input a Tag' : false,
+                      minLength: {
+                          value: 3,
+                          message: 'Task should be at least 3 characters long',
+                      },
+                      maxLength: {
+                          value: 18,
+                          message: 'Task should be max 18 characters long',
+                      },
+                      validate: existingtag || 'This tag already exists'
+                    }}
+                  />
+                <TagPicker load={load} loadx={loadx} tags={tags} selectedTag={selectedTag} setSelectedTag={setSelectedTag}/>
+              </View>
               <Pressable onPress={handleSubmit(addState)} style={styles.submit}><Text>CREATE</Text></Pressable>
-            </View>
             <Text style={{color: 'lightgray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
           </View> 
         </TouchableWithoutFeedback>
@@ -118,21 +261,14 @@ export default NewIndicator;
 
 const styles = StyleSheet.create({
   container: {
-    height: 200,
-    width: 250,
+    width: '70%',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: 'lightgray',
     borderRadius: 10,
-  },
-  minicontainer: {
-    flex:2,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 0,
+    paddingVertical: 15,
   },
   title: {
     fontSize: 20,
@@ -157,5 +293,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
+  type: {
+    flex: 1/3, 
+    alignItems:'center', 
+    justifyContent: 'center', 
+    height: 30,
+    borderColor: 'lightgray', 
+    borderRadius: 10,
+  },
+  typeContainer: {
+    width: '70%',
+    flexDirection:'row',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 10,
+    marginVertical: 5,
+  },
 });
+
 

@@ -8,7 +8,7 @@ import IndicatorMenu from '../modal/IndicatorMenu';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month}) {
+export default function TrackersElement({db, year, month, load, loadx, setStates, states, tags, setTags}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -16,8 +16,6 @@ export default function TrackersElement({db, year, month}) {
   var thisDay = today.getDate();
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
-  const [load, loadx] = useState(false);
-  const [states, setStates] = useState([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -26,25 +24,21 @@ export default function TrackersElement({db, year, month}) {
       db.transaction(tx => {
         tx.executeSql('DROP TABLE IF EXISTS states', null,
           (txObj, resultSet) => setStates([]),
-          (txObj, error) => console.log('error selecting states')
+          (txObj, error) => console.log('error deleting states')
+        );
+      });
+      loadx(!load);
+    }
+    const removeTagsDb = () => {
+      db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS tags', null,
+          (txObj, resultSet) => setTags([]),
+          (txObj, error) => console.log('error deleting tags')
         );
       });
       loadx(!load);
     }
 
-    const deleteState = (name) => {
-      db.transaction(tx=> {
-        tx.executeSql('DELETE FROM states WHERE name = ?', [name],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              let existingStates = [...states].filter(state => state.name !==name);
-              setStates(existingStates);
-            }
-          },
-          (txObj, error) => console.log(error)
-        );       
-      });      
-    };
 
     const updateState = (id) => {
       let existingStates=[...states];
@@ -105,6 +99,9 @@ export default function TrackersElement({db, year, month}) {
             index={ind.id}
             month={month}
             year={year}
+            db={db}
+            setStates={setStates}
+            states={states}
           />
         </View>
       )   
@@ -151,7 +148,8 @@ export default function TrackersElement({db, year, month}) {
         </View>
       </ScrollView >
       </View>
-      <Button title='remove Table' onPress={removeDb} />
+      <Button title='remove Indicators' onPress={removeDb} />
+      <Button title='remove Tags' onPress={removeTagsDb} />
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
       </ TouchableOpacity> 
@@ -163,6 +161,8 @@ export default function TrackersElement({db, year, month}) {
         db={db}
         states={states}
         setStates={setStates}
+        tags={tags}
+        setTags={setTags}
       />
     </SafeAreaView>
   );

@@ -21,15 +21,28 @@ const Trackers = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [load, loadx] = useState(false);
   const [states, setStates] = useState([]);
+  const [tags, setTags] = useState([]);
   const [firstMonth, setFirstMonth] = useState(false);
   const [lastMonth, setLastMonth] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
     db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, tag INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
+    });
+    db.transaction(tx => {
       tx.executeSql('SELECT * FROM states', null,
       (txObj, resultSet) => setStates(resultSet.rows._array),
       (txObj, error) => console.log('error selecting states')
+      );
+    });
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, tag TEXT, color TEXT, UNIQUE(tag))')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM tags', null,
+      (txObj, resultSet) => setTags(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting tags')
       );
     });
     if (states.filter(c=>(c.year==year && c.month==month-1)).length==0) {
@@ -150,7 +163,16 @@ const Trackers = () => {
           <Feather name='chevron-right' size={40} style={{left:30}} color={lastMonth?'lightgray':'black'}/>
         </Pressable>
       </View>
-      <TrackersElement db={db} year={year} month={month}/>
+      <TrackersElement 
+      db={db} 
+      year={year} 
+      month={month} 
+      load={load} 
+      loadx={loadx} 
+      setStates={setStates} 
+      states={states}
+      tags={tags}
+      setTags={setTags}/>
     </SafeAreaView>
   );
 }
