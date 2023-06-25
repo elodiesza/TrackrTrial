@@ -34,9 +34,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
     setItems(newArray)
     setIsLoading(false);
 
-    console.warn(states.filter(c=>c.day==1));
-    console.warn(tags);
-
   },[load]);
 
 

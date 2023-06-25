@@ -1,24 +1,76 @@
 import React, { useState } from 'react';
 import { StyleSheet, Modal, Alert, TouchableWithoutFeedback, Pressable, TouchableOpacity, Text, View } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
+import IsLoading from './IsLoading';
 
 
 const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setStates, states, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const deleteState = (name) => {
-      db.transaction(tx => {
-        tx.executeSql('DELETE FROM states WHERE name = ?', [name],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              let existingStates = [...states].filter(state => state.name !== name);
-              setStates(existingStates);
+      setIsLoading(true);
+      let existingStates = [...states];
+      const currentPlace = existingStates.filter((state) => state.name === name && state.day === 1).map((state) => state.place)[0];
+      let remainingStates = existingStates.filter((state) => state.name !== name);
+    
+      db.transaction((tx) => {
+        tx.executeSql(
+          'DELETE FROM states WHERE name = ?',
+          [name],
+          (txObj, deleteResultSet) => {
+            if (deleteResultSet.rowsAffected > 0) {
+              setStates(remainingStates);
+              for (var i = 0; i < [...remainingStates].length; i++) {
+                if([...remainingStates][i].place>currentPlace){
+                  let newPlace = [...remainingStates][i].place - 1;
+                  let iDtoUpdate = [...remainingStates][i].id;
+                  db.transaction((tx) => {
+                    tx.executeSql(
+                      'UPDATE states SET place = ? WHERE id = ?',
+                      [newPlace, iDtoUpdate],
+                      (txObj, placeResultSet) => {
+                        if (placeResultSet.rowsAffected > 0 && remainingStates[i]) {
+                          [...remainingStates][i].place = newPlace;
+                          setStates([...remainingStates]);
+                        }
+                      },
+                      (txObj, error) => console.log('Error updating data', error)
+                    );
+                  });
+                }
+              }
             }
           },
           (txObj, error) => console.log(error)
         );
       });
-      setDeleteModalVisible(!deleteModalVisible);
+      setModalVisible(false);
+      loadx(!load);
+      setIsLoading(false);
+    }; 
+
+    const moveLeft = (name) => {
+      console.warn(name);
+      let existingStates = [...states];
+      const newPlace = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0]-1;
+      const impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
+      console.warn('new place ' + newPlace + 'days '+ impactedDays);
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
+          (txObj, resultSet) => {
+            for (var i=1; i<impactedDays+1;i++){
+            if (resultSet.rowsAffected > 0) {
+                const indexToUpdate = existingStates.findIndex(c => (c.name===name && c.day===i));
+                console.warn(indexToUpdate);
+                existingStates[indexToUpdate].place = newPlace;
+                setStates(existingStates);
+              }
+            }
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
       setModalVisible(!modalVisible);
       loadx(!loadx);
     };
@@ -36,7 +88,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
           <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setModalVisible(!modalVisible)}} activeOpacity={1}>
             <TouchableWithoutFeedback>
               <View style={styles.dialogBox}>
-              <Pressable >
+              <Pressable onPress={()=>moveLeft(data)} >
                 <Feather name="chevron-left" size={25} color={'gray'}
                   
                 />
@@ -84,6 +136,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
                     </View>
                   </TouchableWithoutFeedback>
                 </TouchableOpacity>
+                <IsLoading isLoading={isLoading}/>
               </Modal>
         </Modal>
   );};
