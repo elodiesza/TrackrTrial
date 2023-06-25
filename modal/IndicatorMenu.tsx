@@ -11,17 +11,16 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
     const [displayRight, setDisplayRight] = useState<"none" | "flex" | undefined>('flex');
 
     useEffect(() => {
-      if([...states].filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
+      if(states.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
         setDisplayLeft('none');
       }
-    },[data]);
+    },[load]);
     useEffect(() => {
-      const lastPlace = [...states].filter(c=>c.day==1).map(c=>c.place).length-1;
-      console.warn(lastPlace);
-      if([...states].filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==lastPlace){
+      const lastPlace = states.filter(c=>c.day==1).map(c=>c.place).length-1;
+      if(states.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==lastPlace){
         setDisplayRight('none');
       }
-    },[data]);
+    },[load]);
     
 
     const deleteState = (name) => {
@@ -69,20 +68,25 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
     const moveLeft = (name) => {
       setIsLoading(true);
       let existingStates = [...states];
+      let sortedStates = [...states];
       const nameList = existingStates.filter(c=>c.day==1).map(c=>c.name);
       const nameIndex = nameList.indexOf(name);
       const previousName = nameList[nameIndex-1];
       const newPlace2 = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
       const newPlace = existingStates.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
+      const toMoveLeft = existingStates.filter(c=>c.name==name);
+      const toMoveLeftIndex = existingStates.indexOf(name);
+      const toMoveRight = existingStates.filter(c=>c.name==previousName);
+      const toMoveRightIndex = existingStates.indexOf(previousName);
       const impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
       db.transaction(tx=> {
         tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
           (txObj, resultSet) => {
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet.rowsAffected > 0) {
-                const indexToUpdate = existingStates.findIndex(c => (c.name===name && c.day===i));
-                existingStates[indexToUpdate].place = newPlace;
-                setStates(existingStates);
+                sortedStates[toMoveRightIndex-1+i] = existingStates[toMoveLeftIndex-1+i];
+                setStates(sortedStates);
+                
               }
             }
           },
@@ -94,11 +98,12 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
           (txObj, resultSet2) => {
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet2.rowsAffected > 0) {
-                const indexToUpdate2 = [...existingStates].findIndex(c => (c.name===previousName && c.day===i));
-                [...existingStates][indexToUpdate2].place = newPlace2;
-                setStates([...existingStates]);
+                [...sortedStates][toMoveLeftIndex-1+i] = existingStates[toMoveRightIndex-1+i];
+                console.warn([...sortedStates][toMoveLeftIndex-1+i]);
               }
             }
+            setStates([...sortedStates]);
+            console.warn([...sortedStates]);
           },
           (txObj, error) => console.log('Error updating data', error)
         );
