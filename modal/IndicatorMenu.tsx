@@ -121,6 +121,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
           onRequestClose={() => {
             Alert.alert("Modal has been closed.");
             setModalVisible(!modalVisible);
+            loadx(!load);
           }}
         >
           <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setModalVisible(!modalVisible)}} activeOpacity={1}>
@@ -147,8 +148,8 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
                 transparent={true}
                 visible={deleteModalVisible}
                 onRequestClose={() => {
-                  Alert.alert("Modal has been closed.");
                   setDeleteModalVisible(!deleteModalVisible);
+                  loadx(!load);
                 }}
               >
                 <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setDeleteModalVisible(!deleteModalVisible)}} activeOpacity={1}>

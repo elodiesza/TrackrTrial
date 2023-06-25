@@ -132,6 +132,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                       };
                       existingStates.push(newState);
                       setStates(existingStates); // Update the state with the new array of states
+                      loadx(!load);
                     }
                   );
                 });
@@ -155,6 +156,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
       visible={addModalVisible}
       onRequestClose={() => {
         setAddModalVisible(!addModalVisible);
+        loadx(!load);
       }}
     > 
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible)}} activeOpacity={1}>
