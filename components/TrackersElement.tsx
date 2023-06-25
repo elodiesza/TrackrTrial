@@ -102,6 +102,8 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
             db={db}
             setStates={setStates}
             states={states}
+            loadx={loadx}
+            load={load}
           />
         </View>
       )   

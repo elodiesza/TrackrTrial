@@ -3,8 +3,25 @@ import { StyleSheet, Modal, Alert, TouchableWithoutFeedback, Pressable, Touchabl
 import Feather from '@expo/vector-icons/Feather';
 
 
-const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index }) => {
+const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setStates, states, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+    const deleteState = (name) => {
+      db.transaction(tx => {
+        tx.executeSql('DELETE FROM states WHERE name = ?', [name],
+          (txObj, resultSet) => {
+            if (resultSet.rowsAffected > 0) {
+              let existingStates = [...states].filter(state => state.name !== name);
+              setStates(existingStates);
+            }
+          },
+          (txObj, error) => console.log(error)
+        );
+      });
+      setDeleteModalVisible(!deleteModalVisible);
+      loadx(!loadx);
+    };
+
     return(
     <Modal
           animationType="none"
@@ -56,7 +73,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
                       </View>
                       <Text style={{color: 'gray', fontSize: 10}}>You will not be able to recover your data for this month</Text>
                       <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => deleteState(data)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
                           <Text>Delete</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {setDeleteModalVisible(!deleteModalVisible)}} style={[styles.button,{backgroundColor: '#F4F9FA'}]}>
