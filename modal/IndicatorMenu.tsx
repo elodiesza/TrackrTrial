@@ -23,47 +23,63 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
     },[load]);
     
 
-    const deleteState = (name) => {
+    const deleteState = async (name) => {
       setIsLoading(true);
       let existingStates = [...states];
       const currentPlace = existingStates.filter((state) => state.name === name && state.day === 1).map((state) => state.place)[0];
       let remainingStates = existingStates.filter((state) => state.name !== name);
     
-      db.transaction((tx) => {
-        tx.executeSql(
-          'DELETE FROM states WHERE name = ?',
-          [name],
-          (txObj, deleteResultSet) => {
-            if (deleteResultSet.rowsAffected > 0) {
-              setStates(remainingStates);
-              for (var i = 0; i < [...remainingStates].length; i++) {
-                if([...remainingStates][i].place>currentPlace){
-                  let newPlace = [...remainingStates][i].place - 1;
-                  let iDtoUpdate = [...remainingStates][i].id;
-                  db.transaction((tx) => {
-                    tx.executeSql(
-                      'UPDATE states SET place = ? WHERE id = ?',
-                      [newPlace, iDtoUpdate],
-                      (txObj, placeResultSet) => {
-                        if (placeResultSet.rowsAffected > 0 && remainingStates[i]) {
-                          [...remainingStates][i].place = newPlace;
-                          setStates([...remainingStates]);
-                        }
-                      },
-                      (txObj, error) => console.log('Error updating data', error)
-                    );
-                  });
+      await new Promise((resolve) => {
+        db.transaction((tx) => {
+          tx.executeSql(
+            'DELETE FROM states WHERE name = ?',
+            [name],
+            (txObj, deleteResultSet) => {
+              if (deleteResultSet.rowsAffected > 0) {
+                setStates(remainingStates);
+                let updatedStatesCount = 0;
+                let remainingStatesLength = remainingStates.length;
+                for (var i = 0; i < remainingStatesLength; i++) {
+                  if (remainingStates[i].place > currentPlace) {
+                    let newPlace = remainingStates[i].place - 1;
+                    let iDtoUpdate = remainingStates[i].id;
+                    db.transaction((tx) => {
+                      tx.executeSql(
+                        'UPDATE states SET place = ? WHERE id = ?',
+                        [newPlace, iDtoUpdate],
+                        (txObj, placeResultSet) => {
+                          if (placeResultSet.rowsAffected > 0 && remainingStates[i]) {
+                            remainingStates[i].place = newPlace;
+                          }
+                          updatedStatesCount++;
+                          if (updatedStatesCount === remainingStatesLength) {
+                            resolve();
+                          }
+                        },
+                        (txObj, error) => console.log('Error updating data', error)
+                      );
+                    });
+                  } else {
+                    updatedStatesCount++;
+                    if (updatedStatesCount === remainingStatesLength) {
+                      resolve();
+                    }
+                  }
                 }
+              } else {
+                resolve();
               }
-            }
-          },
-          (txObj, error) => console.log(error)
-        );
+            },
+            (txObj, error) => console.log(error)
+          );
+        });
       });
+    
+      setStates([...remainingStates]);
       setModalVisible(false);
       loadx(!load);
       setIsLoading(false);
-    }; 
+    };
 
     const moveLeft = (name) => {
       setIsLoading(true);

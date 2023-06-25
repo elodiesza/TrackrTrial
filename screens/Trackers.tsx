@@ -52,7 +52,7 @@ const Trackers = () => {
       setLastMonth(true);
     }
     setIsLoading(false);
-    console.warn(states.filter(c=>c.day==1));
+    //console.warn(states.filter(c=>c.day==1));
 
   },[load]);
 
