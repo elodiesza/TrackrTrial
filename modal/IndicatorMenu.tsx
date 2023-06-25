@@ -19,6 +19,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
         );
       });
       setDeleteModalVisible(!deleteModalVisible);
+      setModalVisible(!modalVisible);
       loadx(!loadx);
     };
 

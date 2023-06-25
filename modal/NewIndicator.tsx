@@ -146,7 +146,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
         console.warn('Error inserting data:', error);
       }
     }
-
     setAddModalVisible(false);
     loadx(!load);
   };
