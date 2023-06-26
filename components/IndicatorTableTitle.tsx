@@ -6,7 +6,7 @@ const width = Dimensions.get('window').width;
 const IndicatorTableTitle = ({name, tags, states, modalVisible, setModalVisible}) => {
 
     const IndicatorTag = states.filter(c=>(c.name==name && c.day==1)).map(c=>c.tag)[0];
-    const IndicatorColor = tags.filter(c=>c.id==IndicatorTag).map(c=>c.color)[0];
+    const IndicatorColor = IndicatorTag==0 ? 'white' : tags.filter(c=>c.id==IndicatorTag).map(c=>c.color)[0];
 
     return (
             <TouchableOpacity onPress={()=>setModalVisible(true)} style={{width:1, height:1, margin:12, left:-43}}>

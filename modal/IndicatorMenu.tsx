@@ -204,14 +204,14 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
             </TouchableWithoutFeedback>
           </TouchableOpacity>
           <Modal
-                animationType="none"
-                transparent={true}
-                visible={deleteModalVisible}
-                onRequestClose={() => {
-                  setDeleteModalVisible(!deleteModalVisible);
-                  loadx(!load);
-                }}
-              >
+            animationType="none"
+            transparent={true}
+            visible={deleteModalVisible}
+            onRequestClose={() => {
+              setDeleteModalVisible(!deleteModalVisible);
+              loadx(!load);
+            }}
+          >
                 <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setDeleteModalVisible(!deleteModalVisible)}} activeOpacity={1}>
                   <TouchableWithoutFeedback>
                     <View style={styles.deleteBox}>

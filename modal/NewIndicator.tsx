@@ -17,7 +17,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);    
   const [tagIndex, setTagIndex] = useState(0); 
-  const [picked, setPicked] = useState<string>('#DFF2F5');
+  const [picked, setPicked] = useState<string>('white');
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
 
   const colorChoice =  ['crimson','orange','yellow','yellowgreen','seagreen',
@@ -158,6 +158,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
         console.warn('Error inserting data:', error);
       }
     }
+    setPicked('white');
     setAddModalVisible(false);
     loadx(!load);
   };
