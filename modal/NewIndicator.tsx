@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Platform, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import TagPicker from '../components/TagPicker';
+import ColorPicker from '../components/ColorPicker';
+import Color from '../components/Color';
 
 
 function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, states, setStates, tags, setTags}) {
@@ -15,6 +17,18 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);    
   const [tagIndex, setTagIndex] = useState(0); 
+  const [picked, setPicked] = useState<string>('#DFF2F5');
+  const [colorPickerVisible, setColorPickerVisible] = useState(false);
+
+  const colorChoice =  ['crimson','orange','yellow','yellowgreen','seagreen',
+  'paleturquoise', 'royalblue', 'mediumorchid', 'mediumvioletred', 'pink',
+  'white', 'whitesmoke','lavender','sienna','blanchedalmond'];
+
+  const TagColor = ({item}) => (
+    <TouchableOpacity onPress={() => (setPicked(item),setColorPickerVisible(!colorPickerVisible))}>
+      <Color color={item}/>
+    </TouchableOpacity>
+  );
   
 
   const [type, setType] = useState(0);
@@ -107,10 +121,10 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
         await db.transaction(async (tx) => {
           tx.executeSql(
             'INSERT INTO tags (tag, color) VALUES (?, ?)',
-            [data.tag, '#ffffff'],
+            [data.tag, picked],
             (txtObj, tagResultSet) => {
               const tagId = tagResultSet.insertId;
-              existingTags.push({ id: tagId, tag: data.tag, color: '#ffffff' });
+              existingTags.push({ id: tagId, tag: data.tag, color: picked });
               setTags(existingTags); // Update the state with the new array of tags
               for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
                 db.transaction((tx) => {
@@ -212,6 +226,15 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
               </View>
               <Button title={addTag} onPress={() => (setAddTag(addTag==='Add Tag' ? 'Delete Tag': 'Add Tag'), setTagDisplay(tagDisplay==='none' ? 'flex': 'none'))}/>
               <View style={{display: tagDisplay, width:'70%', justifyContent: 'center'}}>
+                <View style={{width:'100%', flexDirection: 'row'}}>
+                  <View style={{width: '80%'}}>
+                    <TagPicker load={load} loadx={loadx} tags={tags} selectedTag={selectedTag} setSelectedTag={setSelectedTag}/>
+                  </View>
+                  <View style={{flex:1, alignItems: 'flex-end', justifyContent: 'center'}}>
+                    <Pressable onPress={selectedTag === 'Add a new Tag' ? colorPickerVisible => setColorPickerVisible(true): null} style={[styles.color, {backgroundColor: picked}]}/>
+                  </View>
+                  <ColorPicker TagColor={TagColor} colorChoice={colorChoice} colorPickerVisible={colorPickerVisible} setColorPickerVisible={setColorPickerVisible}/>
+                </View> 
                   <Controller
                     control= {control}
                     name="tag"
@@ -244,7 +267,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                       validate: existingtag || 'This tag already exists'
                     }}
                   />
-                <TagPicker load={load} loadx={loadx} tags={tags} selectedTag={selectedTag} setSelectedTag={setSelectedTag}/>
               </View>
               <Pressable onPress={handleSubmit(addState)} style={styles.submit}><Text>CREATE</Text></Pressable>
             <Text style={{color: 'lightgray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
@@ -307,6 +329,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 5,
   },
+  color: {
+    width: 30,
+    height: 30,
+    borderWidth: 1,
+    borderRadius: 15,
+    borderColor: 'lightgray',
+  },
+  colorPicker: {
+    flex: 1, 
+    position: 'absolute',
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: 'lightgray',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    padding: 15,
+  }
 });
 
 
