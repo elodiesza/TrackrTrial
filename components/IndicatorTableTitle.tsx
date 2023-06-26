@@ -3,11 +3,14 @@ import { View, Text, StyleSheet, Pressable,TouchableOpacity, Dimensions } from '
 
 const width = Dimensions.get('window').width;
 
-const IndicatorTableTitle = ({name, modalVisible, setModalVisible}) => {
+const IndicatorTableTitle = ({name, tags, states, modalVisible, setModalVisible}) => {
+
+    const IndicatorTag = states.filter(c=>(c.name==name && c.day==1)).map(c=>c.tag)[0];
+    const IndicatorColor = tags.filter(c=>c.id==IndicatorTag).map(c=>c.color)[0];
 
     return (
             <TouchableOpacity onPress={()=>setModalVisible(true)} style={{width:1, height:1, margin:12, left:-43}}>
-                <View style={[styles.polygon, {backgroundColor: 'white'}]} /><Text numberOfLines={1} style={styles.indText}>{name}</Text>
+                <View style={[styles.polygon, {backgroundColor: IndicatorColor}]} /><Text numberOfLines={1} style={styles.indText}>{name}</Text>
             </TouchableOpacity>
        );     
 };

@@ -89,7 +89,7 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
       return  (
         <View style={{flex:1}}>
           <Pressable style={{height: 87,transform: [{skewX: '-45deg'}], left:43, backgroundColor:'red'}}>
-            <IndicatorTableTitle name={ind.item} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+            <IndicatorTableTitle name={ind.item} tags={tags} states={states} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
           </Pressable>
           {showStates(ind.item)}
           <IndicatorMenu
