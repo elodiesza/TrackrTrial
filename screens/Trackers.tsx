@@ -52,26 +52,10 @@ const Trackers = () => {
       setLastMonth(true);
     }
     setIsLoading(false);
-    //console.warn(states.filter(c=>c.day==1));
+    console.warn(states.filter(c=>c.day==1));
 
   },[load]);
 
-{/*
-  useEffect(()=>{
-    let existingStates=[...states];
-    const lastPlace = [...states].filter(c=>c.day==1).map(c=>c.place).length;
-    const impactedDays = existingStates.filter(c=>c.place==0).map(c=>c.day).length;
-    const dataArray: never[] = [];
-    for (var i=0; i<lastPlace;i++){
-      for(var j=1; j<impactedDays+1;j++){
-        dataArray.push(existingStates.filter(c=>(c.place==i && c.day==j))[0]);
-      }
-    }
-    setStates(dataArray);
-    setIsLoading(false);
-    console.warn(dataArray.filter(c=>c.day==1));
-  },[])
-*/}
 
   if (isLoading) {
     return (

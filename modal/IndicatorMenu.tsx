@@ -85,16 +85,14 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
       setIsLoading(true);
       let existingStates = [...states];
       let sortedStates = [...states];
-      const nameList = existingStates.filter(c=>c.day==1).map(c=>c.name);
-      const nameIndex = nameList.indexOf(name);
-      const previousName = nameList[nameIndex-1];
-      const newPlace2 = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
-      const newPlace = existingStates.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
-      const toMoveLeft = existingStates.filter(c=>c.name==name);
-      const toMoveLeftIndex = existingStates.indexOf(name);
-      const toMoveRight = existingStates.filter(c=>c.name==previousName);
-      const toMoveRightIndex = existingStates.indexOf(previousName);
-      const impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
+      let nameList = existingStates.filter(c=>c.day==1).map(c=>c.name);
+      let nameIndex = nameList.indexOf(name);
+      let previousName = nameList[nameIndex-1];
+      let newPlace2 = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
+      let newPlace = existingStates.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
+      let toMoveLeftIndex = existingStates.indexOf(name);
+      let toMoveRightIndex = existingStates.indexOf(previousName);
+      let impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
       db.transaction(tx=> {
         tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
           (txObj, resultSet) => {
@@ -129,6 +127,52 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
       setIsLoading(false);
     };
 
+    const moveRight = (name) => {
+      setIsLoading(true);
+      let existingStates = [...states];
+      let sortedStates = [...states];
+      let nameList = existingStates.filter(c=>c.day==1).map(c=>c.name);
+      let nameIndex = nameList.indexOf(name);
+      let nextName = nameList[nameIndex+1];
+      let newPlace2 = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
+      let newPlace = existingStates.filter(c=>(c.name==nextName && c.day==1)).map(c=>c.place)[0];
+      let toMoveRightIndex = existingStates.indexOf(name);
+      let toMoveLeftIndex = existingStates.indexOf(nextName);
+      let impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
+          (txObj, resultSet) => {
+            for (var i=1; i<impactedDays+1;i++){
+            if (resultSet.rowsAffected > 0) {
+                sortedStates[toMoveLeftIndex-1+i] = existingStates[toMoveRightIndex-1+i];
+                setStates(sortedStates);
+                
+              }
+            }
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace2, nextName],
+          (txObj, resultSet2) => {
+            for (var i=1; i<impactedDays+1;i++){
+            if (resultSet2.rowsAffected > 0) {
+                [...sortedStates][toMoveRightIndex-1+i] = existingStates[toMoveLeftIndex-1+i];
+                console.warn([...sortedStates][toMoveRightIndex-1+i]);
+              }
+            }
+            setStates([...sortedStates]);
+            console.warn([...sortedStates]);
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
+      setModalVisible(!modalVisible);
+      loadx(!loadx);
+      setIsLoading(false);
+    };
+
     return(
     <Modal
           animationType="none"
@@ -146,8 +190,8 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
               <Pressable onPress={()=>moveLeft(data)} style={{display: displayLeft}}>
                 <Feather name="chevron-left" size={25} color={'gray'}/>
               </Pressable>
-              <Pressable >
-                <Feather name="chevron-right" size={25} color={'gray'} style={{display: displayRight}}/>
+              <Pressable onPress={()=>moveRight(data)} style={{display: displayRight}}>
+                <Feather name="chevron-right" size={25} color={'gray'}/>
               </Pressable>
               <Pressable>
                 <Feather name="edit" size={25}/>
