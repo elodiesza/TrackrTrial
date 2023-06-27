@@ -46,7 +46,10 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
     let newArray=existingTags.map((item) => {
       return {label: item.tag, value: item.tag}})
     setItems(newArray)
+
+    console.warn(selectedTag);
     setIsLoading(false);
+
 
   },[load]);
 
@@ -232,7 +235,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                     <TagPicker load={load} loadx={loadx} tags={tags} selectedTag={selectedTag} setSelectedTag={setSelectedTag}/>
                   </View>
                   <View style={{flex:1, alignItems: 'flex-end', justifyContent: 'center'}}>
-                    <Pressable onPress={selectedTag === 'Add a new Tag' ? colorPickerVisible => setColorPickerVisible(true): null} style={[styles.color, {backgroundColor: picked}]}/>
+                    <Pressable onPress={selectedTag === 'Add a new Tag' ? colorPickerVisible => setColorPickerVisible(true): null} style={[styles.color, {backgroundColor: selectedTag!==null ? (selectedTag=='Add a new Tag' ? picked : tags.filter(c=>c.tag==selectedTag).map(c=>c.color)[0]):'white'}]}/>
                   </View>
                   <ColorPicker TagColor={TagColor} colorChoice={colorChoice} colorPickerVisible={colorPickerVisible} setColorPickerVisible={setColorPickerVisible}/>
                 </View> 

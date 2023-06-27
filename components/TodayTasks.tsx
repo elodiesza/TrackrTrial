@@ -6,11 +6,12 @@ import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import moment from 'moment';
+import Color from './Color';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function TodayTasks() {
+export default function TodayTasks({tags, setTags}) {
   const today = new Date();
   const month = today.getMonth();
   const year = today.getFullYear();
@@ -47,7 +48,7 @@ export default function TodayTasks() {
         );
       });
 
-      
+      console.warn(tasks);
       setIsLoading(false);
     },[load]);
     
@@ -220,10 +221,13 @@ export default function TodayTasks() {
               'arrow-right-bold-box-outline')
             )} size={35} />
           </Pressable>
-          <View style={styles.tasktext}>
+          <View style={{flex:6}}>
             <Text style={styles.tasktext}>
               {item.task}
             </Text>
+          </View>
+          <View style={{flex:1}}>
+            <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />
           </View>
         </View>
     )
@@ -311,6 +315,8 @@ export default function TodayTasks() {
         db={db}
         tasks={tasks}
         setTasks={setTasks}
+        tags={tags}
+        setTags={setTags}
       />
     </>
   );
@@ -352,6 +358,7 @@ const styles = StyleSheet.create({
   tasktext: {
     textAlign:'left',
     marginLeft: 5,
+    textAlignVertical: 'center',
   },
   tasktitle: {
     width: width,
