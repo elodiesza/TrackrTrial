@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useState } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
@@ -8,7 +8,7 @@ import MonthlyTasks from '../components/MonthlyTasks';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day}) {
+export default function CalendarElement({year, month, day, tasks, tags}) {
 
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [statex, setStatex] = useState(false);
@@ -82,6 +82,13 @@ export default function CalendarElement({year, month, day}) {
 
   var daysLines = [line1,line2,line3,line4,line5(),line6()];
 
+  const monthTodo = (tasks, year, month, day) => {
+    if(day>0 && day<32) {
+      return(tasks.filter(
+        c=>(c.year==year && c.month==month && c.day==day)
+      ))
+    }
+  };
 
   const CalendarCell = (date) => {
     return(
@@ -89,7 +96,10 @@ export default function CalendarElement({year, month, day}) {
         <View style={{height:15, flex:1}}>
           <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
         </View>
-        
+        <View style={{flex:1, justifyContent: 'flex-end'}}>
+          <FlatList data={monthTodo(tasks, year, month, date)}
+          horizontal={false} scrollEnabled={false} renderItem={RenderTaskItem} bounces={false} />
+        </View>
       </View>
     )
   }
@@ -107,6 +117,17 @@ export default function CalendarElement({year, month, day}) {
       </View>
     )
   }
+
+  const CalendarTaskItem = ({task, tag}) => (
+    <>
+      <TouchableOpacity style={[styles.task,{backgroundColor: tags.filter(c=>c.id==tag).map(c=>c.color)[0]}]}>
+        <Text style={{fontSize:10}}>{task}</Text>
+      </TouchableOpacity>
+    </>
+  );
+  const RenderTaskItem = ({item}) => (
+    <CalendarTaskItem task={item.task} tag={item.tag} />
+  );
 
   return (
     <View style={styles.container}>
@@ -144,4 +165,11 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     justifyContent: 'center',
   },
+  task: {
+    width: width/7-1,
+    height: 14,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 2,
+  }
 });

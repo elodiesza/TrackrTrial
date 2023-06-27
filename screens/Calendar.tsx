@@ -1,18 +1,20 @@
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
 import Swiper from 'react-native-swiper'
 import MonthlyTasks from '../components/MonthlyTasks';
 import CalendarElement from '../components/CalendarElement';
+import * as SQLite from 'expo-sqlite';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
 export default function Calendar() {
-
+  const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [addTodoVisible, setAddTodoVisible] = useState(false);
-  const [statex, setStatex] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [load, loadx] = useState(false);
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -21,6 +23,8 @@ export default function Calendar() {
   const [month,setMonth] = useState(thisMonth);
   const [year,setYear] = useState(thisYear);
   const [day, setDay] = useState(thisDay);
+  const [tasks, setTasks] = useState([]);
+  const [tags, setTags] = useState([]);
 
   const LastMonth = () => {
     if (month==0){
@@ -41,6 +45,43 @@ export default function Calendar() {
     }
   };
 
+  useEffect(() => {
+
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM tasks', null,
+      (txObj, resultSet) => setTasks(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting tasks')
+      );
+    });
+
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+    });
+
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, tag TEXT, color TEXT, UNIQUE(tag))')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM tags', null,
+      (txObj, resultSet) => setTags(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting tags')
+      );
+    });
+
+    setIsLoading(false);
+
+  },[load]);
+
+
+  if (isLoading) {
+    return (
+      <View>
+        <Text> Is Loading...</Text>
+      </View>
+    )
+  }
+
+
   return (
     <View style={styles.container}>
        <View style={styles.header}>
@@ -55,7 +96,7 @@ export default function Calendar() {
           <Feather name='chevron-right' size={40} style={{left:30}}/>
         </Pressable>
       </View>
-      <CalendarElement year={year} month={month} day={day}/>
+      <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags}/>
     </View>
   );
 }
