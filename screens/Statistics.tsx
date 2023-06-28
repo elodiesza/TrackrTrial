@@ -1,59 +1,24 @@
 import { FlatList, SafeAreaView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useEffect, useState } from 'react';
-import * as SQLite from 'expo-sqlite';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 import LastMonth from '../components/LastMonth';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = () => {
+const Statistics = ({db, states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
   var thisDay = today.getDate();
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
-  const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [month,setMonth] = useState(thisMonth);
   const [year,setYear] = useState(thisYear);
   const [day, setDay] = useState(thisDay);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [load, loadx] = useState(false);
-  const [states, setStates] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [firstMonth, setFirstMonth] = useState(false);
-  const [lastMonth, setLastMonth] = useState(false);
 
-  useEffect(() => {
-    setIsLoading(true);
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, tag INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
-    });
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM states ORDER BY place,day;', null,
-      (txObj, resultSet) => setStates(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting states')
-      );
-    });
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, tag TEXT, color TEXT, UNIQUE(tag))')
-    });
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM tags', null,
-      (txObj, resultSet) => setTags(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting tags')
-      );
-    });
-    if (states.filter(c=>(c.year==year && c.month==month-1)).length==0) {
-      setFirstMonth(true);
-    }
-    if (states.filter(c=>(c.year==year && c.month==month+1)).length==0) {
-      setLastMonth(true);
-    }
-    setIsLoading(false);
-
-  },[load]);
 
   const NextMonth = () => {
     if (month==11){

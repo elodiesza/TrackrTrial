@@ -2,7 +2,6 @@ import { StyleSheet, Modal, TouchableWithoutFeedback, Alert, Pressable, ScrollVi
 import React, { useState, useCallback, useEffect } from 'react';
 import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
-import moment from 'moment';
 import NewIndicator from '../modal/NewIndicator';
 import IndicatorMenu from '../modal/IndicatorMenu';
 
@@ -108,8 +107,6 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
         </View>
       );
     };
-    
-    
     
 
     const showNumber = (day) => {

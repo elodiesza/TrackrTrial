@@ -111,7 +111,7 @@ useEffect(() => {
             <Feather name="check-square" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" component={Today} 
+        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -125,7 +125,7 @@ useEffect(() => {
             <Feather name="calendar" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Settings" component={Settings} 
+        <Tab.Screen name="Settings" children={()=><Statistics db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth}/>} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
