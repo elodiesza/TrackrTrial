@@ -48,7 +48,6 @@ export default function TodayTasks({tags, setTags}) {
         );
       });
 
-      console.warn(tasks);
       setIsLoading(false);
     },[load]);
     
