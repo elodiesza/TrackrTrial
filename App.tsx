@@ -97,7 +97,7 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Today">
-        <Tab.Screen name="Statistics" component={Statistics} 
+        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth}/>} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -125,7 +125,7 @@ useEffect(() => {
             <Feather name="calendar" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Settings" children={()=><Statistics db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth}/>} 
+        <Tab.Screen name="Settings" component={Settings}
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>

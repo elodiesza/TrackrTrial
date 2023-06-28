@@ -6,7 +6,7 @@ import LastMonth from '../components/LastMonth';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({db, states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth}) => {
+const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -18,7 +18,6 @@ const Statistics = ({db, states, tags, setStates, setTags, firstMonth, lastMonth
   const [day, setDay] = useState(thisDay);
   const [isLoading, setIsLoading] = useState(false);
   const [load, loadx] = useState(false);
-
 
   const NextMonth = () => {
     if (month==11){
@@ -62,6 +61,7 @@ const Statistics = ({db, states, tags, setStates, setTags, firstMonth, lastMonth
     }
   };
 
+
   const IndList = ({item}) => {
     let gauge=0;
     for (var i=0;i<DaysInMonth(year,month);i++){
@@ -80,6 +80,15 @@ const Statistics = ({db, states, tags, setStates, setTags, firstMonth, lastMonth
       </View>
     );
   };
+
+  if (!states || states.length === 0) {
+    // Render loading state or placeholder component
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
