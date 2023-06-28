@@ -77,7 +77,7 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=> updateState(state.id)}>
-              <View style={[styles.cell, { backgroundColor : filteredStates[index].state==1 ? 'black' : 'white' }]} />
+              <View style={[styles.cell, { backgroundColor : filteredStates[index].state==1 ? '#242424' : 'white' }]} />
             </TouchableOpacity>
           </View>
         )

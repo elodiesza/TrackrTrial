@@ -5,15 +5,13 @@ import moment from 'moment';
 import Swiper from 'react-native-swiper'
 import MonthlyTasks from '../components/MonthlyTasks';
 import CalendarElement from '../components/CalendarElement';
-import * as SQLite from 'expo-sqlite';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function Calendar() {
-  const [db,setDb] = useState(SQLite.openDatabase('example.db'));
+export default function Calendar({db, states, tags, setStates, setTags, tasks, setTasks, firstMonth, lastMonth, setFirstMonth, setLastMonth}) {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [load, loadx] = useState(false);
 
   var today = new Date();
@@ -23,8 +21,7 @@ export default function Calendar() {
   const [month,setMonth] = useState(thisMonth);
   const [year,setYear] = useState(thisYear);
   const [day, setDay] = useState(thisDay);
-  const [tasks, setTasks] = useState([]);
-  const [tags, setTags] = useState([]);
+
 
   const LastMonth = () => {
     if (month==0){
@@ -44,33 +41,6 @@ export default function Calendar() {
       setMonth(month+1);
     }
   };
-
-  useEffect(() => {
-
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM tasks', null,
-      (txObj, resultSet) => setTasks(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting tasks')
-      );
-    });
-
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
-    });
-
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, tag TEXT, color TEXT, UNIQUE(tag))')
-    });
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM tags', null,
-      (txObj, resultSet) => setTags(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting tags')
-      );
-    });
-
-    setIsLoading(false);
-
-  },[load]);
 
 
   if (isLoading) {

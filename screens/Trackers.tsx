@@ -3,69 +3,17 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
 import TrackersElement from '../components/TrackersElement';
-import * as SQLite from 'expo-sqlite';
 
 const width = Dimensions.get('window').width;
 
-const Trackers = () => {
+const Trackers = ({db, states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth}) => {
 
+  const [load, loadx] = useState(false);
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
-  var thisDay = today.getDate();
-
-  const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [month,setMonth] = useState(thisMonth);
   const [year,setYear] = useState(thisYear);
-  const [day, setDay] = useState(thisDay);
-  const [isLoading, setIsLoading] = useState(true);
-  const [load, loadx] = useState(false);
-  const [states, setStates] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [firstMonth, setFirstMonth] = useState(false);
-  const [lastMonth, setLastMonth] = useState(false);
-
-  useEffect(() => {
-    setIsLoading(true);
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, tag INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
-    });
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM states ORDER BY place,day;', null,
-      (txObj, resultSet) => setStates(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting states')
-      );
-    });
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, tag TEXT, color TEXT, UNIQUE(tag))')
-    });
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM tags', null,
-      (txObj, resultSet) => setTags(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting tags')
-      );
-    });
-    if (states.filter(c=>(c.year==year && c.month==month-1)).length==0) {
-      setFirstMonth(true);
-    }
-    if (states.filter(c=>(c.year==year && c.month==month+1)).length==0) {
-      setLastMonth(true);
-    }
-    setIsLoading(false);
-    console.warn(states.filter(c=>c.day==1));
-
-  },[load]);
-
-
-  if (isLoading) {
-    return (
-      <View>
-        <Text> Is Loading...</Text>
-      </View>
-    )
-  }
-
-
 
   const LastMonth = () => {
     if (month==0){
