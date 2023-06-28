@@ -47,7 +47,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
       return {label: item.tag, value: item.tag}})
     setItems(newArray)
 
-    console.warn(selectedTag);
     setIsLoading(false);
 
 

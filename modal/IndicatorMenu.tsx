@@ -113,11 +113,9 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet2.rowsAffected > 0) {
                 [...sortedStates][toMoveLeftIndex-1+i] = existingStates[toMoveRightIndex-1+i];
-                console.warn([...sortedStates][toMoveLeftIndex-1+i]);
               }
             }
             setStates([...sortedStates]);
-            console.warn([...sortedStates]);
           },
           (txObj, error) => console.log('Error updating data', error)
         );
@@ -159,11 +157,9 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet2.rowsAffected > 0) {
                 [...sortedStates][toMoveRightIndex-1+i] = existingStates[toMoveLeftIndex-1+i];
-                console.warn([...sortedStates][toMoveRightIndex-1+i]);
               }
             }
             setStates([...sortedStates]);
-            console.warn([...sortedStates]);
           },
           (txObj, error) => console.log('Error updating data', error)
         );

@@ -86,15 +86,15 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
     
 
     const showTitle = (ind) => {
-      return  (
-        <View style={{flex:1}}>
-          <Pressable style={{height: 87,transform: [{skewX: '-45deg'}], left:43, backgroundColor:'red'}}>
-            <IndicatorTableTitle name={ind.item} tags={tags} states={states} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+      return (
+        <View>
+          <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37 }}>
+            <IndicatorTableTitle name={ind.item} tags={tags} states={states} setModalVisible={setModalVisible}/>
           </Pressable>
           {showStates(ind.item)}
           <IndicatorMenu
             data={ind.item}
-            modalVisible={modalVisible}
+            modalVisible={modalVisible === ind.item}
             setModalVisible={setModalVisible}
             index={ind.id}
             month={month}
@@ -106,8 +106,11 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
             load={load}
           />
         </View>
-      )   
-    }
+      );
+    };
+    
+    
+    
 
     const showNumber = (day) => {
       return  (
