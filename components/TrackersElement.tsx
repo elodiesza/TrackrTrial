@@ -138,7 +138,8 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
             data={listDays()}
             renderItem={(item)=>showNumber(item)}
             keyExtractor={(_, index) => index.toString()}
-            style={{marginTop:90,width:25,flexDirection:'row'}}
+            style={{marginTop:76,width:25,flexDirection:'row'}}
+            scrollEnabled={false}
             />
           </View>
           <FlatList
@@ -148,6 +149,7 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
             keyExtractor={(name) => name.toString()} //{(_, index) => index.toString()}
           />
         </View>
+        <View style={{position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >
       </View>
       <Button title='remove Indicators' onPress={removeDb} />
