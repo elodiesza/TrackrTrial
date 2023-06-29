@@ -63,6 +63,7 @@ const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, se
 
 
   const IndList = ({item}) => {
+    console.warn(tags);
     let gauge=0;
     for (var i=0;i<DaysInMonth(year,month);i++){
       gauge = gauge + states.filter(c=>(c.name==item.name && c.month==month && c.year==year)).map(c=>c.state)[i];

@@ -20,9 +20,9 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
   const [picked, setPicked] = useState<string>('white');
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
 
-  const colorChoice =  ['crimson','orange','yellow','yellowgreen','seagreen',
+  const colorChoice =  ['crimson','#ffa500','yellow','yellowgreen','seagreen',
   'paleturquoise', 'royalblue', 'mediumorchid', 'mediumvioletred', 'pink',
-  'white', 'whitesmoke','lavender','sienna','blanchedalmond'];
+  '#ffffff', '#f5f5f5','#e6e6fa','sienna','blanchedalmond'];
 
   const TagColor = ({item}) => (
     <TouchableOpacity onPress={() => (setPicked(item),setColorPickerVisible(!colorPickerVisible))}>

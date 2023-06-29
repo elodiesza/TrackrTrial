@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
         width: 26,
         height: 75,
         borderWidth: 0.3,
-        borderColor: '#71A4AC',
+        borderColor: 'gray',
         opacity: 1,
     },
     indText: {
