@@ -9,10 +9,9 @@ import CalendarElement from '../components/CalendarElement';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function Calendar({db, states, tags, setStates, setTags, tasks, setTasks, firstMonth, lastMonth, setFirstMonth, setLastMonth}) {
+export default function Calendar({db, states, tags, setStates, setTags, tasks, setTasks, firstMonth, lastMonth, setFirstMonth, setLastMonth, load, loadx}) {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [load, loadx] = useState(false);
 
   var today = new Date();
   var thisMonth = today.getMonth();

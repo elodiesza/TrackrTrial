@@ -4,11 +4,10 @@ import Swiper from 'react-native-swiper';
 import TodayTasks from '../components/TodayTasks';
 
 
-const Today = ({db, tasks, setTasks, tags, setTags}) => {
+const Today = ({db, tasks, setTasks, tags, setTags, load, loadx}) => {
 
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
-  const [load, loadx] = useState(false);
 
 
 

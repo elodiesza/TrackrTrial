@@ -6,9 +6,8 @@ import TrackersElement from '../components/TrackersElement';
 
 const width = Dimensions.get('window').width;
 
-const Trackers = ({db, states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth}) => {
+const Trackers = ({db, states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth, load, loadx}) => {
 
-  const [load, loadx] = useState(false);
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();

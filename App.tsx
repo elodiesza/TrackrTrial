@@ -97,28 +97,28 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Today">
-        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth}/>} 
+        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth} load={load} loadx={loadx}/>} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
               <Feather name="activity" size={28} />  
             </View>)}}
         />
-        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth}/>} 
+        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
             <Feather name="check-square" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags}/>} 
+        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} states={states} tags={tags} tasks={tasks} setTasks={setTasks} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} month={month} setMonth={setMonth} year={year} setYear={setYear} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth}/>} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} states={states} tags={tags} tasks={tasks} setTasks={setTasks} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} month={month} setMonth={setMonth} year={year} setYear={setYear} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

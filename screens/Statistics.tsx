@@ -6,7 +6,7 @@ import LastMonth from '../components/LastMonth';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth}) => {
+const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth, load, loadx}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -17,7 +17,6 @@ const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, se
   const [year,setYear] = useState(thisYear);
   const [day, setDay] = useState(thisDay);
   const [isLoading, setIsLoading] = useState(false);
-  const [load, loadx] = useState(false);
 
   const NextMonth = () => {
     if (month==11){

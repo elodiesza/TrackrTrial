@@ -2,13 +2,18 @@ import React, { useState,  useEffect } from 'react';
 import { StyleSheet, Modal, Alert, TouchableWithoutFeedback, Pressable, TouchableOpacity, Text, View } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import IsLoading from './IsLoading';
+import ChangeIndName from './ChangeIndName';
+
 
 
 const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setStates, states, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [changeModalVisible, setChangeModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [displayLeft, setDisplayLeft] = useState<"none" | "flex" | undefined>('flex');
     const [displayRight, setDisplayRight] = useState<"none" | "flex" | undefined>('flex');
+
+
 
     useEffect(() => {
       if(states.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
@@ -169,6 +174,8 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
       setIsLoading(false);
     };
 
+    
+
     return(
     <Modal
           animationType="none"
@@ -189,7 +196,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
               <Pressable onPress={()=>moveRight(data)} style={{display: displayRight}}>
                 <Feather name="chevron-right" size={25} color={'gray'}/>
               </Pressable>
-              <Pressable>
+              <Pressable onPress={() => setChangeModalVisible(true)}>
                 <Feather name="edit" size={25}/>
               </Pressable>
               <Pressable onPress={() => setDeleteModalVisible(true)}>
@@ -199,6 +206,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
               
             </TouchableWithoutFeedback>
           </TouchableOpacity>
+          <ChangeIndName db={db} data={data} changeModalVisible={changeModalVisible} setChangeModalVisible={setChangeModalVisible} states={states} setStates={setStates} load={load} loadx={loadx} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
           <Modal
             animationType="none"
             transparent={true}
