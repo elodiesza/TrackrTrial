@@ -25,7 +25,7 @@ const Today = ({db, tasks, setTasks, tags, setTags, load, loadx}) => {
         <View>
           <Text>Hello</Text>
         </View>
-        <TodayTasks tags={tags} setTags={setTags}/>
+        <TodayTasks db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags}/>
       </Swiper>
     </SafeAreaView>
   );

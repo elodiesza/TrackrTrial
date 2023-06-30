@@ -23,9 +23,9 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
   const [recurring, setRecurring] = useState(false);
   const toggleSwitch = () => setRecurring(previousState => !previousState);
 
-  const colorChoice =  ['crimson','orange','yellow','yellowgreen','seagreen',
-  'paleturquoise', 'royalblue', 'mediumorchid', 'mediumvioletred', 'pink',
-  'white', 'whitesmoke','lavender','sienna','blanchedalmond'];
+  const colorChoice =  ['#dc143c','#ffa500','#ffff00','#9acd32','#2e8b57',
+  '#afeeee', '#4169e1', '#ba55d3', '#c71585', '#ffc0cb',
+  '#ffffff', '#f5f5f5','#e6e6fa','#a0522d','#ffebcd'];
 
   const TagColor = ({item}) => (
     <TouchableOpacity onPress={() => (setPicked(item),setColorPickerVisible(!colorPickerVisible))}>
@@ -278,4 +278,3 @@ const styles = StyleSheet.create({
     padding: 15,
   }
 });
-

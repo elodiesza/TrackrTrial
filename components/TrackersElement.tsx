@@ -88,7 +88,7 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
       return (
         <View>
           <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37 }}>
-            <IndicatorTableTitle name={ind.item} tags={tags} states={states} setModalVisible={setModalVisible}/>
+            <IndicatorTableTitle name={ind.item} tags={tags} states={states} year={year} month={month} setModalVisible={setModalVisible}/>
           </Pressable>
           {showStates(ind.item)}
           <IndicatorMenu
@@ -146,10 +146,10 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
             horizontal
             data={uniqueNames}
             renderItem={(name)=>showTitle(name)}
-            keyExtractor={(name) => name.toString()} //{(_, index) => index.toString()}
+            keyExtractor={(name) => name.toString()} 
           />
         </View>
-        <View style={{position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
+        <View pointerEvents="none" style={{position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >
       </View>
       <Button title='remove Indicators' onPress={removeDb} />

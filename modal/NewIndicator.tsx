@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import TagPicker from '../components/TagPicker';
 import ColorPicker from '../components/ColorPicker';
 import Color from '../components/Color';
+import IsLoading from './IsLoading';
 
 
 function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, states, setStates, tags, setTags}) {
@@ -19,10 +20,11 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
   const [tagIndex, setTagIndex] = useState(0); 
   const [picked, setPicked] = useState<string>('white');
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
+  const [isStateCreationComplete, setIsStateCreationComplete] = useState(false);
 
-  const colorChoice =  ['crimson','#ffa500','yellow','yellowgreen','seagreen',
-  'paleturquoise', 'royalblue', 'mediumorchid', 'mediumvioletred', 'pink',
-  '#ffffff', '#f5f5f5','#e6e6fa','sienna','blanchedalmond'];
+  const colorChoice =  ['#dc143c','#ffa500','#ffff00','#9acd32','#2e8b57',
+  '#afeeee', '#4169e1', '#ba55d3', '#c71585', '#ffc0cb',
+  '#ffffff', '#f5f5f5','#e6e6fa','#a0522d','#ffebcd'];
 
   const TagColor = ({item}) => (
     <TouchableOpacity onPress={() => (setPicked(item),setColorPickerVisible(!colorPickerVisible))}>
@@ -85,6 +87,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                 };
                 existingStates.push(newState);
                 setStates(existingStates); // Update the state with the new array of states
+                loadx(!load);
               }
             );
         });
@@ -112,6 +115,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                 };
                 existingStates.push(newState);
                 setStates(existingStates); // Update the state with the new array of states
+                loadx(!load);
               }
             );
         });
@@ -148,11 +152,10 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                       };
                       existingStates.push(newState);
                       setStates(existingStates); // Update the state with the new array of states
-                      loadx(!load);
                     }
                   );
                 });
-              }
+              }         
             }
           );
         });

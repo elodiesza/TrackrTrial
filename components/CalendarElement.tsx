@@ -1,7 +1,5 @@
 import { TouchableOpacity, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useState } from 'react';
-import Feather from '@expo/vector-icons/Feather';
-import moment from 'moment';
 import Swiper from 'react-native-swiper'
 import MonthlyTasks from '../components/MonthlyTasks';
 
@@ -93,7 +91,7 @@ export default function CalendarElement({year, month, day, tasks, tags}) {
   const CalendarCell = (date) => {
     return(
       <View style={[styles.calendarCell,{backgroundColor: date==0? 'lightgray' : 'white', borderColor: (date==thisDay && month==thisMonth && year==thisYear)? 'red':'gray', borderWidth: (date==thisDay && month==thisMonth && year==thisYear)? 2:0.5}]}>
-        <View style={{height:15, flex:1}}>
+        <View style={{height:15}}>
           <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
         </View>
         <View style={{flex:1, justifyContent: 'flex-end'}}>

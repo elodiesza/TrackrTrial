@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable,TouchableOpacity, Dimensions } from 'react-native';
 
-const IndicatorTableTitle = ({name, tags, states, setModalVisible}) => {
+const IndicatorTableTitle = ({name, tags, states, year, month, setModalVisible}) => {
 
-    const IndicatorTag = states.filter(c=>(c.name==name && c.day==1)).map(c=>c.tag)[0];
+    const IndicatorTag = states.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==1)).map(c=>c.tag)[0];
     const IndicatorColor = IndicatorTag==0 ? 'white' : tags.filter(c=>c.id==IndicatorTag).map(c=>c.color)[0];
 
     return (

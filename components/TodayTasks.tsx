@@ -1,6 +1,5 @@
 import { StyleSheet, Button, TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
-import * as SQLite from 'expo-sqlite';
 import NewTask from '../modal/NewTask';
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,17 +10,13 @@ import Color from './Color';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function TodayTasks({tags, setTags}) {
+export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
   const today = new Date();
   const month = today.getMonth();
   const year = today.getFullYear();
   const day = today.getDate();
 
-  const [tasks, setTasks] = useState([]);
   const [logs, setLogs] = useState([]);
-  const [taskState, setTaskState] = useState<number>(0);
-
-  const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [isLoading, setIsLoading] = useState(true);
   const [load, loadx] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -29,14 +24,7 @@ export default function TodayTasks({tags, setTags}) {
 
   
   useEffect(() => {
-      setIsLoading(true);
-      db.transaction(tx => {
-        tx.executeSql('SELECT * FROM tasks', null,
-        (txObj, resultSet) => setTasks(resultSet.rows._array),
-        (txObj, error) => console.log('error selecting tasks')
-        );
-      });
-
+  
       db.transaction(tx => {
         tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
       });
@@ -47,44 +35,49 @@ export default function TodayTasks({tags, setTags}) {
         (txObj, error) => console.log('error selecting states')
         );
       });
-
+      console.warn(tasks);
       setIsLoading(false);
     },[load]);
     
     useEffect(() => {
       let existingLogs = [...logs];  
-      db.transaction(tx => {
-        tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
-          (txtObj,resultSet)=> {    
-            existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
-            setLogs(existingLogs);
-          },
-        );
-      });
 
-      let lastLogIndex = existingLogs.indexOf(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0])-1;
-      let lastLog = existingLogs[lastLogIndex];
-      existingLogs=[];
+      if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined){
+        
+        db.transaction(tx => {
+          tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
+            (txtObj,resultSet)=> {    
+              existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+              setLogs(existingLogs);
+            },
+          );
+        });
+        let lastLogIndex = existingLogs.indexOf(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0])-1;
+        let lastLog = existingLogs[lastLogIndex];
+        existingLogs=[];
 
-      if (lastLog!==undefined) {
-        var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
-        let existingTasks=[...tasks];
-        let existingRecurringTasks=existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
-        for(var j=1;j<daysBetweenLastAndToday+1;j++){
-          var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
-          for (var i=0; i<existingRecurringTasks.length;i++){      
-            let newTask=existingRecurringTasks[i].task;
-            db.transaction(tx => {
-              tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring) values (?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1],
-                (txtObj,resultSet)=> {   
-                  existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1});
-                },
-              );
-            });
+        if (lastLog!==undefined) {
+          var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
+          let existingTasks=[...tasks];
+          let existingRecurringTasks=existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
+          for(var j=1;j<daysBetweenLastAndToday+1;j++){
+            var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
+            for (var i=0; i<existingRecurringTasks.length;i++){      
+              let newTask=existingRecurringTasks[i].task;
+              let copyTag=existingRecurringTasks[i].tag;
+              db.transaction(tx => {
+                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,0],
+                  (txtObj,resultSet)=> {   
+                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:0});
+                  },
+                );
+              });
+            }
           }
+          setTasks(existingTasks);
         }
-        setTasks(existingTasks);
       }
+      
     },[load]);
 
     if (isLoading) {
