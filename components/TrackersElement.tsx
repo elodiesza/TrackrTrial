@@ -18,6 +18,41 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
+  useEffect(() => {
+    if(states.filter(c=>(c.year==year && c.month==month))==undefined){
+      let existingStates=[...states];
+      const lastMonthData=states.filter(c=>(c.year==(month==0?year-1:year) && c.month==(month==0? 11 :month-1)));
+      const lastMonthStates = lastMonthData.map(c=>c.name);
+      const lastMonthTypes = lastMonthData.map(c=>c.type);
+      const lastMonthTags = lastMonthData.map(c=>c.tag);
+      for (var j=0;j<lastMonthStates.length;j++){
+        for(var i=1;i<DaysInMonth(year,month)+1;i++){
+          db.transaction((tx) => {
+            tx.executeSql(
+              'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              [lastMonthStates[j], year, month, i, 0, lastMonthTypes[j], lastMonthTags[j], j],
+              (txtObj, stateResultSet) => {
+                const newStateId = stateResultSet.insertId;
+                const newState = {
+                  id: newStateId,
+                  name: lastMonthStates[j],
+                  year: year,
+                  month: month,
+                  day: i,
+                  state: 0,
+                  type: lastMonthTypes[j],
+                  tag: lastMonthTags[j],
+                  place: j,
+                };
+                existingStates.push(newState);
+                setStates(existingStates); // Update the state with the new array of states
+              }
+            );
+          });
+        }
+      }
+    }
+  })
 
     const removeDb = () => {
       db.transaction(tx => {

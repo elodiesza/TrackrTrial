@@ -105,7 +105,7 @@ const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, se
       </View>
       <View style={styles.body}>
         <FlatList
-          data={states.filter(c=>c.day==1)}
+          data={states.filter(c=>(c.day==1 && c.month==month && c.year==year))}
           renderItem={(item)=>IndList(item)}
           keyExtractor={(_, index) => index.toString()}
         />
@@ -129,6 +129,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray',    
   },
   body: {
     flex:15,
