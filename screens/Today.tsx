@@ -9,8 +9,6 @@ const Today = ({db, tasks, setTasks, tags, setTags, load, loadx}) => {
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
 
-
-
   if (isLoading) {
     return (
       <View>
@@ -25,7 +23,7 @@ const Today = ({db, tasks, setTasks, tags, setTags, load, loadx}) => {
         <View>
           <Text>Hello</Text>
         </View>
-        <TodayTasks db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags}/>
+        <TodayTasks db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} load={load} loadx={loadx}/>
       </Swiper>
     </SafeAreaView>
   );

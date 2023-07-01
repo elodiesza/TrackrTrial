@@ -91,9 +91,9 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
     var newPlace = existingTasks.filter(c => c.day === 1).map(c => c.name).length;
     if(addTag=='Add Tag' || (selectedTag==null && selectedTag!=='Add a new Tag')){
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM'),addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,0,addTime=='Add Time'?null:time.toString()],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM')-1,addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,0,addTime=='Add Time'?null:time.toString()],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM'), day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:0, time:addTime=='Add Time'?null:time.toString()});
+            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM')-1, day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:0, time:addTime=='Add Time'?null:time.toString()});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
@@ -103,9 +103,9 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
     else if (addTag=='Delete Tag' && selectedTag!=='Add a new Tag'){
       const tempTag = existingTags.filter(c=>c.tag==selectedTag).map(c=>c.id)[0];
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM'),addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tempTag,addTime=='Add Time'?null:time.toString()],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM')-1,addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tempTag,addTime=='Add Time'?null:time.toString()],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM'), day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tempTag, time:addTime=='Add Time'?null:time.toString()});
+            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM')-1, day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tempTag, time:addTime=='Add Time'?null:time.toString()});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
@@ -124,9 +124,9 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
               existingTags.push({ id: tagId, tag: data.tag, color: picked });
               setTags(existingTags); // Update the state with the new array of tags
                 db.transaction((tx) => {
-                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM'),addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tagId,addTime=='Add Time'?null:time.toString()],
+                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM')-1,addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tagId,addTime=='Add Time'?null:time.toString()],
                     (txtObj,resultSet)=> {    
-                      existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM'), day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tagId, time:addTime=='Add Time'?null:time.toString()});
+                      existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM')-1, day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tagId, time:addTime=='Add Time'?null:time.toString()});
                       setTasks(existingTasks);
                     },
                     (txtObj, error) => console.warn('Error inserting data:', error)

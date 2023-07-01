@@ -10,7 +10,7 @@ import Color from './Color';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
+export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx}) {
   const today = new Date();
   const month = today.getMonth();
   const year = today.getFullYear();
@@ -18,10 +18,8 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
 
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [load, loadx] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [date, setDate] = useState(today);
-
   
   useEffect(() => {
   
@@ -35,50 +33,78 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
         (txObj, error) => console.log('error selecting states')
         );
       });
-
+      console.warn(logs);
+      console.warn(tasks);
       setIsLoading(false);
-    },[load]);
+    },[]);
     
     useEffect(() => {
-      let existingLogs = [...logs];  
-      if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined){
-        
-        db.transaction(tx => {
-          tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
-            (txtObj,resultSet)=> {    
-              existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
-              setLogs(existingLogs);
-            },
-          );
-        });
-        let lastLogIndex = logs.length-1;
-        let lastLog = logs[lastLogIndex];
-        existingLogs=[];
-
-        if (lastLog!==undefined) {
-          var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
+      if (!isLoading && tasks.length > 0 && logs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined) {
+        if(logs.length > 0){
+        let existingLogs = [...logs];  
+        if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
+          db.transaction(tx => {
+            tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
+              (txtObj,resultSet)=> {    
+                existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+                setLogs(existingLogs);
+              },
+            );
+          });
+          let lastLogIndex = logs.length-1;
+          let lastLog = logs[lastLogIndex];
+          console.warn(lastLog);
           let existingTasks=[...tasks];
-          let existingRecurringTasks=existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
-          for(var j=1;j<daysBetweenLastAndToday+1;j++){
-            var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
-            for (var i=0; i<existingRecurringTasks.length;i++){      
-              let newTask=existingRecurringTasks[i].task;
-              let copyTag=existingRecurringTasks[i].tag;
-              let copyTime=existingRecurringTasks[i].time;
-              db.transaction(tx => {
-                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,copyTime],
-                  (txtObj,resultSet)=> {   
-                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:copyTime});
-                  },
-                );
-              });
+          console.warn(existingTasks);
+          console.warn(existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day)));
+
+          let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
+          console.warn(existingRecurringTasks);
+          existingLogs=[];
+
+          if (lastLog!==undefined) {
+            console.warn('enters');
+            var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
+            console.warn(daysBetweenLastAndToday);
+            for(var j=1;j<daysBetweenLastAndToday+1;j++){
+              console.warn('enters');
+              var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
+              console.warn(newDate);
+              console.warn(existingRecurringTasks.length);
+              for (var i=0; i<existingRecurringTasks.length;i++){    
+                console.warn('enters');  
+                let newTask=existingRecurringTasks[i].task;
+                console.warn(existingRecurringTasks[i].task);
+                let copyTag=existingRecurringTasks[i].tag;
+                let copyTime=existingRecurringTasks[i].time;
+                db.transaction(tx => {
+                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,copyTime],
+                    (txtObj,resultSet)=> {   
+                      existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:copyTime});
+                    },
+                  );
+                });
+              }
             }
+            setTasks(existingTasks);
           }
-          setTasks(existingTasks);
+        }
+        }
+        else {
+          let existingLogs = [...logs];  
+          if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
+            db.transaction(tx => {
+              tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
+                (txtObj,resultSet)=> {    
+                  existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+                  setLogs(existingLogs);
+                },
+              );
+            });
+          }
         }
       }
-      
-    },[load]);
+    },[isLoading, logs]);
 
     if (isLoading) {
       return (
