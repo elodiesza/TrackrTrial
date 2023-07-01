@@ -139,7 +139,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
         'DELETE FROM logs WHERE day = ?',
         [1],
         (txObj, resultSet) => {
-          setLogs(existingLogs.filter(c=>c.day!=1)),
+          setLogs(existingLogs.filter(c=>c.day!=day)),
           console.log('Log deleted successfully');
         },
         (txObj, error) => {
@@ -354,8 +354,6 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
       <NewTask
         addModalVisible={addModalVisible===true}
         setAddModalVisible={setAddModalVisible}
-        load={load}
-        loadx={loadx}
         db={db}
         tasks={tasks}
         setTasks={setTasks}

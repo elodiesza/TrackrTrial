@@ -9,6 +9,7 @@ const Today = ({db, tasks, setTasks, tags, setTags, load, loadx}) => {
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
 
+
   if (isLoading) {
     return (
       <View>

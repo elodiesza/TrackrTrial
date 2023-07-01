@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, set } from 'react-hook-form';
 import ColorPicker from '../components/ColorPicker';
 import TagPicker from '../components/TagPicker';
 import Color from '../components/Color';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 
-function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, setTasks, tags, setTags}) {
+function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags, setTags}) {
 
   const [isLoading, setIsLoading] = useState(true);
   const {control, handleSubmit, reset} = useForm();
@@ -24,6 +24,7 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
   const [addDeadline, setAddDeadline] = useState('Add Deadline')
   const [timeDisplay, setTimeDisplay] = useState('none')
   const [addTime, setAddTime] = useState('Add Time')
+  const [load, loadx] = useState(false);
 
   var today = new Date();
   var day = today.getDate();
@@ -153,9 +154,29 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
       onRequestClose={() => {
         setAddModalVisible(!addModalVisible);
         setRecurring(false);
+        setTime(new Date());
+        setAddTime('Add Time');
+        setAddDeadline('Add deadline');
+        setDate(new Date());  
+        setAddTag('Add Tag');
+        setTagDisplay('none');
+        setDateDisplay('none');
+        setTimeDisplay('none');
       }}
     > 
-      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible)}} activeOpacity={1}>
+      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {
+        setAddModalVisible(!addModalVisible);
+        setRecurring(false);
+        setTime(new Date());
+        setAddTime('Add Time');
+        setAddDeadline('Add deadline');
+        setDate(new Date());  
+        setAddTag('Add Tag');
+        setTagDisplay('none');
+        setDateDisplay('none');
+        setTimeDisplay('none');
+        }} 
+        activeOpacity={1}>
         <TouchableWithoutFeedback>
           <View style={styles.container}>
               <Text>Insert new Task</Text>
@@ -199,17 +220,17 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
                     onChange={onChange}
                   />
                 )}
-              </View>
-              <Button title={addTime} onPress={() => (setTimeDisplay(timeDisplay==='none'? 'flex' : 'none'), setAddTime(addTime==='Add Time'? 'Cancel Time' : 'Add Time'))}/>
-              <View style={{display: timeDisplay}}>
-                {showTimePicker && (
-                  <DateTimePicker
-                    value={time}
-                    mode="time"
-                    display="default"
-                    onChange={onChange2}
-                  />
-                )}
+                <Button title={addTime} onPress={() => (setTimeDisplay(timeDisplay==='none'? 'flex' : 'none'), setAddTime(addTime==='Add Time'? 'Cancel Time' : 'Add Time'))}/>
+                <View style={{display: timeDisplay}}>
+                  {showTimePicker && (
+                    <DateTimePicker
+                      value={time}
+                      mode="time"
+                      display="default"
+                      onChange={onChange2}
+                    />
+                  )}
+                </View>
               </View>
               <Button title={addTag} onPress={() => (setTagDisplay(tagDisplay==='none'? 'flex' : 'none'), setAddTag(addTag==='Add Tag'? 'Delete Tag' : 'Add Tag'))}/>
               <View style={{display: tagDisplay, width:'70%', justifyContent: 'center'}}>
