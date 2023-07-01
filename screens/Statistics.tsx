@@ -21,20 +21,19 @@ const Statistics = ({states, tags, setStates, setTags, load, loadx}) => {
   const [lastMonth, setLastMonth] = useState(false);
 
   useEffect(() => {
-    if (states.filter(c=>(c.year==year && c.month==month-1))==undefined) {
+    if (states.filter(c=>(c.year==year && c.month==month-1))=="") {
       setFirstMonth(true);
     }
     else{
       setFirstMonth(false);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+1))==undefined) {
+    if (states.filter(c=>(c.year==year && c.month==month+1))=="") {
       setLastMonth(true);
     }
     else{
       setLastMonth(false);
     }
   },[])
-
 
   const LastMonth = () => {
     if (month==0){
@@ -58,11 +57,12 @@ const Statistics = ({states, tags, setStates, setTags, load, loadx}) => {
     else {
       setMonth(month+1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+1))==""){
+    if (states.filter(c=>(c.year==year && c.month==month+2))==""){
       setLastMonth(true);
     }
     setFirstMonth(false);
   };
+
 
 
   const IndList = ({item}) => {
