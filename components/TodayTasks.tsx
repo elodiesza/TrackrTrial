@@ -36,18 +36,20 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
       console.warn(logs);
       console.warn(tasks);
       setIsLoading(false);
-    },[]);
+    },[load]);
     
     useEffect(() => {
       if (!isLoading && tasks.length > 0 && logs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined) {
+        console.warn('enters new log');
         if(logs.length > 0){
         let existingLogs = [...logs];  
         if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
+          console.warn('creates new log');
           db.transaction(tx => {
             tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
               (txtObj,resultSet)=> {    
                 existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
-                setLogs(existingLogs);
+                setLogs(existingLogs);                      
               },
             );
           });
@@ -81,6 +83,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
                   tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,copyTime],
                     (txtObj,resultSet)=> {   
                       existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:copyTime});
+                      setTasks(existingTasks);
                     },
                   );
                 });
@@ -114,6 +117,19 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
       )
   }
 
+  const addLog = () => {
+    let existingLogs = [...logs];  
+      console.warn('creates new log');
+      db.transaction(tx => {
+        tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day-1],
+          (txtObj,resultSet)=> {    
+            existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day-1});
+            setLogs(existingLogs);
+          },
+        );
+      });
+  }
+
   const removeDb = () => {
     db.transaction(tx => {
       tx.executeSql('DROP TABLE IF EXISTS tasks', null,
@@ -137,7 +153,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
     db.transaction(tx => {
       tx.executeSql(
         'DELETE FROM logs WHERE day = ?',
-        [1],
+        [day],
         (txObj, resultSet) => {
           setLogs(existingLogs.filter(c=>c.day!=day)),
           console.log('Log deleted successfully');
@@ -349,6 +365,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
+        <Button title='Add yesterdayLog' onPress={addLog} />
         <Button title='remove Todays log' onPress={removeTodayLog} />
         <Button title='remove Tasks' onPress={removeDb} />
         <Button title='remove Logs' onPress={removelogDb} />
