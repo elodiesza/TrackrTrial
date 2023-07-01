@@ -2,7 +2,6 @@ import { FlatList, SafeAreaView, Pressable, StyleSheet, Text, View, Dimensions }
 import { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
-import LastMonth from '../components/LastMonth';
 
 const width = Dimensions.get('window').width;
 
@@ -71,14 +70,27 @@ const Statistics = ({states, tags, setStates, setTags, load, loadx}) => {
       gauge = gauge + states.filter(c=>(c.name==item.name && c.month==month && c.year==year)).map(c=>c.state)[i];
     }
     gauge=gauge/DaysInMonth(year,month);
+    let lastMonthGauge=0;
+    for (var i=0;i<DaysInMonth(year,month-1);i++){
+      lastMonthGauge = lastMonthGauge + states.filter(c=>(c.name==item.name && c.month==month-1 && c.year==year)).map(c=>c.state)[i];
+    }
+    lastMonthGauge=lastMonthGauge/DaysInMonth(year,month-1);
+    let progress=(gauge-lastMonthGauge)*100;
     return(
       <View style={{width:width}}>
         <View style={{flex:1, width: width, height:40, justifyContent:'center', paddingLeft:20, backgroundColor: tags.filter(c=>c.id==item.tag).map(c=>c.color)[0], opacity:0.2}}/>
         <View style={{flex:1, width: width*gauge, height:40, justifyContent:'center',position:'absolute', paddingLeft:20, backgroundColor: tags.filter(c=>c.id==item.tag).map(c=>c.color)[0], opacity:0.7}}/>
-        <View style={{flex:1, width: width, height:40, justifyContent:'center', paddingLeft:20,position:'absolute'}}>
-          <Text style={{textAlignVertical:'center'}}>
-            {item.name}
-          </Text>
+        <View style={{flex:1, flexDirection:'row', width: width, height:40, justifyContent:'center', paddingLeft:20,position:'absolute'}}>
+          <View style={{flex:9, justifyContent:'center'}}>
+            <Text style={{textAlignVertical:'center'}}>
+              {item.name}
+            </Text>
+          </View>
+          <View style={{flex:1, justifyContent:'center'}}>
+            <Text style={{textAlignVertical:'center',textAlign:'right',right:10, color: lastMonthGauge.toString()=='NaN'?'black':((progress<1 && progress>-1)? 'black': progress>0? 'green':'red')}}>
+              {lastMonthGauge.toString()=='NaN'?'':((progress<0 && progress>-1)? "0%": progress>1? "+"+progress.toFixed(0)+"%":progress.toFixed(0)+"%")}
+            </Text>
+          </View>
         </View>
       </View>
     );
