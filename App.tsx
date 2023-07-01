@@ -51,8 +51,7 @@ const [load, loadx] = useState(false);
 const [states, setStates] = useState([]);
 const [tasks, setTasks] = useState([]);
 const [tags, setTags] = useState([]);
-const [firstMonth, setFirstMonth] = useState(false);
-const [lastMonth, setLastMonth] = useState(false);
+
 
 useEffect(() => {
   setIsLoading(true);
@@ -84,12 +83,7 @@ useEffect(() => {
     (txObj, error) => console.log('error selecting states')
     );
   });
-  if (states.filter(c=>(c.year==year && c.month==month-1)).length==0) {
-    setFirstMonth(true);
-  }
-  if (states.filter(c=>(c.year==year && c.month==month+1)).length==0) {
-    setLastMonth(true);
-  }
+
   setIsLoading(false);
 
 },[load]);
@@ -97,14 +91,14 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Today">
-        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx}/>} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
               <Feather name="activity" size={28} />  
             </View>)}}
         />
-        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -118,7 +112,7 @@ useEffect(() => {
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} states={states} tags={tags} tasks={tasks} setTasks={setTasks} setStates={setStates} setTags={setTags} firstMonth={firstMonth} lastMonth={lastMonth} month={month} setMonth={setMonth} year={year} setYear={setYear} setFirstMonth={setFirstMonth} setLastMonth={setLastMonth} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} states={states} tags={tags} tasks={tasks} setTasks={setTasks} setStates={setStates} setTags={setTags} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

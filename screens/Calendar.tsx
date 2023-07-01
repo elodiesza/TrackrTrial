@@ -9,7 +9,7 @@ import CalendarElement from '../components/CalendarElement';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function Calendar({db, states, tags, setStates, setTags, tasks, setTasks, firstMonth, lastMonth, setFirstMonth, setLastMonth, load, loadx}) {
+export default function Calendar({db, states, tags, setStates, setTags, tasks, setTasks, load, loadx}) {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,6 +20,24 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
   const [month,setMonth] = useState(thisMonth);
   const [year,setYear] = useState(thisYear);
   const [day, setDay] = useState(thisDay);
+  const [firstMonth, setFirstMonth] = useState(false);
+  const [lastMonth, setLastMonth] = useState(false);
+
+  useEffect(() => {
+    if (states.filter(c=>(c.year==year && c.month==month-1))==undefined) {
+      setFirstMonth(true);
+    }
+    else{
+      setFirstMonth(false);
+    }
+    if (states.filter(c=>(c.year==year && c.month==month+1))==undefined) {
+      setLastMonth(true);
+    }
+    else{
+      setLastMonth(false);
+    }
+  },[])
+
 
 
   const LastMonth = () => {
@@ -30,7 +48,12 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
     else {
       setMonth(month-1);
     }
+    if (states.filter(c=>(c.year==year && c.month==month-2))==""){
+      setFirstMonth(true);
+    }
+    setLastMonth(false);
   };
+
   const NextMonth = () => {
     if (month==11){
       setMonth(0);
@@ -39,6 +62,10 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
     else {
       setMonth(month+1);
     }
+    if (states.filter(c=>(c.year==year && c.month==month+1))==""){
+      setLastMonth(true);
+    }
+    setFirstMonth(false);
   };
 
 

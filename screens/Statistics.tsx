@@ -6,7 +6,7 @@ import LastMonth from '../components/LastMonth';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, setFirstMonth, setLastMonth, load, loadx}) => {
+const Statistics = ({states, tags, setStates, setTags, load, loadx}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -17,6 +17,38 @@ const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, se
   const [year,setYear] = useState(thisYear);
   const [day, setDay] = useState(thisDay);
   const [isLoading, setIsLoading] = useState(false);
+  const [firstMonth, setFirstMonth] = useState(false);
+  const [lastMonth, setLastMonth] = useState(false);
+
+  useEffect(() => {
+    if (states.filter(c=>(c.year==year && c.month==month-1))==undefined) {
+      setFirstMonth(true);
+    }
+    else{
+      setFirstMonth(false);
+    }
+    if (states.filter(c=>(c.year==year && c.month==month+1))==undefined) {
+      setLastMonth(true);
+    }
+    else{
+      setLastMonth(false);
+    }
+  },[])
+
+
+  const LastMonth = () => {
+    if (month==0){
+      setMonth(11);
+      setYear(year-1);
+    }
+    else {
+      setMonth(month-1);
+    }
+    if (states.filter(c=>(c.year==year && c.month==month-2))==""){
+      setFirstMonth(true);
+    }
+    setLastMonth(false);
+  };
 
   const NextMonth = () => {
     if (month==11){
@@ -26,38 +58,10 @@ const Statistics = ({states, tags, setStates, setTags, firstMonth, lastMonth, se
     else {
       setMonth(month+1);
     }
-    if (month==1){
-      if (states.filter(c=>(c.year==year-1 && c.month==11)).length==0) {
-        setFirstMonth(true);
-      }
-      else{
-        setFirstMonth(false);
-      }
+    if (states.filter(c=>(c.year==year && c.month==month+1))==""){
+      setLastMonth(true);
     }
-    else {
-      if (states.filter(c=>(c.year==year && c.month==month)).length==0) {
-        setFirstMonth(true);
-      }
-      else{
-        setFirstMonth(false);
-      }
-    }
-    if (month==10){
-      if (states.filter(c=>(c.year==year+1 && c.month==0)).length==0) {
-        setLastMonth(true);
-      }
-      else{
-        setLastMonth(false);
-      }
-    }
-    else {
-      if (states.filter(c=>(c.year==year && c.month==month+2)).length==0) {
-        setLastMonth(true);
-      }
-      else{
-        setLastMonth(false);
-      }
-    }
+    setFirstMonth(false);
   };
 
 
