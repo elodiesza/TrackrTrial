@@ -20,10 +20,10 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
   const [showDatePicker, setShowDatePicker] = useState(true);
   const [time, setTime] = useState(new Date())
   const [showTimePicker, setShowTimePicker] = useState(true);
-  const [dateDisplay, setDateDisplay] = useState<String>('none')
-  const [addDeadline, setAddDeadline] = useState('Add Deadline')
-  const [timeDisplay, setTimeDisplay] = useState('none')
-  const [addTime, setAddTime] = useState('Add Time')
+  const [dateDisplay, setDateDisplay] = useState<"none" | "flex" | undefined>('none');
+  const [addDeadline, setAddDeadline] = useState('Add Deadline');
+  const [timeDisplay, setTimeDisplay] = useState<"none" | "flex" | undefined>('none');
+  const [addTime, setAddTime] = useState('Add Time');
   const [load, loadx] = useState(false);
 
   var today = new Date();
@@ -162,6 +162,7 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
         setTagDisplay('none');
         setDateDisplay('none');
         setTimeDisplay('none');
+        setSelectedTag(null);
       }}
     > 
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {
@@ -175,6 +176,7 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
         setTagDisplay('none');
         setDateDisplay('none');
         setTimeDisplay('none');
+        setSelectedTag(null);
         }} 
         activeOpacity={1}>
         <TouchableWithoutFeedback>
@@ -210,26 +212,28 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
               }}
               />
               <Switch onValueChange={toggleSwitch} value={recurring}/>
-              <Button title={addDeadline} onPress={() => (setDateDisplay(dateDisplay==='none'? 'flex' : 'none'), setAddDeadline(addDeadline==='Add Deadline'? 'Cancel Deadline' : 'Add Deadline'))}/>
-              <View style={{display: dateDisplay}}>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={onChange}
-                  />
-                )}
-                <Button title={addTime} onPress={() => (setTimeDisplay(timeDisplay==='none'? 'flex' : 'none'), setAddTime(addTime==='Add Time'? 'Cancel Time' : 'Add Time'))}/>
-                <View style={{display: timeDisplay}}>
-                  {showTimePicker && (
+              <View style={{display: recurring==true? 'none':'flex'}}>
+                <Button title={addDeadline} onPress={() => (setDateDisplay(dateDisplay==='none'? 'flex' : 'none'), setAddDeadline(addDeadline==='Add Deadline'? 'Cancel Deadline' : 'Add Deadline'))}/>
+                <View style={{display: dateDisplay}}>
+                  {showDatePicker && (
                     <DateTimePicker
-                      value={time}
-                      mode="time"
+                      value={date}
+                      mode="date"
                       display="default"
-                      onChange={onChange2}
+                      onChange={onChange}
                     />
                   )}
+                  <Button title={addTime} onPress={() => (setTimeDisplay(timeDisplay==='none'? 'flex' : 'none'), setAddTime(addTime==='Add Time'? 'Cancel Time' : 'Add Time'))}/>
+                  <View style={{display: timeDisplay}}>
+                    {showTimePicker && (
+                      <DateTimePicker
+                        value={time}
+                        mode="time"
+                        display="default"
+                        onChange={onChange2}
+                      />
+                    )}
+                  </View>
                 </View>
               </View>
               <Button title={addTag} onPress={() => (setTagDisplay(tagDisplay==='none'? 'flex' : 'none'), setAddTag(addTag==='Add Tag'? 'Delete Tag' : 'Add Tag'))}/>

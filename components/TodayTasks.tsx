@@ -266,8 +266,13 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
               {item.task}
             </Text>
           </View>
-          <View style={{flex:1}}>
-            <Text>{taskTime}</Text>
+          <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
+            <View style={{flex:1,justifyContent:'flex-end'}}>
+              <Text style={{fontSize:10}}>{item.month<9?"0"+(item.month+1).toString():item.month+1}-{item.month<10?"0"+item.day.toString():item.day}</Text>
+            </View>
+            <View style={{flex:1,justifyContent:'flex-start'}}>
+              <Text style={{fontSize:10}}>{taskTime}</Text>
+            </View>
           </View>
           <View style={{flex:1}}>
             <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />
