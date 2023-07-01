@@ -35,13 +35,12 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
         (txObj, error) => console.log('error selecting states')
         );
       });
-      console.warn(tasks);
+
       setIsLoading(false);
     },[load]);
     
     useEffect(() => {
       let existingLogs = [...logs];  
-
       if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined){
         
         db.transaction(tx => {
@@ -52,8 +51,8 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
             },
           );
         });
-        let lastLogIndex = existingLogs.indexOf(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0])-1;
-        let lastLog = existingLogs[lastLogIndex];
+        let lastLogIndex = logs.length-1;
+        let lastLog = logs[lastLogIndex];
         existingLogs=[];
 
         if (lastLog!==undefined) {
@@ -65,10 +64,11 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
             for (var i=0; i<existingRecurringTasks.length;i++){      
               let newTask=existingRecurringTasks[i].task;
               let copyTag=existingRecurringTasks[i].tag;
+              let copyTime=existingRecurringTasks[i].time;
               db.transaction(tx => {
-                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,0],
+                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,copyTime],
                   (txtObj,resultSet)=> {   
-                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:0});
+                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:copyTime});
                   },
                 );
               });
@@ -106,6 +106,24 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
     });
     loadx(!load);
   }
+  const removeTodayLog = () => {
+    let existingLogs = [...logs];
+    db.transaction(tx => {
+      tx.executeSql(
+        'DELETE FROM logs WHERE day = ?',
+        [1],
+        (txObj, resultSet) => {
+          setLogs(existingLogs.filter(c=>c.day!=1)),
+          console.log('Log deleted successfully');
+        },
+        (txObj, error) => {
+          // Handle error
+          console.log('Error deleting logs:', error);
+        }
+      );
+    });
+    console.warn(existingLogs);
+  };
 
   const updateTaskState = (id) => {
     let existingTasks=[...tasks];
@@ -115,6 +133,8 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
     let nextDayYear = nextDay.getFullYear();
     let nextDayMonth = nextDay.getMonth();
     let nextDayDay = nextDay.getDate();
+    let copyTag=existingTasks[indexToUpdate].tag;
+    let copyTime=existingTasks[indexToUpdate].time;
     if (existingTasks[indexToUpdate].taskState==0){
       db.transaction(tx=> {
         tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [1, id],
@@ -155,9 +175,9 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring) values (?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copyTag,copyTime],
             (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0});
+              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, tag:copyTag, time:copyTime});
             },
           );
         });
@@ -204,6 +224,8 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
   };
 
   const Task = ({item}) => {
+
+    let taskTime= item.time==null? "":moment(item.time).format('HH:mm');
     return(
         <View style={styles.taskcontainer}>
           <Pressable onPress={()=> updateTaskState(item.id)}>
@@ -217,6 +239,9 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
             <Text style={styles.tasktext}>
               {item.task}
             </Text>
+          </View>
+          <View style={{flex:1}}>
+            <Text>{taskTime}</Text>
           </View>
           <View style={{flex:1}}>
             <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />
@@ -293,6 +318,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags}) {
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
+        <Button title='remove Todays log' onPress={removeTodayLog} />
         <Button title='remove Tasks' onPress={removeDb} />
         <Button title='remove Logs' onPress={removelogDb} />
       </View>

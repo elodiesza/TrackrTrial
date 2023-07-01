@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import ColorPicker from '../components/ColorPicker';
 import TagPicker from '../components/TagPicker';
 import Color from '../components/Color';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, setTasks, tags, setTags}) {
 
@@ -14,6 +16,14 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
   const [selectedTag, setSelectedTag] = useState(null);
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [picked, setPicked] = useState<string>('white');
+  const [date, setDate] = useState(new Date())
+  const [showDatePicker, setShowDatePicker] = useState(true);
+  const [time, setTime] = useState(new Date())
+  const [showTimePicker, setShowTimePicker] = useState(true);
+  const [dateDisplay, setDateDisplay] = useState<String>('none')
+  const [addDeadline, setAddDeadline] = useState('Add Deadline')
+  const [timeDisplay, setTimeDisplay] = useState('none')
+  const [addTime, setAddTime] = useState('Add Time')
 
   var today = new Date();
   var day = today.getDate();
@@ -47,7 +57,6 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
       (txObj, error) => console.log('error selecting states')
       );
     });
-
     setIsLoading(false);
   },[load]);
 
@@ -61,15 +70,30 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
   }, [addModalVisible, reset]);
 
 
+
+  
+    const onChange = (event, selectedDate) => {
+      const currentDate = selectedDate || date;
+      setShowDatePicker(Platform.OS === 'ios');
+      setDate(currentDate);
+    };
+
+    const onChange2 = (event, selectedTime) => {
+      const currentTime = selectedTime || time;
+      setShowTimePicker(Platform.OS === 'ios');
+      setTime(currentTime);
+    };
+
+
   const addTask = async (data) => {
     let existingTags = [...tags];
     let existingTasks = [...tasks]; 
     var newPlace = existingTasks.filter(c => c.day === 1).map(c => c.name).length;
     if(addTag=='Add Tag' || (selectedTag==null && selectedTag!=='Add a new Tag')){
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,year,month,day,0,recurring?1:0,0,0],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM'),addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,0,addTime=='Add Time'?null:time.toString()],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:day, taskState:0, recurring:recurring?1:0, tag:0, time:0});
+            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM'), day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:0, time:addTime=='Add Time'?null:time.toString()});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
@@ -79,9 +103,9 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
     else if (addTag=='Delete Tag' && selectedTag!=='Add a new Tag'){
       const tempTag = existingTags.filter(c=>c.tag==selectedTag).map(c=>c.id)[0];
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,year,month,day,0,recurring?1:0,tempTag,0],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM'),addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tempTag,addTime=='Add Time'?null:time.toString()],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:day, taskState:0, recurring:recurring?1:0, tag:tempTag, time:0});
+            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM'), day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tempTag, time:addTime=='Add Time'?null:time.toString()});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
@@ -100,9 +124,9 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
               existingTags.push({ id: tagId, tag: data.tag, color: picked });
               setTags(existingTags); // Update the state with the new array of tags
                 db.transaction((tx) => {
-                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,year,month,day,0,recurring?1:0,tagId,0],
+                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM'),addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tagId,addTime=='Add Time'?null:time.toString()],
                     (txtObj,resultSet)=> {    
-                      existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:day, taskState:0, recurring:recurring?1:0, tag:tagId, time:0});
+                      existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM'), day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tagId, time:addTime=='Add Time'?null:time.toString()});
                       setTasks(existingTasks);
                     },
                     (txtObj, error) => console.warn('Error inserting data:', error)
@@ -165,6 +189,28 @@ function NewTask({addModalVisible, setAddModalVisible, load, loadx, db, tasks, s
               }}
               />
               <Switch onValueChange={toggleSwitch} value={recurring}/>
+              <Button title={addDeadline} onPress={() => (setDateDisplay(dateDisplay==='none'? 'flex' : 'none'), setAddDeadline(addDeadline==='Add Deadline'? 'Cancel Deadline' : 'Add Deadline'))}/>
+              <View style={{display: dateDisplay}}>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display="default"
+                    onChange={onChange}
+                  />
+                )}
+              </View>
+              <Button title={addTime} onPress={() => (setTimeDisplay(timeDisplay==='none'? 'flex' : 'none'), setAddTime(addTime==='Add Time'? 'Cancel Time' : 'Add Time'))}/>
+              <View style={{display: timeDisplay}}>
+                {showTimePicker && (
+                  <DateTimePicker
+                    value={time}
+                    mode="time"
+                    display="default"
+                    onChange={onChange2}
+                  />
+                )}
+              </View>
               <Button title={addTag} onPress={() => (setTagDisplay(tagDisplay==='none'? 'flex' : 'none'), setAddTag(addTag==='Add Tag'? 'Delete Tag' : 'Add Tag'))}/>
               <View style={{display: tagDisplay, width:'70%', justifyContent: 'center'}}>
                 <View style={{width:'100%', flexDirection: 'row'}}>
