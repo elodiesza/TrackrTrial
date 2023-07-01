@@ -51,7 +51,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
 
     setIsLoading(false);
 
-
   },[load]);
 
 

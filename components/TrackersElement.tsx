@@ -1,9 +1,11 @@
-import { StyleSheet, Modal, TouchableWithoutFeedback, Alert, Pressable, ScrollView, SafeAreaView, Dimensions, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
+import { StyleSheet,ActivityIndicator, Modal, TouchableWithoutFeedback, Alert, Pressable, ScrollView, SafeAreaView, Dimensions, Text, View, TouchableOpacity, TextInput, FlatList, Button } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
 import NewIndicator from '../modal/NewIndicator';
 import IndicatorMenu from '../modal/IndicatorMenu';
+import IsLoading from '../modal/IsLoading';
+import LastMonth from './LastMonth';
 
 const width = Dimensions.get('window').width;
 
@@ -17,42 +19,82 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
 
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [updatedStates, setUpdatedStates] = useState([]);
+
+  const lastMonthData = states.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
+
 
   useEffect(() => {
-    if(states.filter(c=>(c.year==year && c.month==month))==undefined){
-      let existingStates=[...states];
-      const lastMonthData=states.filter(c=>(c.year==(month==0?year-1:year) && c.month==(month==0? 11 :month-1)));
-      const lastMonthStates = lastMonthData.map(c=>c.name);
-      const lastMonthTypes = lastMonthData.map(c=>c.type);
-      const lastMonthTags = lastMonthData.map(c=>c.tag);
-      for (var j=0;j<lastMonthStates.length;j++){
-        for(var i=1;i<DaysInMonth(year,month)+1;i++){
-          db.transaction((tx) => {
-            tx.executeSql(
-              'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-              [lastMonthStates[j], year, month, i, 0, lastMonthTypes[j], lastMonthTags[j], j],
-              (txtObj, stateResultSet) => {
-                const newStateId = stateResultSet.insertId;
-                const newState = {
-                  id: newStateId,
-                  name: lastMonthStates[j],
-                  year: year,
-                  month: month,
-                  day: i,
-                  state: 0,
-                  type: lastMonthTypes[j],
-                  tag: lastMonthTags[j],
-                  place: j,
-                };
-                existingStates.push(newState);
-                setStates(existingStates); // Update the state with the new array of states
-              }
-            );
-          });
+    if (states.filter(c => c.year === thisYear && c.month === thisMonth).length === 0) {
+      let existingStates = [...states];
+      let lastMonthStates = lastMonthData.filter(c => c.day === 1).map(c => c.name);
+      let lastMonthTypes = lastMonthData.filter(c => c.day === 1).map(c => c.type);
+      let lastMonthTags = lastMonthData.filter(c => c.day === 1).map(c => c.tag);
+
+      const insertStates = async () => {
+        const promises = [];
+      for (let j = 0; j < lastMonthStates.length; j++) {
+        const name = lastMonthStates[j];
+
+        for (let i = 1; i <= DaysInMonth(thisYear, thisMonth); i++) {
+          promises.push(
+          new Promise((resolve, reject) => {
+            db.transaction(tx => {
+              tx.executeSql(
+                'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthTags[j], j],
+                (txtObj, stateResultSet) => {
+                  const newState = {
+                    id: stateResultSet.insertId,
+                    name: name,
+                    year: thisYear,
+                    month: thisMonth,
+                    day: i,
+                    state: 0,
+                    type: lastMonthTypes[j],
+                    tag: lastMonthTags[j],
+                    place: j,
+                  };
+                  existingStates.push(newState);
+                  resolve(newState);
+                },
+                (_, error) => {
+                  console.log(error);
+                  reject(error);
+                }
+              );
+            });
+          })
+          );
         }
       }
+      return Promise.all(promises);
+      };
+      insertStates()
+        .then(newStates => {
+          setUpdatedStates([...updatedStates, ...newStates]); // Update the updatedStates state variable
+          setIsLoading(false); 
+        })
+        .catch(error => {
+          console.log(error);
+          setIsLoading(false); 
+        });
+    } 
+    else {
+      setIsLoading(false); // Set loading state to false if the data is already present
     }
-  })
+  }, []);
+
+  useEffect(() => {
+
+      setStates(updatedStates); // Update the states state variable
+      loadx(!load);
+
+  }, [updatedStates]);
+
+  
 
     const removeDb = () => {
       db.transaction(tx => {
@@ -72,6 +114,25 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
       });
       loadx(!load);
     }
+
+    const removeDbMonth = () => {
+      let existingStates = [...states];
+      db.transaction(tx => {
+        tx.executeSql(
+          'DELETE FROM states WHERE month = ?',
+          [6],
+          (txObj, resultSet) => {
+            setStates(existingStates.filter(c=>c.month!=6)),
+            console.log('States deleted successfully');
+          },
+          (txObj, error) => {
+            // Handle error
+            console.log('Error deleting states:', error);
+          }
+        );
+      });
+    };
+
 
 
     const updateState = (id) => {
@@ -166,12 +227,17 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.container,{width: width}]}>
+      {isLoading ? (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="blue" /> 
+        </View>
+      ) : (
       <ScrollView nestedScrollEnabled  bounces={false} showsVerticalScrollIndicator={false} style={{flex:1,width:width}}>
         <View style={{flex:1,flexDirection:'row'}}>
           <View>
           <FlatList
             data={listDays()}
-            renderItem={(item)=>showNumber(item)}
+            renderItem={(item)=>(showNumber(item))}
             keyExtractor={(_, index) => index.toString()}
             style={{marginTop:76,width:25,flexDirection:'row'}}
             scrollEnabled={false}
@@ -180,13 +246,15 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
           <FlatList
             horizontal
             data={uniqueNames}
-            renderItem={(name)=>showTitle(name)}
-            keyExtractor={(name) => name.toString()} 
+            renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
+            keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
           />
         </View>
         <View pointerEvents="none" style={{position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >
+      )}
       </View>
+      <Button title='remove thismonth indicators' onPress={removeDbMonth} />
       <Button title='remove Indicators' onPress={removeDb} />
       <Button title='remove Tags' onPress={removeTagsDb} />
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>

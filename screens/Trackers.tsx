@@ -53,7 +53,7 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx}) => {
     else {
       setMonth(month+1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+1))==""){
+    if (states.filter(c=>(c.year==year && c.month==month+2))==""){
       setLastMonth(true);
     }
     setFirstMonth(false);
