@@ -1,6 +1,7 @@
 import { FlatList, Pressable, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
 import IndicatorTableTitleToday from './IndicatorTableTitleToday';
+import SleeplogToday from './SleeplogToday';
 import Sad from '../assets/images/icons/sad.png';
 import Angry from '../assets/images/icons/angry.png';
 import Happy from '../assets/images/icons/happy.png';
@@ -11,7 +12,7 @@ import Bored from '../assets/images/icons/bored.png';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, moods, setMoods, load, loadx}) => {
+const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, moods, setMoods, sleep, setSleep, load, loadx}) => {
 
     var today = new Date();
     var year = today.getFullYear();
@@ -135,17 +136,23 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
             </TouchableOpacity>     
         </View>
       </View>
-        <View style={{flex:1, width:width}}>
-            <Text>
-                Today's habits completion
-            </Text>
-            <FlatList
-                horizontal
-                data={uniqueNames}
-                renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
-                keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
-            />
-        </View>
+      <View style={{flex:1, width:width}}>
+        <Text>
+          Today's habits completion
+        </Text>
+        <FlatList
+          horizontal
+          data={uniqueNames}
+          renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
+          keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
+        />
+      </View>
+      <View style={{flex:1, width:width}}>
+        <Text>
+          Sleep Log
+        </Text>
+        <SleeplogToday db={db} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>
+      </View>
     </SafeAreaView>
   );
 }

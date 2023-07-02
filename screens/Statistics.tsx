@@ -2,10 +2,11 @@ import { FlatList, SafeAreaView, Pressable, StyleSheet, Text, View, Dimensions }
 import { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
+import SleeplogMonth from '../components/SleepLogMonth';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({states, tags, setStates, setTags, load, loadx}) => {
+const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -118,11 +119,14 @@ const Statistics = ({states, tags, setStates, setTags, load, loadx}) => {
         </Pressable>
       </View>
       <View style={styles.body}>
-        <FlatList
-          data={states.filter(c=>(c.day==1 && c.month==month && c.year==year))}
-          renderItem={(item)=>IndList(item)}
-          keyExtractor={(_, index) => index.toString()}
-        />
+        <View style={{height:400}}>
+          <FlatList
+            data={states.filter(c=>(c.day==1 && c.month==month && c.year==year))}
+            renderItem={(item)=>IndList(item)}
+            keyExtractor={(_, index) => index.toString()}
+          />
+        </View>
+        <SleeplogMonth sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
       </View>
     </SafeAreaView>
   );
@@ -137,8 +141,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   header: {
-    flex: 1,
     width: width,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -146,6 +150,6 @@ const styles = StyleSheet.create({
     borderBottomColor: 'gray',    
   },
   body: {
-    flex:16,
+    flex:1,
   }
 });

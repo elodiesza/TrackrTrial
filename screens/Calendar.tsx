@@ -114,11 +114,11 @@ const styles = StyleSheet.create({
     height: (8/10)*(height/6),
   },
   header: {
-    flex:1,
+    width: width,
+    height: 50,
     marginTop: 48,
     alignContent: 'center',
     justifyContent: 'center',
-    width: width,
     flexDirection: 'row',
     borderBottomColor:'gray',
     borderBottomWidth:1,

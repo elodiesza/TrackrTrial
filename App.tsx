@@ -41,6 +41,7 @@ export default function App() {
   const [tasks, setTasks] = useState([]);
   const [tags, setTags] = useState([]);
   const [moods, setMoods] = useState([]);
+  const [sleep, setSleep] = useState([]);
 
 
 useEffect(() => {
@@ -81,6 +82,15 @@ useEffect(() => {
     (txObj, error) => console.log('error selecting states')
     );
   });
+  db.transaction(tx => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS sleep (id INTEGER PRIMARY KEY AUTOINCREMENT, sleep INTEGER, wakeup INTEGER, year INTEGER, month INTEGER, day INTEGER, type INT, UNIQUE(sleep,year,month,day),UNIQUE(wakeup,year,month,day))')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM sleep', null,
+    (txObj, resultSet) => setSleep(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting states')
+    );
+  });
   setIsLoading(false);
 
 },[load]);
@@ -88,7 +98,7 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Today">
-        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} sleep={sleep} load={load} loadx={loadx}/>} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -102,7 +112,7 @@ useEffect(() => {
             <Feather name="check-square" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} states={states} setStates={setStates} moods={moods} setMoods={setMoods} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} states={states} setStates={setStates} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

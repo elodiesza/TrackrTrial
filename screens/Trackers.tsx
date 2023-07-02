@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   header: {
-    flex: 1,
     width: width,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
