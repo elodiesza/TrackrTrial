@@ -101,7 +101,7 @@ useEffect(() => {
             <Feather name="check-square" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} states={states} setStates={setStates} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

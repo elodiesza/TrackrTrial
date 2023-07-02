@@ -2,9 +2,10 @@ import { FlatList, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react
 import { useState, useEffect } from 'react';
 import Swiper from 'react-native-swiper';
 import TodayTasks from '../components/TodayTasks';
+import TodayScreen from '../components/TodayScreen';
 
 
-const Today = ({db, tasks, setTasks, tags, setTags, load, loadx}) => {
+const Today = ({db, tasks, setTasks, tags, setTags, states, setStates, load, loadx}) => {
 
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
@@ -21,9 +22,7 @@ const Today = ({db, tasks, setTasks, tags, setTags, load, loadx}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
-        <View>
-          <Text>Hello</Text>
-        </View>
+        <TodayScreen db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} states={states} setStates={setStates} load={load} loadx={loadx}/>
         <TodayTasks db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} load={load} loadx={loadx}/>
       </Swiper>
     </SafeAreaView>
