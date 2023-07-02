@@ -6,7 +6,7 @@ import TrackersElement from '../components/TrackersElement';
 
 const width = Dimensions.get('window').width;
 
-const Trackers = ({db, states, tags, setStates, setTags, load, loadx}) => {
+const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, setMoods}) => {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -84,6 +84,8 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx}) => {
       states={states}
       tags={tags}
       setTags={setTags}
+      moods={moods}
+      setMoods={setMoods}
       />
     </SafeAreaView>
   );

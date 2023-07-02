@@ -81,7 +81,6 @@ useEffect(() => {
     (txObj, error) => console.log('error selecting states')
     );
   });
-
   setIsLoading(false);
 
 },[load]);
@@ -96,7 +95,7 @@ useEffect(() => {
               <Feather name="activity" size={28} />  
             </View>)}}
         />
-        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

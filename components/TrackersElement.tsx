@@ -7,7 +7,7 @@ import IndicatorMenu from '../modal/IndicatorMenu';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setStates, states, tags, setTags}) {
+export default function TrackersElement({db, year, month, load, loadx, setStates, states, tags, setTags, moods, setMoods}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -211,8 +211,23 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
         )   
     }
 
+    const showMood = (mood) => {
+      const bgColor = mood.item==null?'white': mood.item=='happy'?'yellowgreen': mood.item=='productive'?'green': mood.item=='sick'?'yellow': mood.item=='stressed'?'orange': mood.item=='angry'?'red': mood.item=='bored'?'purple': mood.item=='sad'?'lightblue': 'white';
+      return  (
+          <View style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: mood.item==null?'white': bgColor }}/>
+        )   
+    }
+
     const allNames = states.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
+
+    const thismonthMoods = (year,month) =>{
+      var arr= [];
+      for (let i=1; i<=DaysInMonth(year,month);i++) {
+        arr.push(moods.filter(c=>(c.year==year && c.month==month && c.day==i)).length==0? null : moods.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.mood)[0] );
+      }
+      return (arr);
+    };
 
     const listDays = () => {
       var arr= [];
@@ -233,12 +248,21 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
       <ScrollView nestedScrollEnabled  bounces={false} showsVerticalScrollIndicator={false} style={{flex:1,width:width}}>
         <View style={{flex:1,flexDirection:'row'}}>
           <View>
-          <FlatList
-            data={listDays()}
-            renderItem={(item)=>(showNumber(item))}
-            keyExtractor={(_, index) => index.toString()}
-            style={{marginTop:76,width:25,flexDirection:'row'}}
-            scrollEnabled={false}
+            <FlatList
+              data={listDays()}
+              renderItem={(item)=>(showNumber(item))}
+              keyExtractor={(_, index) => index.toString()}
+              style={{marginTop:75,width:25,flexDirection:'row'}}
+              scrollEnabled={false}
+            />
+          </View>
+          <View>
+            <FlatList
+              data={thismonthMoods(year,month)}
+              renderItem={(item)=>(showMood(item))}
+              keyExtractor={(_, index) => index.toString()}
+              style={{marginTop:75,width:25,flexDirection:'row'}}
+              scrollEnabled={false}
             />
           </View>
           <FlatList

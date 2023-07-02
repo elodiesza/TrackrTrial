@@ -19,6 +19,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
     var day = today.getDate();
     const [isLoading, setIsLoading] = useState(false);
 
+
     const allNames = states.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
 
@@ -73,6 +74,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
     };
 
     const updateMood = (mood) => {
+
         let existingMoods=[...moods];
         if (existingMoods.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0){
           db.transaction(tx=> {
