@@ -9,13 +9,10 @@ const Statistics = ({states, tags, setStates, setTags, load, loadx}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
-  var thisDay = today.getDate();
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
   const [month,setMonth] = useState(thisMonth);
   const [year,setYear] = useState(thisYear);
-  const [day, setDay] = useState(thisDay);
-  const [isLoading, setIsLoading] = useState(false);
   const [firstMonth, setFirstMonth] = useState(false);
   const [lastMonth, setLastMonth] = useState(false);
 

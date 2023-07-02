@@ -7,6 +7,9 @@ import Calendar from './screens/Calendar';
 import Settings from './screens/Settings';
 import Statistics from './screens/Statistics';
 import Today from './screens/Today';
+import Account from './screens/Settings/Account';
+import About from './screens/Settings/About';
+import Help from './screens/Settings/Help';
 import Feather from '@expo/vector-icons/Feather';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect,useState } from 'react';
@@ -14,21 +17,14 @@ import * as SQLite from 'expo-sqlite';
 
 const Stack = createNativeStackNavigator();
 
-
-function HomeScreen() {
-
-
+function SettingsNavigator() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={Settings}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="Settings" component={Settings} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+      <Stack.Screen name="Account" component={Account} options={{ headerShown: false }} />
+      <Stack.Screen name="About" component={About} options={{ headerShown: false }} />
+      <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
+    </Stack.Navigator>
   );
 }
 
@@ -119,7 +115,7 @@ useEffect(() => {
             <Feather name="calendar" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Settings" component={Settings}
+        <Tab.Screen name="Settings" component={SettingsNavigator}
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>

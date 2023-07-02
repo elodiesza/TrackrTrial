@@ -33,18 +33,14 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
         (txObj, error) => console.log('error selecting states')
         );
       });
-      console.warn(logs);
-      console.warn(tasks);
       setIsLoading(false);
     },[load]);
     
     useEffect(() => {
       if (!isLoading && tasks.length > 0 && logs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined) {
-        console.warn('enters new log');
         if(logs.length > 0){
         let existingLogs = [...logs];  
         if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
-          console.warn('creates new log');
           db.transaction(tx => {
             tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
               (txtObj,resultSet)=> {    
@@ -55,13 +51,9 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
           });
           let lastLogIndex = logs.length-1;
           let lastLog = logs[lastLogIndex];
-          console.warn(lastLog);
           let existingTasks=[...tasks];
-          console.warn(existingTasks);
-          console.warn(existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day)));
 
           let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
-          console.warn(existingRecurringTasks);
           existingLogs=[];
 
           if (lastLog!==undefined) {
@@ -164,7 +156,6 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
         }
       );
     });
-    console.warn(existingLogs);
   };
 
   const updateTaskState = (id) => {

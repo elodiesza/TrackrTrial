@@ -8,7 +8,6 @@ const ChangeIndName = ({db, data, changeModalVisible, setChangeModalVisible, sta
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState(null);
     const {control, handleSubmit, reset} = useForm();
-    var today = new Date();
     const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
     const EditInd = (name) => {

@@ -53,8 +53,6 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
   }, [addModalVisible, reset]);
 
 
-
-  
     const onChange = (event, selectedDate) => {
       const currentDate = selectedDate || date;
       setShowDatePicker(Platform.OS === 'ios');
@@ -70,7 +68,6 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
   const addTask = async (data) => {
     let existingTags = [...tags];
     let existingTasks = [...tasks]; 
-    var newPlace = existingTasks.filter(c => c.day === 1).map(c => c.name).length;
     if(addTag=='Add Tag' || (selectedTag==null && selectedTag!=='Add a new Tag')){
         db.transaction((tx) => {
           tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM')-1,addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,0,addTime=='Add Time'?null:time.toString()],
