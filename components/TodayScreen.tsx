@@ -109,6 +109,8 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={{flex:1}}>
+        <Text>Today's mood</Text>
         <View style={{flex:1, width:width, flexDirection:'row', justifyContent:'center'}}>
             <TouchableOpacity onPress={()=>updateMood('productive')}>
                 <Image source={Productive} style={styles.mood} />
@@ -132,6 +134,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
                 <Image source={Sad} style={styles.mood} />
             </TouchableOpacity>     
         </View>
+      </View>
         <View style={{flex:1, width:width}}>
             <Text>
                 Today's habits completion

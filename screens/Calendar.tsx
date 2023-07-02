@@ -20,6 +20,8 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
   const [day, setDay] = useState(thisDay);
   const [firstMonth, setFirstMonth] = useState(false);
   const [lastMonth, setLastMonth] = useState(false);
+  const [displayMonth, setDisplayMonth] = useState(true);
+
 
   useEffect(() => {
     if (states.filter(c=>(c.year==year && c.month==month-1))==undefined) {
@@ -78,16 +80,16 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
 
   return (
     <View style={styles.container}>
-       <View style={styles.header}>
-        <Pressable onPress={LastMonth}>
-          <Feather name='chevron-left' size={40} style={{right:30}}/>
+      <View style={styles.header}>
+        <Pressable onPress={displayMonth==true? ()=>LastMonth(states): ()=>setYear(year-1)}>
+          <Feather name='chevron-left' size={40} style={{right:30}} color={'black'}/>
         </Pressable>
-        <View>
-          <Text style={{fontSize:10, textAlign:'center'}}>{moment(new Date(year,1,1)).format('YYYY')}</Text>
-          <Text style={{fontSize:22, textAlign:'center'}}>{moment(new Date(0,month,1)).format('MMMM')}</Text>
-        </View>
-        <Pressable onPress={NextMonth}>
-          <Feather name='chevron-right' size={40} style={{left:30}}/>
+        <Pressable onPress={()=>setDisplayMonth(!displayMonth)}>
+          <Text style={{fontSize:10, textAlign:'center'}}>{displayMonth==true?moment(new Date(year,1,1)).format('YYYY'):moment(new Date(0,month,1)).format('MMMM')}</Text>
+          <Text style={{fontSize:22, textAlign:'center'}}>{displayMonth==true?moment(new Date(0,month,1)).format('MMMM'):moment(new Date(year,1,1)).format('YYYY')}</Text>
+        </Pressable>
+        <Pressable onPress={displayMonth==true? ()=>NextMonth(states): ()=>setYear(year+1)}>
+          <Feather name='chevron-right' size={40} style={{left:30}} color={'black'}/>
         </Pressable>
       </View>
       <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags} setTags={setTags} load={load} loadx={loadx} db={db}/>
@@ -118,9 +120,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: width,
     flexDirection: 'row',
+    borderBottomColor:'gray',
+    borderBottomWidth:1,
   },
   calendarContainer: {
-    flex:14,
+    flex:10,
     alignContent: 'center',
     justifyContent: 'center',
   },

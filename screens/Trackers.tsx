@@ -15,6 +15,8 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, set
   const [year,setYear] = useState(thisYear);
   const [firstMonth, setFirstMonth] = useState(false);
   const [lastMonth, setLastMonth] = useState(false);
+  const [displayMonth, setDisplayMonth] = useState(true);
+
 
   useEffect(() => {
     if (states.filter(c=>(c.year==year && c.month==month-1))=="") {
@@ -63,15 +65,15 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, set
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={firstMonth? undefined:LastMonth}>
-          <Feather name='chevron-left' size={40} style={{right:30}} color={firstMonth? 'lightgray':'black'}/>
+        <Pressable onPress={displayMonth==true?firstMonth? undefined:()=>LastMonth(states):(states.filter(c=>c.year==year-1).length==0? undefined: ()=>(setYear(year-1), setMonth(12-states.filter(c=>c.year==year+1).length)))}>
+          <Feather name='chevron-left' size={40} style={{right:30}} color={displayMonth==true?firstMonth? 'lightgray':'black':'lightgray'}/>
         </Pressable>
-        <View>
-          <Text style={{fontSize:10, textAlign:'center'}}>{moment(new Date(year,1,1)).format('YYYY')}</Text>
-          <Text style={{fontSize:22, textAlign:'center'}}>{moment(new Date(0,month,1)).format('MMMM')}</Text>
-        </View>
-        <Pressable onPress={lastMonth? undefined:NextMonth}>
-          <Feather name='chevron-right' size={40} style={{left:30}} color={lastMonth?'lightgray':'black'}/>
+        <Pressable onPress={()=>setDisplayMonth(!displayMonth)}>
+          <Text style={{fontSize:10, textAlign:'center'}}>{displayMonth==true?moment(new Date(year,1,1)).format('YYYY'):moment(new Date(0,month,1)).format('MMMM')}</Text>
+          <Text style={{fontSize:22, textAlign:'center'}}>{displayMonth==true?moment(new Date(0,month,1)).format('MMMM'):moment(new Date(year,1,1)).format('YYYY')}</Text>
+        </Pressable>
+        <Pressable onPress={displayMonth==true?lastMonth? undefined:NextMonth:(states.filter(c=>c.year==year+1).length==0? undefined: ()=>(setYear(year+1), setMonth(states.filter(c=>c.year==year+1).length-1)))}>
+          <Feather name='chevron-right' size={40} style={{left:30}} color={displayMonth==true?lastMonth?'lightgray':'black':'lightgray'}/>
         </Pressable>
       </View>
       <TrackersElement 
@@ -97,7 +99,7 @@ export default Trackers;
 
 const styles = StyleSheet.create({
   container: {
-    flex:16,
+    flex:1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -107,6 +109,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
   },
   cell: {
     width: 25,

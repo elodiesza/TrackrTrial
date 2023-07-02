@@ -257,11 +257,12 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
             />
           </View>
           <View>
+            <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>MOOD</Text>
             <FlatList
               data={thismonthMoods(year,month)}
               renderItem={(item)=>(showMood(item))}
               keyExtractor={(_, index) => index.toString()}
-              style={{marginTop:75,width:25,flexDirection:'row'}}
+              style={{width:25,flexDirection:'row'}}
               scrollEnabled={false}
             />
           </View>
@@ -276,9 +277,9 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
       </ScrollView >
       )}
       </View>
-      <Button title='remove thismonth indicators' onPress={removeDbMonth} />
+      {/*<Button title='remove thismonth indicators' onPress={removeDbMonth} />
       <Button title='remove Indicators' onPress={removeDb} />
-      <Button title='remove Tags' onPress={removeTagsDb} />
+      <Button title='remove Tags' onPress={removeTagsDb} /> */}
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
       </ TouchableOpacity> 
@@ -359,4 +360,22 @@ const styles = StyleSheet.create({
     margin: 10,
     marginTop: 20,
   },
+  polygon: {
+    width: 25,
+    height: 75,
+    borderWidth: 0.3,
+    borderColor: 'gray',
+    opacity: 1,
+    transform: [{skewX: '-45deg'}],
+    left:38,
+    backgroundColor: 'white',
+},
+indText: {
+    position: 'absolute',
+    transform: [{scaleY: 0.5}, { rotate: "295deg" },{skewX: '-35deg'}],
+    width: 120,
+    height: 100,
+    top: 12,
+    left: 12,
+}
 });

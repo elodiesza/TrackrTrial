@@ -356,10 +356,10 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
-        <Button title='Add yesterdayLog' onPress={addLog} />
+        {/*<Button title='Add yesterdayLog' onPress={addLog} />
         <Button title='remove Todays log' onPress={removeTodayLog} />
         <Button title='remove Tasks' onPress={removeDb} />
-        <Button title='remove Logs' onPress={removelogDb} />
+  <Button title='remove Logs' onPress={removelogDb} />*/}
       </View>
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
