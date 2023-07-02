@@ -6,10 +6,8 @@ import MonthlyTasks from '../components/MonthlyTasks';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db}) {
+export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks}) {
 
-  const [addTodoVisible, setAddTodoVisible] = useState(false);
-  const [statex, setStatex] = useState(false);
   var today = new Date();
   var thisDay = today.getDate();
   var thisMonth = today.getMonth();
@@ -135,7 +133,7 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
             renderItem={({item}) => CalendarLine(item)}
             keyExtractor={item => item.id}
           />
-          <MonthlyTasks db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month}/>
+          <MonthlyTasks db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month} tasks={tasks} setTasks={setTasks}/>
         </Swiper>
     </View>
   );

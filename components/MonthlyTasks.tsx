@@ -10,9 +10,11 @@ import NewMTask from '../modal/NewMTask';
 
 const width = Dimensions.get('window').width;
 
-export default function MonthlyTasks({db, load, loadx, tags, setTags, year, month}) {
+export default function MonthlyTasks({db, load, loadx, tags, setTags, year, month, tasks, setTasks}) {
   
   const today = new Date();
+  const thisYear = today.getFullYear();
+  const thisMonth = today.getMonth();
   const day = today.getDate();
   const [isLoading, setIsLoading] = useState(true);
   const [mtasks, setMTasks] = useState([]);
@@ -118,23 +120,55 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     }
   },[isLoading, mlogs]);
 
+  const TransferDaily = (id) => {
+    let existingTasks = [...tasks];
+    let toTransfer = mtasks.filter(c=>(c.id==id))[0];
+    console.warn(toTransfer);
+    db.transaction((tx) => {
+      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,toTransfer.tag,null],
+      (txtObj,resultSet)=> {    
+        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, tag:toTransfer.tag, time:null});
+        setTasks(existingTasks);
+      },
+      (txtObj, error) => console.warn('Error inserting data:', error)
+      );
+    })
+    db.transaction(tx => {
+      tx.executeSql('DELETE FROM mtasks WHERE id = ?', [id],
+        (txObj, resultSet) => {
+          if (resultSet.rowsAffected > 0) {
+            let existingTasks = [...mtasks].filter(task => task.id !== id);
+            setMTasks(existingTasks);
+          }
+        },
+        (txObj, error) => console.log(error)
+      );
+    })
+  }
+
   const DeleteItem = ({ id }) => (
-    <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
-      <Pressable onPress={ () =>
-        db.transaction(tx=> {
+    <View style={{ flex: 1, backgroundColor: 'green', flexDirection: 'row' }}>
+      <View style={{ width: width - 50, paddingRight: 12, justifyContent: 'center', alignItems: 'flex-end', backgroundColor: 'yellowgreen' }}>
+        <Pressable onPress={()=>TransferDaily(id)}>
+          <Feather name="calendar" size={25} color={'white'} />
+        </Pressable>
+      </View>
+      <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: 'darkred' }}>
+        <Pressable onPress={() => 
+        db.transaction(tx => {
           tx.executeSql('DELETE FROM mtasks WHERE id = ?', [id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
-                let existingTasks = [...mtasks].filter(task => task.id !==id);
+                let existingTasks = [...mtasks].filter(task => task.id !== id);
                 setMTasks(existingTasks);
               }
             },
             (txObj, error) => console.log(error)
-          );       
-        })  
-      }>
-          <Feather name="trash-2" size={25} color={'white'}/>
-      </Pressable> 
+          );
+        })}>
+          <Feather name="trash-2" size={25} color={'white'} />
+        </Pressable>
+      </View>
     </View>
   );
 
@@ -292,7 +326,7 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
         </View>
         <SwipeListView style={styles.dailyTasks} data={dailyData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
-          rightOpenValue={-80}
+          rightOpenValue={-100}
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />

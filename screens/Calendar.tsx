@@ -92,7 +92,7 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
           <Feather name='chevron-right' size={40} style={{left:30}} color={'black'}/>
         </Pressable>
       </View>
-      <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags} setTags={setTags} load={load} loadx={loadx} db={db}/>
+      <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags} setTags={setTags} load={load} loadx={loadx} db={db} setTasks={setTasks}/>
     </View>
   );
 }
