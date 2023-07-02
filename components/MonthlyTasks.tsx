@@ -9,13 +9,10 @@ import NewMTask from '../modal/NewMTask';
 
 
 const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
 
-export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
+export default function MonthlyTasks({db, load, loadx, tags, setTags, year, month}) {
   
   const today = new Date();
-  const month = today.getMonth();
-  const year = today.getFullYear();
   const day = today.getDate();
   const [isLoading, setIsLoading] = useState(true);
   const [mtasks, setMTasks] = useState([]);
@@ -44,7 +41,6 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
       (txObj, error) => console.log('error selecting states')
       );
     });
-    console.warn(mtasks);
     setIsLoading(false);
   },[load]);
 
@@ -60,18 +56,14 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
       (txObj, error) => console.log('error selecting states')
       );
     });
-    console.warn(mlogs);
-    console.warn(mtasks);
     setIsLoading(false);
   },[load]);
   
   useEffect(() => {
     if (!isLoading && mtasks.length > 0 && mlogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined) {
-      console.warn('enters new mlog');
       if(mlogs.length > 0){
       let existingLogs = [...mlogs];  
       if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
-        console.warn('creates new mlog');
         db.transaction(tx => {
           tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,day],
             (txtObj,resultSet)=> {    
@@ -82,28 +74,18 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
         });
         let lastLogIndex = mlogs.length-1;
         let lastLog = mlogs[lastLogIndex];
-        console.warn(lastLog);
         let existingTasks=[...mtasks];
-        console.warn(existingTasks);
-        console.warn(existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day)));
 
         let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
-        console.warn(existingRecurringTasks);
         existingLogs=[];
 
         if (lastLog!==undefined) {
-          console.warn('enters');
+
           var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
-          console.warn(daysBetweenLastAndToday);
           for(var j=1;j<daysBetweenLastAndToday+1;j++){
-            console.warn('enters');
             var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
-            console.warn(newDate);
-            console.warn(existingRecurringTasks.length);
             for (var i=0; i<existingRecurringTasks.length;i++){    
-              console.warn('enters');  
               let newTask=existingRecurringTasks[i].task;
-              console.warn(existingRecurringTasks[i].task);
               let copyTag=existingRecurringTasks[i].tag;
               let copyTime=existingRecurringTasks[i].time;
               db.transaction(tx => {
@@ -274,8 +256,6 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
   };
 
   const Task = ({item}) => {
-
-    let taskTime= item.time==null? "":moment(item.time).format('HH:mm');
     return(
         <View style={styles.taskcontainer}>
           <Pressable onPress={()=> updateTaskState(item.id)}>
@@ -291,12 +271,6 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
             </Text>
           </View>
           <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
-            <View style={{flex:1,justifyContent:'flex-end'}}>
-              <Text style={{fontSize:10}}>{item.month<9?"0"+(item.month+1).toString():item.month+1}-{item.month<10?"0"+item.day.toString():item.day}</Text>
-            </View>
-            <View style={{flex:1,justifyContent:'flex-start'}}>
-              <Text style={{fontSize:10}}>{taskTime}</Text>
-            </View>
           </View>
           <View style={{flex:1}}>
             <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />
@@ -305,8 +279,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
     )
   };
 
-  const dailyData = mtasks.filter(c=>(c.day==date.getDate() && c.recurring==0));
-  const recurringData = mtasks.filter(c=>(c.day==date.getDate() && c.recurring==1));
+  const dailyData = mtasks.filter(c=>(c.year==year && c.month==month && c.recurring==0));
+  const recurringData = mtasks.filter(c=>(c.year==year && c.month==month && c.recurring==1));
 
   return (
     <>
@@ -345,6 +319,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
         setMTasks={setMTasks}
         tags={tags}
         setTags={setTags}
+        year={year}
+        month={month}
       />
     </>
   );

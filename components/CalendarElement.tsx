@@ -135,7 +135,7 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
             renderItem={({item}) => CalendarLine(item)}
             keyExtractor={item => item.id}
           />
-          <MonthlyTasks db={db} load={load} loadx={loadx} tags={tags} setTags={setTags}/>
+          <MonthlyTasks db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month}/>
         </Swiper>
     </View>
   );

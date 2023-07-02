@@ -8,7 +8,6 @@ import moment from 'moment';
 import Color from './Color';
 
 const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
 
 export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx}) {
   const today = new Date();
@@ -257,8 +256,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
   };
 
   const Task = ({item}) => {
-
-    let taskTime= item.time==null? "":moment(item.time).format('HH:mm');
+    let taskTime= item.time=="null"? "":moment(item.time).format('HH:mm');
     return(
         <View style={styles.taskcontainer}>
           <Pressable onPress={()=> updateTaskState(item.id)}>
@@ -274,12 +272,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
             </Text>
           </View>
           <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
-            <View style={{flex:1,justifyContent:'flex-end'}}>
-              <Text style={{fontSize:10}}>{item.month<9?"0"+(item.month+1).toString():item.month+1}-{item.month<10?"0"+item.day.toString():item.day}</Text>
-            </View>
-            <View style={{flex:1,justifyContent:'flex-start'}}>
-              <Text style={{fontSize:10}}>{taskTime}</Text>
-            </View>
+              <Text style={{fontSize:10}}>{taskTime=="Invalid date"?"":taskTime}</Text>
           </View>
           <View style={{flex:1}}>
             <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />

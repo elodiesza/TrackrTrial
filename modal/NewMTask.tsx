@@ -6,7 +6,7 @@ import TagPicker from '../components/TagPicker';
 import Color from '../components/Color';
 import moment from 'moment';
 
-function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, tags, setTags}) {
+function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, tags, setTags, year, month}) {
 
   const {control, handleSubmit, reset} = useForm();
   const [tagDisplay, setTagDisplay] = useState<"none" | "flex" | undefined>('none');
@@ -26,8 +26,6 @@ function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, ta
 
   var today = new Date();
   var day = today.getDate();
-  var month = today.getMonth();
-  var year = today.getFullYear();
 
   const [recurring, setRecurring] = useState(false);
   const toggleSwitch = () => setRecurring(previousState => !previousState);

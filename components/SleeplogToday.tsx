@@ -17,7 +17,6 @@ const SleeplogToday = ({ db, sleep, setSleep, load, loadx}) => {
     const [sleepTime,setSleepTime] = useState(new Date());
     const [wakeupTime,setWakeupTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(true);
-    console.warn(sleep);
 
 
     const onChangeSleep = (event, selectedTime) => {
@@ -98,8 +97,8 @@ const SleeplogToday = ({ db, sleep, setSleep, load, loadx}) => {
   return (
     <SafeAreaView style={styles.container}>
         <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <View style={{marginLeft:10,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
-                <Text>Today's wakeup time</Text>
+            <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
+                <Text>WAKE-UP TIME</Text>
                 <DateTimePicker
                     value={wakeupTime}
                     mode="time"
@@ -107,11 +106,12 @@ const SleeplogToday = ({ db, sleep, setSleep, load, loadx}) => {
                     onChange={onChangeWakeup}
                     minuteInterval={30}
                     timeZoneOffsetInMinutes={9*60}
+                    style={{marginRight:8}}
                 />
                 <Pressable onPress={addWakeup} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
             </View>
-            <View style={{marginRight:10,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
-                <Text>Yesterday's sleep time</Text>
+            <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
+                <Text>SLEEP TIME</Text>
                 <DateTimePicker
                     value={sleepTime}
                     mode="time"
@@ -119,6 +119,7 @@ const SleeplogToday = ({ db, sleep, setSleep, load, loadx}) => {
                     onChange={onChangeSleep}
                     minuteInterval={30}
                     timeZoneOffsetInMinutes={9*60}
+                    style={{marginRight:8}}
                 />
                 <Pressable onPress={addSleep} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
             </View>

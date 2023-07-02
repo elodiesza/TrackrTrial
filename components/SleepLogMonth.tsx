@@ -29,9 +29,12 @@ const SleeplogMonth = ({ sleep, load, loadx, year, month}) => {
       }
     };
 
-    const HorizontalAxisGraduation =() => {
+    const HorizontalAxisGraduation =(day) => {
       return(
-        <View style={{flex:1, width:10, height:3, borderRightWidth:1}}/>
+        <View style={{width:10}}>
+          <View style={{width:10, height:3, borderRightWidth:1}}/>
+          <View style={{width:10, height:17}}><Text style={{fontSize:6,textAlign:'center'}}>{day.item+1}</Text></View>
+        </View>
       )
     };
 
@@ -67,12 +70,12 @@ const SleeplogMonth = ({ sleep, load, loadx, year, month}) => {
                 horizontal={true}
                 scrollEnabled={false}
               />
-              <View pointerEvents="none" style={{position:'absolute',width:'100%',height:10*15,borderTopWidth:1,borderTopColor:'lightgray',bottom:0}}/>
+              <View pointerEvents="none" style={{position:'absolute',width:'100%',height:10*16,borderTopWidth:1,borderTopColor:'lightgray',bottom:0}}/>
             </View>
             <View style={{width:DaysInMonth(year,month)*10, height:10}}>
               <FlatList
                 data={Array.from(Array(DaysInMonth(year,month)).keys())}
-                renderItem={HorizontalAxisGraduation}
+                renderItem={(item)=>HorizontalAxisGraduation(item)}
                 keyExtractor={(_, index) => index.toString()}
                 horizontal={true}
                 scrollEnabled={false}

@@ -219,6 +219,7 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
                         mode="time"
                         display="default"
                         onChange={onChange2}
+                        minuteInterval={5}
                       />
                     )}
                   </View>

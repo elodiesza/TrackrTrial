@@ -33,7 +33,6 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
       }
 
     const updateState = (id) => {
-        console.warn(id);
         let existingStates=[...states];
         const indexToUpdate = existingStates.findIndex(state => state.id === id);
         if (existingStates[indexToUpdate].state==0){
@@ -66,8 +65,8 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
 
     const showTitle = (ind) => {
       return (
-        <View style={{left:20}}>
-          <Pressable onPress={()=>updateState(states.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0])} style={{ height: 75, width:25*1.25, transform: [{ skewX: '-45deg' },{scale: 1.25}], left: 37 }}>
+        <View>
+          <Pressable onPress={()=>updateState(states.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0])} style={{ height: 75, width:25*1.25, transform: [{ skewX: '-45deg' },{scale: 1.25}], left: 60 }}>
             <IndicatorTableTitleToday name={ind.item} state={states.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.state)[0]} tags={tags} states={states} year={year} month={month}/>
           </Pressable>
         </View>
@@ -75,7 +74,6 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
     };
 
     const updateMood = (mood) => {
-
         let existingMoods=[...moods];
         if (existingMoods.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0){
           db.transaction(tx=> {
@@ -165,7 +163,6 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     justifyContent: 'center',
   },
-
   mood: {
     width: 40,
     resizeMode: 'contain',
