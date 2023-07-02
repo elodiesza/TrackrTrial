@@ -6,7 +6,7 @@ import MonthlyTasks from '../components/MonthlyTasks';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tags}) {
+export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db}) {
 
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [statex, setStatex] = useState(false);
@@ -96,7 +96,7 @@ export default function CalendarElement({year, month, day, tasks, tags}) {
         </View>
         <View style={{flex:1, justifyContent: 'flex-end'}}>
           <FlatList data={monthTodo(tasks, year, month, date)}
-          horizontal={false} scrollEnabled={false} renderItem={RenderTaskItem} bounces={false} />
+          horizontal={false} scrollEnabled={true} renderItem={RenderTaskItem} bounces={false} />
         </View>
       </View>
     )
@@ -135,7 +135,7 @@ export default function CalendarElement({year, month, day, tasks, tags}) {
             renderItem={({item}) => CalendarLine(item)}
             keyExtractor={item => item.id}
           />
-          <MonthlyTasks/>
+          <MonthlyTasks db={db} load={load} loadx={loadx} tags={tags} setTags={setTags}/>
         </Swiper>
     </View>
   );

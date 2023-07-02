@@ -1,28 +1,352 @@
-import { FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
-import Feather from '@expo/vector-icons/Feather';
+import { FlatList, TouchableOpacity, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { useState,useEffect } from 'react';
 import moment from 'moment';
-import RecurringTasks from './RecurringTasks';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import { Feather } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Color from './Color';
+import NewMTask from '../modal/NewMTask';
 
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function MonthlyTasks() {
+export default function MonthlyTasks({db, load, loadx, tags, setTags}) {
+  
+  const today = new Date();
+  const month = today.getMonth();
+  const year = today.getFullYear();
+  const day = today.getDate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [mtasks, setMTasks] = useState([]);
+  const [mlogs, setMLogs] = useState([]);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [date, setDate] = useState(today);
+  
+  useEffect(() => {
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS mtasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, tag INTEGER, time TEXT, UNIQUE(task,year,month,day))')
+    });
 
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM mtasks', null,
+      (txObj, resultSet) => setMTasks(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting states')
+      );
+    });
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+    });
+
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM mlogs', null,
+      (txObj, resultSet) => setMLogs(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting states')
+      );
+    });
+    console.warn(mtasks);
+    setIsLoading(false);
+  },[load]);
+
+  useEffect(() => {
+  
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+    });
+
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM mlogs', null,
+      (txObj, resultSet) => setMLogs(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting states')
+      );
+    });
+    console.warn(mlogs);
+    console.warn(mtasks);
+    setIsLoading(false);
+  },[load]);
+  
+  useEffect(() => {
+    if (!isLoading && mtasks.length > 0 && mlogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined) {
+      console.warn('enters new mlog');
+      if(mlogs.length > 0){
+      let existingLogs = [...mlogs];  
+      if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
+        console.warn('creates new mlog');
+        db.transaction(tx => {
+          tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,day],
+            (txtObj,resultSet)=> {    
+              existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+              setMLogs(existingLogs);                      
+            },
+          );
+        });
+        let lastLogIndex = mlogs.length-1;
+        let lastLog = mlogs[lastLogIndex];
+        console.warn(lastLog);
+        let existingTasks=[...mtasks];
+        console.warn(existingTasks);
+        console.warn(existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day)));
+
+        let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
+        console.warn(existingRecurringTasks);
+        existingLogs=[];
+
+        if (lastLog!==undefined) {
+          console.warn('enters');
+          var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
+          console.warn(daysBetweenLastAndToday);
+          for(var j=1;j<daysBetweenLastAndToday+1;j++){
+            console.warn('enters');
+            var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
+            console.warn(newDate);
+            console.warn(existingRecurringTasks.length);
+            for (var i=0; i<existingRecurringTasks.length;i++){    
+              console.warn('enters');  
+              let newTask=existingRecurringTasks[i].task;
+              console.warn(existingRecurringTasks[i].task);
+              let copyTag=existingRecurringTasks[i].tag;
+              let copyTime=existingRecurringTasks[i].time;
+              db.transaction(tx => {
+                tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,copyTime],
+                  (txtObj,resultSet)=> {   
+                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:copyTime});
+                    setMTasks(existingTasks);
+                  },
+                );
+              });
+            }
+          }
+          setMTasks(existingTasks);
+        }
+      }
+      }
+      else {
+        let existingLogs = [...mlogs];  
+        if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
+          db.transaction(tx => {
+            tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,day],
+              (txtObj,resultSet)=> {    
+                existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+                setMLogs(existingLogs);
+              },
+            );
+          });
+        }
+      }
+    }
+  },[isLoading, mlogs]);
+
+  const DeleteItem = ({ id }) => (
+    <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
+      <Pressable onPress={ () =>
+        db.transaction(tx=> {
+          tx.executeSql('DELETE FROM mtasks WHERE id = ?', [id],
+            (txObj, resultSet) => {
+              if (resultSet.rowsAffected > 0) {
+                let existingTasks = [...mtasks].filter(task => task.id !==id);
+                setMTasks(existingTasks);
+              }
+            },
+            (txObj, error) => console.log(error)
+          );       
+        })  
+      }>
+          <Feather name="trash-2" size={25} color={'white'}/>
+      </Pressable> 
+    </View>
+  );
+
+  const removeDb = () => {
+    db.transaction(tx => {
+      tx.executeSql('DROP TABLE IF EXISTS mtasks', null,
+        (txObj, resultSet) => setMTasks([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    });
+    loadx(!load);
+  }
+  const removelogDb = () => {
+    db.transaction(tx => {
+      tx.executeSql('DROP TABLE IF EXISTS mlogs', null,
+        (txObj, resultSet) => setMLogs([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    });
+    loadx(!load);
+  }
+
+  const updateTaskState = (id) => {
+    let existingTasks=[...mtasks];
+    const indexToUpdate = existingTasks.findIndex(task => task.id === id);
+    let postponedTask = existingTasks[indexToUpdate].task;
+    let nextDay= new Date(Math.floor(today.getTime()+(1000*60*60*24)));
+    let nextDayYear = nextDay.getFullYear();
+    let nextDayMonth = nextDay.getMonth();
+    let nextDayDay = nextDay.getDate();
+    let copyTag=existingTasks[indexToUpdate].tag;
+    let copyTime=existingTasks[indexToUpdate].time;
+    if (existingTasks[indexToUpdate].taskState==0){
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [1, id],
+          (txObj, resultSet) => {
+            if (resultSet.rowsAffected > 0) {
+              existingTasks[indexToUpdate].taskState = 1;
+              setMTasks(existingTasks);
+            }
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
+    }
+    else if(existingTasks[indexToUpdate].taskState==1){
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [2, id],
+          (txObj, resultSet) => {
+            if (resultSet.rowsAffected > 0) {
+              existingTasks[indexToUpdate].taskState = 2;
+              setMTasks(existingTasks);
+            }
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
+    }
+    else if(existingTasks[indexToUpdate].taskState==2){
+      if (existingTasks[indexToUpdate].recurring==0){
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [3, id],
+            (txObj, resultSet) => {
+              if (resultSet.rowsAffected > 0) {
+                existingTasks[indexToUpdate].taskState = 3;
+                setMTasks(existingTasks);
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        db.transaction(tx => {
+          tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copyTag,copyTime],
+            (txtObj,resultSet)=> {   
+              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, tag:copyTag, time:copyTime});
+            },
+          );
+        });
+      }
+      else {
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [0, id],
+            (txObj, resultSet) => {
+              if (resultSet.rowsAffected > 0) {
+                existingTasks[indexToUpdate].taskState = 0;
+                setMTasks(existingTasks);
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+      }
+    }
+    else {
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [0, id],
+          (txObj, resultSet) => {
+            if (resultSet.rowsAffected > 0) {
+              existingTasks[indexToUpdate].taskState = 0;
+              setMTasks(existingTasks);
+            }
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
+      let postponedTaskId = existingTasks.filter(c=>(c.year==nextDayYear && c.month==nextDayMonth && c.day==nextDayDay && c.task==postponedTask)).map(c=>c.id)[0];
+      db.transaction(tx=> {
+        tx.executeSql('DELETE FROM mtasks WHERE id = ?', [postponedTaskId],
+          (txObj, resultSet) => {
+            if (resultSet.rowsAffected > 0) {
+              let existingTasks = [...mtasks].filter(task => task.id !==postponedTaskId);
+              setMTasks(existingTasks);
+            }
+          },
+          (txObj, error) => console.log(error)
+        );       
+      }) 
+    }
+  };
+
+  const Task = ({item}) => {
+
+    let taskTime= item.time==null? "":moment(item.time).format('HH:mm');
+    return(
+        <View style={styles.taskcontainer}>
+          <Pressable onPress={()=> updateTaskState(item.id)}>
+            <MaterialCommunityIcons name={item.taskState===0 ? 'checkbox-blank-outline' : (
+              item.taskState===1 ? 'checkbox-intermediate' : (
+              item.taskState===2 ? 'checkbox-blank' :
+              'arrow-right-bold-box-outline')
+            )} size={35} />
+          </Pressable>
+          <View style={{flex:6}}>
+            <Text style={styles.tasktext}>
+              {item.task}
+            </Text>
+          </View>
+          <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
+            <View style={{flex:1,justifyContent:'flex-end'}}>
+              <Text style={{fontSize:10}}>{item.month<9?"0"+(item.month+1).toString():item.month+1}-{item.month<10?"0"+item.day.toString():item.day}</Text>
+            </View>
+            <View style={{flex:1,justifyContent:'flex-start'}}>
+              <Text style={{fontSize:10}}>{taskTime}</Text>
+            </View>
+          </View>
+          <View style={{flex:1}}>
+            <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />
+          </View>
+        </View>
+    )
+  };
+
+  const dailyData = mtasks.filter(c=>(c.day==date.getDate() && c.recurring==0));
+  const recurringData = mtasks.filter(c=>(c.day==date.getDate() && c.recurring==1));
 
   return (
-    <View style={styles.container}>
-        <View style={styles.monthTodo}>
-            </View>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: 'gray'}}>
-              <Text style={styles.monthlyRec}>
-                Monthly recurring tasks :
-              </Text>
+    <>
+      <View style={styles.container}>
+        <View style={styles.tasktitle}>
+          <Text style={styles.titletext}>
+            MONTHLY TASKS
+          </Text>
         </View>
-            
-        <View style={styles.monthly}>
+        <SwipeListView style={styles.dailyTasks} data={dailyData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
+          renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
+          rightOpenValue={-80}
+          disableRightSwipe={true}
+          closeOnRowBeginSwipe={true}
+        />
+        <View style={styles.tasktitle}>
+          <Text style={styles.titletext}>
+            MONTHLY RECURRING TASKS
+          </Text>
         </View>
-    </View>
+        <SwipeListView style={styles.recurringTasks} data={recurringData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
+          renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
+          rightOpenValue={-80}
+          disableRightSwipe={true}
+          closeOnRowBeginSwipe={true}
+        />
+      </View>
+      <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
+        <Feather name='plus-circle' size={50} />
+      </ TouchableOpacity> 
+      <NewMTask
+        addModalVisible={addModalVisible===true}
+        setAddModalVisible={setAddModalVisible}
+        db={db}
+        mtasks={mtasks}
+        setMTasks={setMTasks}
+        tags={tags}
+        setTags={setTags}
+      />
+    </>
   );
 }
 
@@ -32,20 +356,56 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     justifyContent: 'center',
   },
-  thisMonth: {
-    flex: 1,
+  header:{
+    width:width,
+    height:40,
+    borderBottomWidth:1,
+    borderColor:'gray',
+    justifyContent:'center',
+    flexDirection:'row',
+    alignContent:'center',
+    alignItems:'center',
   },
-  monthly: {
-    flex: 2,
-    marginBottom: 10,
+  checkbox: {
+    width: 25,
+    height: 25,
+    borderWidth: 1,
+    borderColor: 'black',
+    marginLeft: 30,
   },
-  monthTodo: {
-    flex: 6,
+  taskcontainer: {
+    width: width,
+    flexDirection: 'row',
+    height: 45,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: 'white',
+    paddingLeft: 20,
+  },
+  tasktext: {
+    textAlign:'left',
+    marginLeft: 5,
+    textAlignVertical: 'center',
+  },
+  tasktitle: {
+    width: width,
+    height: 45,
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
+    justifyContent: 'center',
   },
-  monthlyRec: {
-    fontSize: 16,
-    marginVertical: 10,
+  titletext: {
+    marginLeft: 20,
+    fontSize: 20,
+    color: 'gray',
+    fontWeight: 'bold',
+    textAlignVertical: 'center',
+  },
+  dailyTasks:{
+    flex:4,
+  },
+  recurringTasks:{
+    flex:1,
   }
 });

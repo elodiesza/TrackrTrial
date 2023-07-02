@@ -2,8 +2,6 @@ import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-n
 import { useState, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
-import Swiper from 'react-native-swiper'
-import MonthlyTasks from '../components/MonthlyTasks';
 import CalendarElement from '../components/CalendarElement';
 
 const width = Dimensions.get('window').width;
@@ -92,7 +90,7 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
           <Feather name='chevron-right' size={40} style={{left:30}}/>
         </Pressable>
       </View>
-      <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags}/>
+      <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags} setTags={setTags} load={load} loadx={loadx} db={db}/>
     </View>
   );
 }
