@@ -35,18 +35,12 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const [db,setDb] = useState(SQLite.openDatabase('example.db'));
-  var today = new Date();
-var thisMonth = today.getMonth();
-var thisYear = today.getFullYear();
-var thisDay = today.getDate();
-const [month,setMonth] = useState(thisMonth);
-const [year,setYear] = useState(thisYear);
-const [day, setDay] = useState(thisDay);
-const [isLoading, setIsLoading] = useState(true);
-const [load, loadx] = useState(false);
-const [states, setStates] = useState([]);
-const [tasks, setTasks] = useState([]);
-const [tags, setTags] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [load, loadx] = useState(false);
+  const [states, setStates] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [moods, setMoods] = useState([]);
 
 
 useEffect(() => {
@@ -72,10 +66,18 @@ useEffect(() => {
   db.transaction(tx => {
     tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, tag INTEGER, time TEXT, UNIQUE(task,year,month,day))')
   });
-
   db.transaction(tx => {
     tx.executeSql('SELECT * FROM tasks', null,
     (txObj, resultSet) => setTasks(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting states')
+    );
+  });
+  db.transaction(tx => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS moods (id INTEGER PRIMARY KEY AUTOINCREMENT, mood TEXT, year INTEGER, month INTEGER, day INTEGER,UNIQUE(year,month,day))')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM moods', null,
+    (txObj, resultSet) => setMoods(resultSet.rows._array),
     (txObj, error) => console.log('error selecting states')
     );
   });
@@ -101,7 +103,7 @@ useEffect(() => {
             <Feather name="check-square" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} states={states} setStates={setStates} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} states={states} setStates={setStates} moods={moods} setMoods={setMoods} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

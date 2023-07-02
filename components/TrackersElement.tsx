@@ -4,8 +4,6 @@ import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
 import NewIndicator from '../modal/NewIndicator';
 import IndicatorMenu from '../modal/IndicatorMenu';
-import IsLoading from '../modal/IsLoading';
-import LastMonth from './LastMonth';
 
 const width = Dimensions.get('window').width;
 
@@ -250,7 +248,7 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
             keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
           />
         </View>
-        <View pointerEvents="none" style={{position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
+        <View pointerEvents="none" style={{display: year==thisYear?(month==thisMonth?'flex':'none'):'none',position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >
       )}
       </View>
