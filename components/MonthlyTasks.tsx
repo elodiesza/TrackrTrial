@@ -337,7 +337,7 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
         </View>
         <SwipeListView style={styles.recurringTasks} data={recurringData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
-          rightOpenValue={-80}
+          rightOpenValue={-100}
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />

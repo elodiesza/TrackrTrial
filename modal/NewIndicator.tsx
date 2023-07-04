@@ -113,7 +113,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                   place: newPlace,
                 };
                 existingStates.push(newState);
-                setStates(existingStates); // Update the state with the new array of states
+                setStates(existingStates); 
                 loadx(!load);
               }
             );
@@ -149,6 +149,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                         tag: tagId,
                         place: newPlace,
                       };
+                      console.warn(picked);
                       existingStates.push(newState);
                       setStates(existingStates); // Update the state with the new array of states
                     }

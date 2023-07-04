@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 import SleeplogMonth from '../components/SleepLogMonth';
+import SleepLog from './Statistics/SleepLog';
+import Mood from './Statistics/Mood';
+import Swiper from 'react-native-swiper';
 
 const width = Dimensions.get('window').width;
 
@@ -119,14 +122,20 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx}) => {
         </Pressable>
       </View>
       <View style={styles.body}>
-        <View style={{height:400}}>
-          <FlatList
-            data={states.filter(c=>(c.day==1 && c.month==month && c.year==year))}
-            renderItem={(item)=>IndList(item)}
-            keyExtractor={(_, index) => index.toString()}
-          />
-        </View>
-        <SleeplogMonth sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
+        <Swiper horizontal={true} showsButtons={false} showsPagination={false} loop={false}>
+          <View style={{flex:1}}>
+            <View style={{height:400}}>
+              <FlatList
+                data={states.filter(c=>(c.day==1 && c.month==month && c.year==year))}
+                renderItem={(item)=>IndList(item)}
+                keyExtractor={(_, index) => index.toString()}
+              />
+            </View>
+            <SleeplogMonth sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
+          </View>
+          <Mood/>
+          <SleepLog/>
+        </Swiper>
       </View>
     </SafeAreaView>
   );
