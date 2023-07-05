@@ -122,7 +122,7 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx}) => {
         </Pressable>
       </View>
       <View style={styles.body}>
-        <Swiper horizontal={true} showsButtons={false} showsPagination={false} loop={false}>
+        <Swiper horizontal={true} showsButtons={false} showsPagination={true} loop={false}>
           <View style={{flex:1}}>
             <View style={{height:400}}>
               <FlatList

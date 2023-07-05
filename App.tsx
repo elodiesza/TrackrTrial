@@ -105,7 +105,7 @@ useEffect(() => {
               <Feather name="activity" size={28} />  
             </View>)}}
         />
-        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods}/>} 
+        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -126,7 +126,7 @@ useEffect(() => {
             <Feather name="calendar" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Settings" component={SettingsNavigator}
+        <Tab.Screen name="SettingsNavigator" component={SettingsNavigator}
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>

@@ -4,10 +4,12 @@ import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
 import NewIndicator from '../modal/NewIndicator';
 import IndicatorMenu from '../modal/IndicatorMenu';
+import AddSleepLog from './AddSleepLog';
+import moment from 'moment';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setStates, states, tags, setTags, moods, setMoods}) {
+export default function TrackersElement({db, year, month, load, loadx, setStates, states, tags, setTags, moods, setMoods, sleep, setSleep}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -17,6 +19,8 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
 
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [sleepModalVisible, setSleepModalVisible] = useState(false);
+  const [selectedSleepIndex, setSelectedSleepIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
 
   const [updatedStates, setUpdatedStates] = useState([]);
@@ -218,6 +222,59 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
         )   
     }
 
+    const showSleep = (item,index) => {
+      return  (
+        <View>
+          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: 'white' }}>
+            <Text style={{textAlign:'center', textAlignVertical:'center'}}>{item}</Text>
+          </Pressable>
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={selectedSleepIndex === index && sleepModalVisible}
+            onRequestClose={() => {
+              setSelectedSleepIndex(-1);
+              setSleepModalVisible(!sleepModalVisible);
+              loadx(!load);
+            }}
+          >
+                <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
+                  <TouchableWithoutFeedback>
+                    <View style={styles.deleteBox}>
+                      <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
+                      <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx}/>
+                      <TouchableOpacity onPress={() => deleteState(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
+                        <Text>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableWithoutFeedback>
+                </TouchableOpacity>
+              </Modal>
+        </View>
+        )   
+    }
+
+    const deleteState = (index) => {
+      let existingSleep = [...sleep];
+      let Idtodelete = existingSleep.filter(c=>(c.year==year && c.month==month && c.day==index+1))[0].id;
+      db.transaction(tx => {
+        tx.executeSql(
+          'DELETE FROM sleep WHERE id=?',
+          [Idtodelete],
+          (txObj, resultSet) => {
+            setSleep(existingSleep.filter(c=>(c.id!=Idtodelete))),
+            console.log('Sleep deleted successfully');
+          },
+          (txObj, error) => {
+            // Handle error
+            console.log('Error deleting sleep:', error);
+          }
+        );
+      });
+      setSleepModalVisible(false);
+    };
+
+
     const allNames = states.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
 
@@ -225,6 +282,17 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
       var arr= [];
       for (let i=1; i<=DaysInMonth(year,month);i++) {
         arr.push(moods.filter(c=>(c.year==year && c.month==month && c.day==i)).length==0? null : moods.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.mood)[0] );
+      }
+      return (arr);
+    };
+
+    const thismonthSleep = (year,month) =>{
+      var arr= [];
+      for (let i=1; i<=DaysInMonth(year,month);i++) {
+        let goSleepTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.sleep)[0];
+        let wakeupTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.wakeup)[0];
+        let sleepTime= goSleepTime>wakeupTime ? wakeupTime+24-goSleepTime : wakeupTime-goSleepTime;
+        arr.push(sleep.filter(c=>(c.year==year && c.month==month && c.day==i)).length==0? '' : sleepTime );
       }
       return (arr);
     };
@@ -256,22 +324,36 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
               scrollEnabled={false}
             />
           </View>
-          <View>
-            <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>MOOD</Text>
+          <ScrollView horizontal={true} style={{flex:1,flexDirection:'row'}}>
+            <View>
+              <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>MOOD</Text>
+              <FlatList
+                data={thismonthMoods(year,month)}
+                renderItem={(item)=>(showMood(item))}
+                keyExtractor={(_, index) => index.toString()}
+                style={{width:25,flexDirection:'row'}}
+                scrollEnabled={false}
+              />
+            </View>
+            <View>
+              <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>SLEEP TIME</Text>
+                <FlatList
+                  data={thismonthSleep(year,month)}
+                  renderItem={({item, index}) => showSleep(item, index)}
+                  keyExtractor={(_, index) => index.toString()}
+                  style={{width:25,flexDirection:'row'}}
+                  scrollEnabled={false}
+                />
+            </View>
             <FlatList
-              data={thismonthMoods(year,month)}
-              renderItem={(item)=>(showMood(item))}
-              keyExtractor={(_, index) => index.toString()}
-              style={{width:25,flexDirection:'row'}}
-              scrollEnabled={false}
+              horizontal
+              data={uniqueNames}
+              renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
+              keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
+              contentContainerStyle={{paddingRight:75}}
             />
-          </View>
-          <FlatList
-            horizontal
-            data={uniqueNames}
-            renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
-            keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
-          />
+            
+          </ScrollView>
         </View>
         <View pointerEvents="none" style={{display: year==thisYear?(month==thisMonth?'flex':'none'):'none',position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >

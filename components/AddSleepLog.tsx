@@ -7,12 +7,8 @@ import moment from 'moment';
 
 const width = Dimensions.get('window').width;
 
-const SleeplogToday = ({ db, sleep, setSleep, load, loadx}) => {
+const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx}) => {
 
-    var today = new Date();
-    var year = today.getFullYear();
-    var month = today.getMonth();
-    var day = today.getDate();
     const [isLoading, setIsLoading] = useState(false);
     const [sleepTime,setSleepTime] = useState(new Date());
     const [wakeupTime,setWakeupTime] = useState(new Date());
@@ -123,13 +119,12 @@ const SleeplogToday = ({ db, sleep, setSleep, load, loadx}) => {
                 />
                 <Pressable onPress={addSleep} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
             </View>
-            <Button title="Delete Sleep" onPress={deleteSleepDb}/>
         </View>
     </SafeAreaView>
   );
 }
 
-export default SleeplogToday;
+export default AddSleepLog;
 
 const styles = StyleSheet.create({
   container: {

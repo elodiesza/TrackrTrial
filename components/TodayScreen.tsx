@@ -1,7 +1,7 @@
 import { FlatList, Pressable, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
 import IndicatorTableTitleToday from './IndicatorTableTitleToday';
-import SleeplogToday from './SleeplogToday';
+import AddSleepLog from './AddSleepLog';
 import Sad from '../assets/images/icons/sad.png';
 import Angry from '../assets/images/icons/angry.png';
 import Happy from '../assets/images/icons/happy.png';
@@ -149,7 +149,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
         <Text>
           Sleep Log
         </Text>
-        <SleeplogToday db={db} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>
+        <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx}/>
       </View>
     </SafeAreaView>
   );
