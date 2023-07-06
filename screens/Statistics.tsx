@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
-import SleeplogMonth from '../components/SleepLogMonth';
 import SleepLog from './Statistics/SleepLog';
 import Mood from './Statistics/Mood';
 import Swiper from 'react-native-swiper';
@@ -132,10 +131,9 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods
                 keyExtractor={(_, index) => index.toString()}
               />
             </View>
-            <SleeplogMonth sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
           </View>
           <Mood moods={moods.filter(c=>(c.year==year && c.month==month))} daysInMonth={DaysInMonth(year,month)}/>
-          <SleepLog/>
+          <SleepLog sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
         </Swiper>
       </View>
     </SafeAreaView>
