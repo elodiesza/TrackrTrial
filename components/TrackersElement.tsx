@@ -96,7 +96,20 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
 
   }, [updatedStates]);
 
-  
+  //colorChannelA and colorChannelB are ints ranging from 0 to 255
+function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
+  var channelA = colorChannelA*amountToMix;
+  var channelB = colorChannelB*(1-amountToMix);
+  return parseInt(channelA+channelB);
+}
+//rgbA and rgbB are arrays, amountToMix ranges from 0.0 to 1.0
+//example (red): rgbA = [255,0,0]
+function colorMixer(rgbA, rgbB, amountToMix){
+  var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
+  var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
+  var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
+  return "rgb("+r+","+g+","+b+")";
+}
 
     const removeDb = () => {
       db.transaction(tx => {
@@ -223,9 +236,23 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
     }
 
     const showSleep = (item,index) => {
+      let sleepArray = [];
+      for (let i=1; i<DaysInMonth(year,month); i++){
+        let goSleepTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.sleep)[0];
+        let wakeupTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.wakeup)[0];
+        let sleepTime= goSleepTime>wakeupTime ? wakeupTime+24-goSleepTime : wakeupTime-goSleepTime;
+        (wakeupTime!=null && goSleepTime!=null) ? sleepArray.push(sleepTime) : undefined;
+      }
+      let sleepMin = Math.min(...sleepArray);
+      let sleepMax = Math.max(...sleepArray);
+      let thisgoSleepTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==index+1)).map(c=>c.sleep)[0];
+      let thiswakeupTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==index+1)).map(c=>c.wakeup)[0];
+      let thissleepTime= thisgoSleepTime>thiswakeupTime ? thiswakeupTime+24-thisgoSleepTime : thiswakeupTime-thisgoSleepTime;
+      let sleepColorCode = (thissleepTime-sleepMin)/(sleepMax-sleepMin);
+      let sleepColor= sleepColorCode==null? 'white' : sleepColorCode>0.5? colorMixer([130,200,50], [255,255,0], 2*sleepColorCode) : colorMixer([255,255,50], [255,0,0], 2*sleepColorCode);
       return  (
         <View>
-          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: 'white' }}>
+          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: sleepColor }}>
             <Text style={{textAlign:'center', textAlignVertical:'center'}}>{item}</Text>
           </Pressable>
           <Modal

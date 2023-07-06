@@ -1,5 +1,6 @@
 import { FlatList, SafeAreaView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useEffect, useState } from 'react';
+import React from 'react';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 import SleeplogMonth from '../components/SleepLogMonth';
@@ -9,7 +10,7 @@ import Swiper from 'react-native-swiper';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx}) => {
+const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -133,7 +134,7 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx}) => {
             </View>
             <SleeplogMonth sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
           </View>
-          <Mood/>
+          <Mood moods={moods.filter(c=>(c.year==year && c.month==month))} daysInMonth={DaysInMonth(year,month)}/>
           <SleepLog/>
         </Swiper>
       </View>
