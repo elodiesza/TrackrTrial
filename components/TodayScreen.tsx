@@ -2,13 +2,8 @@ import { FlatList, Pressable, TouchableOpacity, Image, StyleSheet, Text, View, S
 import { useState, useEffect } from 'react';
 import IndicatorTableTitleToday from './IndicatorTableTitleToday';
 import AddSleepLog from './AddSleepLog';
-import Sad from '../assets/images/icons/sad.png';
-import Angry from '../assets/images/icons/angry.png';
-import Happy from '../assets/images/icons/happy.png';
-import Productive from '../assets/images/icons/productive.png';
-import Sick from '../assets/images/icons/sick.png';
-import Stressed from '../assets/images/icons/stressed.png';
-import Bored from '../assets/images/icons/bored.png';
+import AddMood from './AddMood';
+
 
 const width = Dimensions.get('window').width;
 
@@ -73,66 +68,13 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
       );
     };
 
-    const updateMood = (mood) => {
-        let existingMoods=[...moods];
-        if (existingMoods.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0){
-          db.transaction(tx=> {
-            tx.executeSql('INSERT INTO moods (year, month, day, mood) VALUES (?, ?, ?, ?)', [year, month, day, mood],
-              (txObj, resultSet) => {
-                if (resultSet.rowsAffected > 0) {
-                  existingMoods.push({id: resultSet.insertId, year: year, month: month, day: day, mood: mood});
-                  setMoods(existingMoods);
-                }
-              },
-              (txObj, error) => console.log('Error inserting data', error)
-            );
-          });
-        }
-        else {
-            let moodId = existingMoods.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0];
-            let moodIndex = existingMoods.findIndex(mood => mood.id === moodId);
-            db.transaction(tx=> {
-                tx.executeSql('UPDATE moods SET mood = ? WHERE id= ?', [mood, moodId],
-                  (txObj, resultSet) => {
-                    if (resultSet.rowsAffected > 0) {
-                      existingMoods[moodIndex].mood = mood;
-                      setMoods(existingMoods);
-                    }
-                  },
-                  (txObj, error) => console.log('Error updating data', error)
-                );
-            });
-        }
-    };
+
 
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex:1}}>
-        <Text>Today's mood</Text>
-        <View style={{flex:1, width:width, flexDirection:'row', justifyContent:'center'}}>
-            <TouchableOpacity onPress={()=>updateMood('productive')}>
-                <Image source={Productive} style={styles.mood} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>updateMood('happy')}>
-                <Image source={Happy} style={styles.mood} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>updateMood('sick')}>
-                <Image source={Sick} style={styles.mood} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>updateMood('stressed')}>
-                <Image source={Stressed} style={styles.mood} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>updateMood('angry')}>
-                <Image source={Angry} style={styles.mood} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>updateMood('bored')}>
-                <Image source={Bored} style={styles.mood} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>updateMood('sad')}>
-                <Image source={Sad} style={styles.mood} />
-            </TouchableOpacity>     
-        </View>
+        <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} load={load} loadx={loadx}/>
       </View>
       <View style={{flex:1, width:width}}>
         <Text>
@@ -163,8 +105,4 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     justifyContent: 'center',
   },
-  mood: {
-    width: 40,
-    resizeMode: 'contain',
-}
 });

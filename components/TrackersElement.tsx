@@ -5,6 +5,7 @@ import Feather from '@expo/vector-icons/Feather';
 import NewIndicator from '../modal/NewIndicator';
 import IndicatorMenu from '../modal/IndicatorMenu';
 import AddSleepLog from './AddSleepLog';
+import AddMood from './AddMood';
 import moment from 'moment';
 
 const width = Dimensions.get('window').width;
@@ -21,6 +22,8 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
   const [modalVisible, setModalVisible] = useState(false);
   const [sleepModalVisible, setSleepModalVisible] = useState(false);
   const [selectedSleepIndex, setSelectedSleepIndex] = useState(-1);
+  const [moodModalVisible, setMoodModalVisible] = useState(false);
+  const [selectedMoodIndex, setSelectedMoodIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
 
   const [updatedStates, setUpdatedStates] = useState([]);
@@ -228,12 +231,57 @@ function colorMixer(rgbA, rgbB, amountToMix){
         )   
     }
 
-    const showMood = (mood) => {
-      const bgColor = mood.item==null?'white': mood.item=='happy'?'yellowgreen': mood.item=='productive'?'green': mood.item=='sick'?'yellow': mood.item=='stressed'?'orange': mood.item=='angry'?'red': mood.item=='bored'?'purple': mood.item=='sad'?'lightblue': 'white';
+    const showMood = (item,index) => {
+      const bgColor = item==null?'white': item=='happy'?'yellowgreen': item=='productive'?'green': item=='sick'?'yellow': item=='stressed'?'orange': item=='angry'?'red': item=='bored'?'plum': item=='sad'?'lightblue': 'white';
       return  (
-          <View style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: mood.item==null?'white': bgColor }}/>
-        )   
+        <>
+          <Pressable onPress={()=>{setSelectedMoodIndex(index);setMoodModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: item==null?'white': bgColor }}/>
+          <Modal
+          animationType="none"
+          transparent={true}
+          visible={selectedMoodIndex === index && moodModalVisible}
+          onRequestClose={() => {
+            setSelectedSleepIndex(-1);
+            setMoodModalVisible(!moodModalVisible);
+            loadx(!load);
+          }}
+          >
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setMoodModalVisible(!moodModalVisible);setSelectedMoodIndex(-1);}} activeOpacity={1}>
+              <TouchableWithoutFeedback>
+                <View style={styles.dialogBox}>
+                  <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} mood</Text>
+                  <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setMoodModalVisible={setMoodModalVisible}/>
+                  <TouchableOpacity onPress={() => deleteMood(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
+                    <Text>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </TouchableOpacity>
+          </Modal>
+        </>
+        
+      )   
     }
+
+    const deleteMood = (index) => {
+      let existingMoods = [...moods];
+      let Idtodelete = existingMoods.filter(c=>(c.year==year && c.month==month && c.day==index+1))[0].id;
+      db.transaction(tx => {
+        tx.executeSql(
+          'DELETE FROM moods WHERE id=?',
+          [Idtodelete],
+          (txObj, resultSet) => {
+            setMoods(existingMoods.filter(c=>(c.id!=Idtodelete))),
+            console.log('Mood deleted successfully');
+          },
+          (txObj, error) => {
+            // Handle error
+            console.log('Error deleting mood:', error);
+          }
+        );
+      });
+      setMoodModalVisible(false);
+    };
 
     const showSleep = (item,index) => {
       let sleepArray = [];
@@ -265,23 +313,23 @@ function colorMixer(rgbA, rgbB, amountToMix){
               loadx(!load);
             }}
           >
-                <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
-                  <TouchableWithoutFeedback>
-                    <View style={styles.deleteBox}>
-                      <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
-                      <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx}/>
-                      <TouchableOpacity onPress={() => deleteState(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
-                        <Text>Delete</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableWithoutFeedback>
-                </TouchableOpacity>
-              </Modal>
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
+              <TouchableWithoutFeedback>
+                <View style={styles.dialogBox}>
+                  <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
+                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx}/>
+                  <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
+                    <Text>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </TouchableOpacity>
+          </Modal>
         </View>
         )   
     }
 
-    const deleteState = (index) => {
+    const deleteSleep = (index) => {
       let existingSleep = [...sleep];
       let Idtodelete = existingSleep.filter(c=>(c.year==year && c.month==month && c.day==index+1))[0].id;
       db.transaction(tx => {
@@ -356,7 +404,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
               <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>MOOD</Text>
               <FlatList
                 data={thismonthMoods(year,month)}
-                renderItem={(item)=>(showMood(item))}
+                renderItem={({item,index})=>(showMood(item,index))}
                 keyExtractor={(_, index) => index.toString()}
                 style={{width:25,flexDirection:'row'}}
                 scrollEnabled={false}
@@ -430,21 +478,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dialogBox: {
-    position: 'absolute',
-    flex: 1,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 50,
-    backgroundColor: 'white',
-    borderWidth: 2,
-    borderColor: 'lightgray',
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    flexDirection: 'row',
-    top: 200,
-  },
-  deleteBox: {
     flex: 1, 
     top: 200,
     position: 'absolute',
@@ -466,8 +499,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 10,
-    marginTop: 20,
+    marginTop: 10,
   },
   polygon: {
     width: 25,
