@@ -1,0 +1,91 @@
+import React from 'react';
+import Color from './Color';
+import { View, StyleSheet, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback, FlatList } from 'react-native';
+
+
+const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPickerVisible,picked,setPicked,sleep,setSleep,year,month,day} ) => {
+  const colorChoice =  ['green','yellowgreen','yellow','orange','red'];
+  const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
+
+  const SleepType = (item) => (
+    <TouchableOpacity onPress={()=>addSleepType(item)}>
+      <Color color={item.item} />
+    </TouchableOpacity>
+  );
+
+  const addSleepType = (item) => {
+    let existingSleep = [...sleep];
+    let pickedType = sleepTypes.filter(c=>c.color==item.item).map(c=>c.type)[0];
+    setPicked(item.color);  
+    if (sleep.filter((c) => c.year == year && c.month == month && c.day == day).length == 0) {
+      db.transaction((tx) => {
+        tx.executeSql(
+          'INSERT INTO sleep (sleep, wakeup, year, month, day, type) values (?,?,?,?,?,?)',
+          [null, null, year, month, day, pickedType],
+          (txtObj, resultSet) => {
+            existingSleep.push({
+              id: resultSet.insertId,
+              sleep: null,
+              wakeup: null,
+              year: year,
+              month: month,
+              day: day,
+              type: pickedType,
+            });
+            setSleep(existingSleep);
+          },
+          (txtObj, error) => console.warn('Error inserting data:', error)
+        );
+      });
+    } else {
+      db.transaction((tx) => {
+        tx.executeSql('UPDATE sleep SET wakeup=? WHERE year=? AND month=? AND day=?',[pickedType,year,month,day],
+          (txtObj,resultSet)=> {    
+            existingSleep.filter(c=>(c.year==year && c.month==month && c.day==day))[0].type = pickedType;
+            setSleep(existingSleep);
+          },
+          (txtObj, error) => console.warn('Error inserting data:', error)
+        );
+      });
+    }
+    setColorPickerVisible(!colorPickerVisible);
+  };
+
+    return (
+        <Modal
+              animationType="slide"
+              transparent={true}
+              visible={colorPickerVisible}
+              onRequestClose={() => {
+                Alert.alert("Modal has been closed.");
+                setColorPickerVisible(!colorPickerVisible);
+              }}
+            >
+              <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setColorPickerVisible(!colorPickerVisible)}} activeOpacity={1}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.colorPicker}>
+                    <FlatList data={colorChoice} renderItem={SleepType} horizontal={true}/>
+                  </View>
+                </TouchableWithoutFeedback>
+              </TouchableOpacity>
+            </Modal>
+    );
+};
+
+const styles = StyleSheet.create({
+    colorPicker: {
+        flex: 1, 
+        position: 'absolute',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        borderWidth: 2,
+        borderColor: 'lightgray',
+        borderRadius: 20,
+        paddingHorizontal: 10,
+        padding: 15,
+      }
+});
+
+export default SleepColorPicker;

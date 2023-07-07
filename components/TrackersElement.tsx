@@ -297,12 +297,44 @@ function colorMixer(rgbA, rgbB, amountToMix){
       let thiswakeupTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==index+1)).map(c=>c.wakeup)[0];
       let thissleepTime= thisgoSleepTime>thiswakeupTime ? thiswakeupTime+24-thisgoSleepTime : thiswakeupTime-thisgoSleepTime;
       let sleepColorCode = (thissleepTime-sleepMin)/(sleepMax-sleepMin);
-      let sleepColor= sleepColorCode==null? 'white' : sleepColorCode>0.5? colorMixer([130,200,50], [255,255,0], 2*sleepColorCode) : colorMixer([255,255,50], [255,0,0], 2*sleepColorCode);
+      let sleepColor= sleepColorCode!==null? sleepColorCode>0.5? colorMixer([130,200,50], [255,255,0], 2*sleepColorCode) : colorMixer([255,255,50], [255,0,0], 2*sleepColorCode) : 'white';
       return  (
         <View>
-          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: sleepColor }}>
+          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: sleep.filter(c=>(c.year==year && c.month==month)).length==0? 'white': sleepColor}}>
             <Text style={{textAlign:'center', textAlignVertical:'center'}}>{item}</Text>
           </Pressable>
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={selectedSleepIndex === index && sleepModalVisible}
+            onRequestClose={() => {
+              setSelectedSleepIndex(-1);
+              setSleepModalVisible(!sleepModalVisible);
+              loadx(!load);
+            }}
+          >
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
+              <TouchableWithoutFeedback>
+                <View style={styles.dialogBox}>
+                  <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
+                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx}/>
+                  <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
+                    <Text>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </TouchableOpacity>
+          </Modal>
+        </View>
+        )   
+    }
+
+    const showSleepQuality = (item,index) => {
+      const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
+      let sleepQuality = sleepTypes.filter(c=>(c.type==item)).map(c=>c.color)[0];
+      return  (
+        <View>
+          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: sleep.filter(c=>(c.year==year && c.month==month)).length==0? 'white': sleepQuality==null? 'white' : sleepQuality }}/>
           <Modal
             animationType="none"
             transparent={true}
@@ -372,6 +404,15 @@ function colorMixer(rgbA, rgbB, amountToMix){
       return (arr);
     };
 
+    const thismonthSleepQuality = (year,month) =>{
+      var arr= [];
+      for (let i=1; i<=DaysInMonth(year,month);i++) {
+        let sleepType= sleep.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.type)[0];
+        arr.push(sleep.filter(c=>(c.year==year && c.month==month && c.day==i)).length==0? '' : sleepType );
+      }
+      return (arr);
+    };
+
     const listDays = () => {
       var arr= [];
       for (let i=1; i<=DaysInMonth(year,month);i++) {
@@ -415,6 +456,16 @@ function colorMixer(rgbA, rgbB, amountToMix){
                 <FlatList
                   data={thismonthSleep(year,month)}
                   renderItem={({item, index}) => showSleep(item, index)}
+                  keyExtractor={(_, index) => index.toString()}
+                  style={{width:25,flexDirection:'row'}}
+                  scrollEnabled={false}
+                />
+            </View>
+            <View>
+              <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>SLEEP QUALITY</Text>
+                <FlatList
+                  data={thismonthSleepQuality(year,month)}
+                  renderItem={({item, index}) => showSleepQuality(item, index)}
                   keyExtractor={(_, index) => index.toString()}
                   style={{width:25,flexDirection:'row'}}
                   scrollEnabled={false}

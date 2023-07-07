@@ -2,6 +2,8 @@ import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text,
 import { useState, useEffect } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import SleepColorPicker from './SleepColorPicker';
+import Color from './Color';
 
 
 
@@ -13,6 +15,11 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx}) => {
     const [sleepTime,setSleepTime] = useState(new Date());
     const [wakeupTime,setWakeupTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(true);
+    const [picked, setPicked] = useState<string>('white');
+    const [colorPickerVisible, setColorPickerVisible] = useState(false);
+    const [selectedType, setSelectedType] = useState('white');
+    
+    const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
 
 
     const onChangeSleep = (event, selectedTime) => {
@@ -60,7 +67,6 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx}) => {
                 );
             });
         }
-        console.warn(sleep);
     };
 
     const addWakeup = () => {
@@ -87,12 +93,27 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx}) => {
                 );
             });
         }
-        console.warn(sleep);
     };
+
 
   return (
     <SafeAreaView style={styles.container}>
         <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {backgroundColor: sleepTypes.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0]}]}/>
+            <SleepColorPicker
+              db={db}
+              selectedType={selectedType}
+              colorPickerVisible={colorPickerVisible}
+              setColorPickerVisible={setColorPickerVisible}
+              picked={picked}
+              setPicked={setPicked}
+              sleep={sleep}
+              setSleep={setSleep}
+              year={year}
+              month={month}
+              day={day}
+
+            />
             <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
                 <Text>WAKE-UP TIME</Text>
                 <DateTimePicker
@@ -141,5 +162,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-  }
+  },
+  color: {
+    width: 30,
+    height: 30,
+    borderWidth: 1,
+    borderRadius: 15,
+    borderColor: 'lightgray',
+  },
 });
