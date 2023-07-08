@@ -62,14 +62,14 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
   },[load]);
   
   useEffect(() => {
-    if (!isLoading && mtasks.length > 0 && mlogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined) {
+    if (!isLoading && mtasks.length > 0 && mlogs.filter(c=>(c.year==year && c.month==month))[0]==undefined) {
       if(mlogs.length > 0){
       let existingLogs = [...mlogs];  
-      if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
+      if(existingLogs.filter(c=>(c.year==year && c.month==month))[0]==undefined && isLoading==false){
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,day],
+          tx.executeSql('INSERT INTO mlogs (year,month) values (?,?)',[year,month],
             (txtObj,resultSet)=> {    
-              existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+              existingLogs.push({ id: resultSet.insertId, year:year, month:month});
               setMLogs(existingLogs);                      
             },
           );
@@ -78,22 +78,22 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
         let lastLog = mlogs[lastLogIndex];
         let existingTasks=[...mtasks];
 
-        let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month && c.day==lastLog.day));
+        let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month));
         existingLogs=[];
 
         if (lastLog!==undefined) {
 
-          var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
-          for(var j=1;j<daysBetweenLastAndToday+1;j++){
-            var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
+          var monthsBetweenLastAndToday = (year-lastLog.year)*12+(month-lastLog.month);
+          for(var j=0;j<monthsBetweenLastAndToday;j++){
+            var newDate=new Date(lastLog.year,lastLog.month+j,1);
             for (var i=0; i<existingRecurringTasks.length;i++){    
               let newTask=existingRecurringTasks[i].task;
               let copyTag=existingRecurringTasks[i].tag;
               let copyTime=existingRecurringTasks[i].time;
               db.transaction(tx => {
-                tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,copyTime],
+                tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,copyTag,copyTime],
                   (txtObj,resultSet)=> {   
-                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:copyTime});
+                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, tag:copyTag, time:copyTime});
                     setMTasks(existingTasks);
                   },
                 );
@@ -123,7 +123,6 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
   const TransferDaily = (id) => {
     let existingTasks = [...tasks];
     let toTransfer = mtasks.filter(c=>(c.id==id))[0];
-    console.warn(toTransfer);
     db.transaction((tx) => {
       tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,toTransfer.tag,null],
       (txtObj,resultSet)=> {    

@@ -7,6 +7,8 @@ const width = Dimensions.get('window').width;
 
 const SleeplogMonth = ({ sleep, load, loadx, year, month}) => {
 
+    const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
+
     var today = new Date();
     var day = today.getDate();
     const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +17,7 @@ const SleeplogMonth = ({ sleep, load, loadx, year, month}) => {
 
     const SleepList =(day) => {
       let thisMonthSleep = sleep.filter(c=>(c.year==year && c.month==month));
+
       if(thisMonthSleep.filter(c=>c.day==day.item+1).length==0 && thisMonthSleep.filter(c=>c.day==day.item+1).map(c=>c.sleep)[0]!==null && thisMonthSleep.filter(c=>c.day==day.item+1).map(c=>c.wakeup)[0]!==null){
         return(
           <View style={{flex:1, width:10, height:10*21}}/>
@@ -24,7 +27,7 @@ const SleeplogMonth = ({ sleep, load, loadx, year, month}) => {
         let wakeupTime =thisMonthSleep.filter(c=>c.day==day.item+1).map(c=>c.wakeup)[0];
         let sleepTime = 24-(thisMonthSleep.filter(c=>c.day==day.item+1).map(c=>c.sleep)[0]-thisMonthSleep.filter(c=>c.day==day.item+1).map(c=>c.wakeup)[0]);     
         return(
-          <View style={{flex:1, width:10, height:10*sleepTime, bottom:-(10-wakeupTime)*10, backgroundColor:'paleturquoise'}}/>
+          <View style={{flex:1, width:10, height:10*sleepTime, bottom:-(10-wakeupTime)*10, backgroundColor: sleep.filter(c=>(c.year==year && c.month==month && c.day==day.item+1)).map(c=>c.type)==0? 'paleturquoise': sleepTypes.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day.item+1)).map(c=>c.type)[0]).map(c=>c.color)[0]}}/>
         )
       }
     };

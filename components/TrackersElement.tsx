@@ -317,7 +317,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
               <TouchableWithoutFeedback>
                 <View style={styles.dialogBox}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
-                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx}/>
+                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
                   <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
                     <Text>Delete</Text>
                   </TouchableOpacity>

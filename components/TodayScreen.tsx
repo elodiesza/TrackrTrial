@@ -74,7 +74,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex:1}}>
-        <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} load={load} loadx={loadx}/>
+        <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} load={load} loadx={loadx} setMoodModalVisible={undefined}/>
       </View>
       <View style={{flex:1, width:width}}>
         <Text>
@@ -91,7 +91,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
         <Text>
           Sleep Log
         </Text>
-        <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx}/>
+        <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
       </View>
     </SafeAreaView>
   );

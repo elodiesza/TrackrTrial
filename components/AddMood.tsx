@@ -50,25 +50,25 @@ const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalV
     <View style={styles.container}>
         <Text>Today's mood</Text>
         <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <TouchableOpacity onPress={()=>{updateMood('productive');setMoodModalVisible(false);}}>
+            <TouchableOpacity onPress={()=>{updateMood('productive');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
                 <Image source={Productive} style={styles.mood} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('happy');setMoodModalVisible(false);}}>
+            <TouchableOpacity onPress={()=>{updateMood('happy');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
                 <Image source={Happy} style={styles.mood} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('sick');setMoodModalVisible(false);}}>
+            <TouchableOpacity onPress={()=>{updateMood('sick');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
                 <Image source={Sick} style={styles.mood} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('stressed');setMoodModalVisible(false);}}>
+            <TouchableOpacity onPress={()=>{updateMood('stressed');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
                 <Image source={Stressed} style={styles.mood} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('angry');setMoodModalVisible(false);}}>
+            <TouchableOpacity onPress={()=>{updateMood('angry');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
                 <Image source={Angry} style={styles.mood} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('bored');setMoodModalVisible(false);}}>
+            <TouchableOpacity onPress={()=>{updateMood('bored');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
                 <Image source={Bored} style={styles.mood} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('sad');setMoodModalVisible(false);}}>
+            <TouchableOpacity onPress={()=>{updateMood('sad');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
                 <Image source={Sad} style={styles.mood} />
             </TouchableOpacity>     
         </View>

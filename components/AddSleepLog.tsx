@@ -3,13 +3,12 @@ import { useState, useEffect } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import SleepColorPicker from './SleepColorPicker';
-import Color from './Color';
 
 
 
 const width = Dimensions.get('window').width;
 
-const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx}) => {
+const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSleepModalVisible,sleepModalVisible}) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [sleepTime,setSleepTime] = useState(new Date());
@@ -99,7 +98,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx}) => {
   return (
     <SafeAreaView style={styles.container}>
         <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {backgroundColor: sleepTypes.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0]}]}/>
+            <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {alignSelf:'center',backgroundColor: sleepTypes.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0]}]}/>
             <SleepColorPicker
               db={db}
               selectedType={selectedType}
@@ -112,7 +111,8 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx}) => {
               year={year}
               month={month}
               day={day}
-
+              setSleepModalVisible={setSleepModalVisible==undefined? undefined : setSleepModalVisible}
+              sleepModalVisible={sleepModalVisible==undefined? undefined : setSleepModalVisible}
             />
             <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
                 <Text>WAKE-UP TIME</Text>

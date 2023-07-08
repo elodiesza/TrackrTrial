@@ -3,12 +3,12 @@ import Color from './Color';
 import { View, StyleSheet, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback, FlatList } from 'react-native';
 
 
-const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPickerVisible,picked,setPicked,sleep,setSleep,year,month,day} ) => {
+const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPickerVisible,picked,setPicked,sleep,setSleep,year,month,day,setSleepModalVisible,sleepModalVisible}) => {
   const colorChoice =  ['green','yellowgreen','yellow','orange','red'];
   const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
 
   const SleepType = (item) => (
-    <TouchableOpacity onPress={()=>addSleepType(item)}>
+    <TouchableOpacity onPress={()=>{addSleepType(item)}}>
       <Color color={item.item} />
     </TouchableOpacity>
   );
@@ -39,7 +39,7 @@ const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPicker
       });
     } else {
       db.transaction((tx) => {
-        tx.executeSql('UPDATE sleep SET wakeup=? WHERE year=? AND month=? AND day=?',[pickedType,year,month,day],
+        tx.executeSql('UPDATE sleep SET type=? WHERE year=? AND month=? AND day=?',[pickedType,year,month,day],
           (txtObj,resultSet)=> {    
             existingSleep.filter(c=>(c.year==year && c.month==month && c.day==day))[0].type = pickedType;
             setSleep(existingSleep);
@@ -49,6 +49,7 @@ const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPicker
       });
     }
     setColorPickerVisible(!colorPickerVisible);
+    setSleepModalVisible==undefined? undefined : setSleepModalVisible(false);
   };
 
     return (
