@@ -4,7 +4,7 @@ import IsLoading from './IsLoading';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
-const ChangeHabitName = ({db, data, changeModalVisible, setChangeModalVisible, habits, sethabits, load, loadx, modalVisible, setModalVisible}) => {
+const ChangeHabitName = ({db, data, changeModalVisible, setChangeModalVisible, habits, setHabits, load, loadx, modalVisible, setModalVisible}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState(null);
     const {control, handleSubmit, reset} = useForm();
@@ -20,7 +20,7 @@ const ChangeHabitName = ({db, data, changeModalVisible, setChangeModalVisible, h
                     indhabits.filter(c=>c.name==name)[i].name = value;
                   }
                 }
-                sethabits(indhabits);
+                setHabits(indhabits);
               },
               (txObj, error) => console.log('Error updating data', error)
             );
