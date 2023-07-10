@@ -2,8 +2,8 @@ import { StyleSheet,ActivityIndicator, Modal, TouchableWithoutFeedback, Alert, P
 import React, { useState, useCallback, useEffect } from 'react';
 import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
-import NewIndicator from '../modal/NewIndicator';
-import IndicatorMenu from '../modal/IndicatorMenu';
+import NewHabit from '../modal/NewHabit';
+import HabitMenu from '../modal/HabitMenu';
 import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
 import moment from 'moment';
@@ -11,7 +11,7 @@ import SleepTypeColors from '../constants/SleepTypeColors';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setStates, states, tags, setTags, moods, setMoods, sleep, setSleep}) {
+export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -27,29 +27,29 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
   const [selectedMoodIndex, setSelectedMoodIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [updatedStates, setUpdatedStates] = useState([]);
+  const [updatedhabits, setUpdatedhabits] = useState([]);
 
-  const lastMonthData = states.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
+  const lastMonthData = habits.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
 
 
   useEffect(() => {
-    if (states.filter(c => c.year === thisYear && c.month === thisMonth).length === 0) {
-      let existingStates = [...states];
-      let lastMonthStates = lastMonthData.filter(c => c.day === 1).map(c => c.name);
+    if (habits.filter(c => c.year === thisYear && c.month === thisMonth).length === 0) {
+      let existinghabits = [...habits];
+      let lastMonthhabits = lastMonthData.filter(c => c.day === 1).map(c => c.name);
       let lastMonthTypes = lastMonthData.filter(c => c.day === 1).map(c => c.type);
       let lastMonthTags = lastMonthData.filter(c => c.day === 1).map(c => c.tag);
 
-      const insertStates = async () => {
+      const inserthabits = async () => {
         const promises = [];
-      for (let j = 0; j < lastMonthStates.length; j++) {
-        const name = lastMonthStates[j];
+      for (let j = 0; j < lastMonthhabits.length; j++) {
+        const name = lastMonthhabits[j];
 
         for (let i = 1; i <= DaysInMonth(thisYear, thisMonth); i++) {
           promises.push(
           new Promise((resolve, reject) => {
             db.transaction(tx => {
               tx.executeSql(
-                'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO habits (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthTags[j], j],
                 (txtObj, stateResultSet) => {
                   const newState = {
@@ -63,7 +63,7 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
                     tag: lastMonthTags[j],
                     place: j,
                   };
-                  existingStates.push(newState);
+                  existinghabits.push(newState);
                   resolve(newState);
                 },
                 (_, error) => {
@@ -78,9 +78,9 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
       }
       return Promise.all(promises);
       };
-      insertStates()
-        .then(newStates => {
-          setUpdatedStates([...updatedStates, ...newStates]); // Update the updatedStates state variable
+      inserthabits()
+        .then(newhabits => {
+          setUpdatedhabits([...updatedhabits, ...newhabits]); // Update the updatedhabits state variable
           setIsLoading(false); 
         })
         .catch(error => {
@@ -95,10 +95,10 @@ export default function TrackersElement({db, year, month, load, loadx, setStates
 
   useEffect(() => {
 
-      setStates(updatedStates); // Update the states state variable
+      setHabits(updatedhabits); // Update the habits state variable
       loadx(!load);
 
-  }, [updatedStates]);
+  }, [updatedhabits]);
 
   //colorChannelA and colorChannelB are ints ranging from 0 to 255
 function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
@@ -117,9 +117,9 @@ function colorMixer(rgbA, rgbB, amountToMix){
 
     const removeDb = () => {
       db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS states', null,
-          (txObj, resultSet) => setStates([]),
-          (txObj, error) => console.log('error deleting states')
+        tx.executeSql('DROP TABLE IF EXISTS habits', null,
+          (txObj, resultSet) => setHabits([]),
+          (txObj, error) => console.log('error deleting habits')
         );
       });
       loadx(!load);
@@ -135,18 +135,18 @@ function colorMixer(rgbA, rgbB, amountToMix){
     }
 
     const removeDbMonth = () => {
-      let existingStates = [...states];
+      let existinghabits = [...habits];
       db.transaction(tx => {
         tx.executeSql(
-          'DELETE FROM states WHERE month = ?',
+          'DELETE FROM habits WHERE month = ?',
           [6],
           (txObj, resultSet) => {
-            setStates(existingStates.filter(c=>c.month!=6)),
-            console.log('States deleted successfully');
+            setHabits(existinghabits.filter(c=>c.month!=6)),
+            console.log('habits deleted successfully');
           },
           (txObj, error) => {
             // Handle error
-            console.log('Error deleting states:', error);
+            console.log('Error deleting habits:', error);
           }
         );
       });
@@ -155,15 +155,15 @@ function colorMixer(rgbA, rgbB, amountToMix){
 
 
     const updateState = (id) => {
-      let existingStates=[...states];
-      const indexToUpdate = existingStates.findIndex(state => state.id === id);
-      if (existingStates[indexToUpdate].state==0){
+      let existinghabits=[...habits];
+      const indexToUpdate = existinghabits.findIndex(state => state.id === id);
+      if (existinghabits[indexToUpdate].state==0){
         db.transaction(tx=> {
-          tx.executeSql('UPDATE states SET state = ? WHERE id = ?', [1, id],
+          tx.executeSql('UPDATE habits SET state = ? WHERE id = ?', [1, id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
-                existingStates[indexToUpdate].state = 1;
-                setStates(existingStates);
+                existinghabits[indexToUpdate].state = 1;
+                setHabits(existinghabits);
               }
             },
             (txObj, error) => console.log('Error updating data', error)
@@ -172,11 +172,11 @@ function colorMixer(rgbA, rgbB, amountToMix){
       }
       else {
         db.transaction(tx=> {
-          tx.executeSql('UPDATE states SET state = ? WHERE id = ?', [0, id],
+          tx.executeSql('UPDATE habits SET state = ? WHERE id = ?', [0, id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
-                existingStates[indexToUpdate].state = 0;
-                setStates(existingStates);
+                existinghabits[indexToUpdate].state = 0;
+                setHabits(existinghabits);
               }
             },
             (txObj, error) => console.log('Error updating data', error)
@@ -185,13 +185,13 @@ function colorMixer(rgbA, rgbB, amountToMix){
       }
     };
 
-    const showStates = (ind) => {
-      const filteredStates = states.filter(c=>(c.name==ind && c.year==year && c.month==month));
-      return filteredStates.map((state,index) => {
+    const showhabits = (ind) => {
+      const filteredhabits = habits.filter(c=>(c.name==ind && c.year==year && c.month==month));
+      return filteredhabits.map((state,index) => {
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=> updateState(state.id)}>
-              <View style={[styles.cell, { backgroundColor : filteredStates[index].state==1 ? '#242424' : 'white' }]} />
+              <View style={[styles.cell, { backgroundColor : filteredhabits[index].state==1 ? '#242424' : 'white' }]} />
             </TouchableOpacity>
           </View>
         )
@@ -203,10 +203,10 @@ function colorMixer(rgbA, rgbB, amountToMix){
       return (
         <View>
           <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37 }}>
-            <IndicatorTableTitle name={ind.item} tags={tags} states={states} year={year} month={month} setModalVisible={setModalVisible}/>
+            <IndicatorTableTitle name={ind.item} tags={tags} habits={habits} year={year} month={month} setModalVisible={setModalVisible}/>
           </Pressable>
-          {showStates(ind.item)}
-          <IndicatorMenu
+          {showhabits(ind.item)}
+          <HabitMenu
             data={ind.item}
             modalVisible={modalVisible === ind.item}
             setModalVisible={setModalVisible}
@@ -214,8 +214,8 @@ function colorMixer(rgbA, rgbB, amountToMix){
             month={month}
             year={year}
             db={db}
-            setStates={setStates}
-            states={states}
+            setHabits={setHabits}
+            habits={habits}
             loadx={loadx}
             load={load}
           />
@@ -387,7 +387,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
     };
 
 
-    const allNames = states.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
+    const allNames = habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
 
     const thismonthMoods = (year,month) =>{
@@ -496,14 +496,14 @@ function colorMixer(rgbA, rgbB, amountToMix){
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
       </ TouchableOpacity> 
-      <NewIndicator
+      <NewHabit
         addModalVisible={addModalVisible===true}
         setAddModalVisible={setAddModalVisible}
         load={load}
         loadx={loadx}
         db={db}
-        states={states}
-        setStates={setStates}
+        habits={habits}
+        setHabits={setHabits}
         tags={tags}
         setTags={setTags}
       />

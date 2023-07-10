@@ -4,19 +4,19 @@ import { FlatList, ScrollView, Pressable, StyleSheet, Text, View, Dimensions } f
 
 const width = Dimensions.get('window').width;
 
-const Habits = ({ states, month, year, tags }) => {
+const Habits = ({ habits, month, year, tags }) => {
 
     const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
     const IndList = ({item}) => {
         let gauge=0;
         for (var i=0;i<DaysInMonth(year,month);i++){
-          gauge = gauge + states.filter(c=>(c.name==item.name && c.month==month && c.year==year)).map(c=>c.state)[i];
+          gauge = gauge + habits.filter(c=>(c.name==item.name && c.month==month && c.year==year)).map(c=>c.state)[i];
         }
         gauge=gauge/DaysInMonth(year,month);
         let lastMonthGauge=0;
         for (var i=0;i<DaysInMonth(year,month-1);i++){
-          lastMonthGauge = lastMonthGauge + states.filter(c=>(c.name==item.name && c.month==month-1 && c.year==year)).map(c=>c.state)[i];
+          lastMonthGauge = lastMonthGauge + habits.filter(c=>(c.name==item.name && c.month==month-1 && c.year==year)).map(c=>c.state)[i];
         }
         lastMonthGauge=lastMonthGauge/DaysInMonth(year,month-1);
         let progress=(gauge-lastMonthGauge)*100;
@@ -44,7 +44,7 @@ const Habits = ({ states, month, year, tags }) => {
     <View style={{ flex: 1, width:width }}>
         <View style={{flex:1,height:400}}>
             <FlatList
-                data={states.filter(c=>(c.day==1 && c.month==month && c.year==year))}
+                data={habits.filter(c=>(c.day==1 && c.month==month && c.year==year))}
                 renderItem={(item)=>IndList(item)}
                 keyExtractor={(_, index) => index.toString()}
             />

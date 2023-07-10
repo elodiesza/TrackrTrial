@@ -10,7 +10,7 @@ import Habits from './Statistics/Habits';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods}) => {
+const Statistics = ({habits, tags, setHabits, setTags, sleep, load, loadx, moods}) => {
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -23,13 +23,13 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods
   const [displayMonth, setDisplayMonth] = useState(true);
 
   useEffect(() => {
-    if (states.filter(c=>(c.year==year && c.month==month-1))=="") {
+    if (habits.filter(c=>(c.year==year && c.month==month-1))=="") {
       setFirstMonth(true);
     }
     else{
       setFirstMonth(false);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+1))=="") {
+    if (habits.filter(c=>(c.year==year && c.month==month+1))=="") {
       setLastMonth(true);
     }
     else{
@@ -45,7 +45,7 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods
     else {
       setMonth(month-1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month-2))==""){
+    if (habits.filter(c=>(c.year==year && c.month==month-2))==""){
       setFirstMonth(true);
     }
     setLastMonth(false);
@@ -59,14 +59,14 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods
     else {
       setMonth(month+1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+2))==""){
+    if (habits.filter(c=>(c.year==year && c.month==month+2))==""){
       setLastMonth(true);
     }
     setFirstMonth(false);
   };
 
 
-  if (!states || states.length === 0) {
+  if (!habits || habits.length === 0) {
     // Render loading state or placeholder component
     return (
       <View style={styles.container}>
@@ -78,20 +78,20 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={displayMonth==true?firstMonth? undefined:()=>LastMonth(states):(states.filter(c=>c.year==year-1).length==0? undefined: ()=>(setYear(year-1), setMonth(12-states.filter(c=>c.year==year+1).length)))}>
+        <Pressable onPress={displayMonth==true?firstMonth? undefined:()=>LastMonth(habits):(habits.filter(c=>c.year==year-1).length==0? undefined: ()=>(setYear(year-1), setMonth(12-habits.filter(c=>c.year==year+1).length)))}>
           <Feather name='chevron-left' size={40} style={{right:30}} color={displayMonth==true?firstMonth? 'lightgray':'black':'lightgray'}/>
         </Pressable>
         <Pressable onPress={()=>setDisplayMonth(!displayMonth)}>
           <Text style={{fontSize:10, textAlign:'center'}}>{displayMonth==true?moment(new Date(year,1,1)).format('YYYY'):moment(new Date(0,month,1)).format('MMMM')}</Text>
           <Text style={{fontSize:22, textAlign:'center'}}>{displayMonth==true?moment(new Date(0,month,1)).format('MMMM'):moment(new Date(year,1,1)).format('YYYY')}</Text>
         </Pressable>
-        <Pressable onPress={displayMonth==true?lastMonth? undefined:NextMonth:(states.filter(c=>c.year==year+1).length==0? undefined: ()=>(setYear(year+1), setMonth(states.filter(c=>c.year==year+1).length-1)))}>
+        <Pressable onPress={displayMonth==true?lastMonth? undefined:NextMonth:(habits.filter(c=>c.year==year+1).length==0? undefined: ()=>(setYear(year+1), setMonth(habits.filter(c=>c.year==year+1).length-1)))}>
           <Feather name='chevron-right' size={40} style={{left:30}} color={displayMonth==true?lastMonth?'lightgray':'black':'lightgray'}/>
         </Pressable>
       </View>
       <View style={styles.body}>
         <Swiper horizontal={true} showsButtons={false} showsPagination={true} loop={false}>
-          <Habits states={states} month={month} year={year} tags={tags}/>
+          <Habits habits={habits} month={month} year={year} tags={tags}/>
           <Mood moods={moods.filter(c=>(c.year==year && c.month==month))} daysInMonth={DaysInMonth(year,month)}/>
           <SleepLog sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
         </Swiper>

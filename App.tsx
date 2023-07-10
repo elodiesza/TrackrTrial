@@ -37,7 +37,7 @@ export default function App() {
   const [db,setDb] = useState(SQLite.openDatabase('example.db'));
   const [isLoading, setIsLoading] = useState(true);
   const [load, loadx] = useState(false);
-  const [states, setStates] = useState([]);
+  const [habits, setHabits] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [tags, setTags] = useState([]);
   const [moods, setMoods] = useState([]);
@@ -47,12 +47,12 @@ export default function App() {
 useEffect(() => {
   setIsLoading(true);
   db.transaction(tx => {
-    tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, tag INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
+    tx.executeSql('CREATE TABLE IF NOT EXISTS habits (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, tag INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
   });
   db.transaction(tx => {
-    tx.executeSql('SELECT * FROM states ORDER BY place,day;', null,
-    (txObj, resultSet) => setStates(resultSet.rows._array),
-    (txObj, error) => console.log('error selecting states')
+    tx.executeSql('SELECT * FROM habits ORDER BY place,day;', null,
+    (txObj, resultSet) => setHabits(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting habits')
     );
   });
   db.transaction(tx => {
@@ -70,7 +70,7 @@ useEffect(() => {
   db.transaction(tx => {
     tx.executeSql('SELECT * FROM tasks', null,
     (txObj, resultSet) => setTasks(resultSet.rows._array),
-    (txObj, error) => console.log('error selecting states')
+    (txObj, error) => console.log('error selecting habits')
     );
   });
   db.transaction(tx => {
@@ -79,7 +79,7 @@ useEffect(() => {
   db.transaction(tx => {
     tx.executeSql('SELECT * FROM moods', null,
     (txObj, resultSet) => setMoods(resultSet.rows._array),
-    (txObj, error) => console.log('error selecting states')
+    (txObj, error) => console.log('error selecting habits')
     );
   });
   db.transaction(tx => {
@@ -88,7 +88,7 @@ useEffect(() => {
   db.transaction(tx => {
     tx.executeSql('SELECT * FROM sleep', null,
     (txObj, resultSet) => setSleep(resultSet.rows._array),
-    (txObj, error) => console.log('error selecting states')
+    (txObj, error) => console.log('error selecting habits')
     );
   });
   setIsLoading(false);
@@ -98,28 +98,28 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Today">
-        <Tab.Screen name="Statistics" children={()=><Statistics states={states} tags={tags} setStates={setStates} setTags={setTags} sleep={sleep} load={load} loadx={loadx} moods={moods}/>} 
+        <Tab.Screen name="Statistics" children={()=><Statistics habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} sleep={sleep} load={load} loadx={loadx} moods={moods}/>} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
               <Feather name="activity" size={28} />  
             </View>)}}
         />
-        <Tab.Screen name="Trackers" children={()=><Trackers db={db} states={states} tags={tags} setStates={setStates} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>} 
+        <Tab.Screen name="Trackers" children={()=><Trackers db={db} habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
             <Feather name="check-square" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} states={states} setStates={setStates} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} states={states} tags={tags} tasks={tasks} setTasks={setTasks} setStates={setStates} setTags={setTags} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

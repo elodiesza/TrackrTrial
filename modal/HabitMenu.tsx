@@ -2,11 +2,11 @@ import React, { useState,  useEffect } from 'react';
 import { StyleSheet, Modal, Alert, TouchableWithoutFeedback, Pressable, TouchableOpacity, Text, View } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import IsLoading from './IsLoading';
-import ChangeIndName from './ChangeIndName';
+import ChangeHabitName from './ChangeHabitName';
 
 
 
-const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setStates, states, loadx, load }) => {
+const HabitMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setHabits, habits, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [changeModalVisible, setChangeModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -16,13 +16,13 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
 
 
     useEffect(() => {
-      if(states.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
+      if(habits.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
         setDisplayLeft('none');
       }
     },[load]);
     useEffect(() => {
-      const lastPlace = states.filter(c=>c.day==1).map(c=>c.place).length-1;
-      if(states.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==lastPlace){
+      const lastPlace = habits.filter(c=>c.day==1).map(c=>c.place).length-1;
+      if(habits.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==lastPlace){
         setDisplayRight('none');
       }
     },[load]);
@@ -30,34 +30,34 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
 
     const deleteState = async (name) => {
       setIsLoading(true);
-      let existingStates = [...states];
-      const currentPlace = existingStates.filter((state) => state.name === name && state.day === 1).map((state) => state.place)[0];
-      let remainingStates = existingStates.filter((state) => state.name !== name);
+      let existinghabits = [...habits];
+      const currentPlace = existinghabits.filter((state) => state.name === name && state.day === 1).map((state) => state.place)[0];
+      let remaininghabits = existinghabits.filter((state) => state.name !== name);
     
       await new Promise((resolve) => {
         db.transaction((tx) => {
           tx.executeSql(
-            'DELETE FROM states WHERE name = ?',
+            'DELETE FROM habits WHERE name = ?',
             [name],
             (txObj, deleteResultSet) => {
               if (deleteResultSet.rowsAffected > 0) {
-                setStates(remainingStates);
-                let updatedStatesCount = 0;
-                let remainingStatesLength = remainingStates.length;
-                for (var i = 0; i < remainingStatesLength; i++) {
-                  if (remainingStates[i].place > currentPlace) {
-                    let newPlace = remainingStates[i].place - 1;
-                    let iDtoUpdate = remainingStates[i].id;
+                setHabits(remaininghabits);
+                let updatedhabitsCount = 0;
+                let remaininghabitsLength = remaininghabits.length;
+                for (var i = 0; i < remaininghabitsLength; i++) {
+                  if (remaininghabits[i].place > currentPlace) {
+                    let newPlace = remaininghabits[i].place - 1;
+                    let iDtoUpdate = remaininghabits[i].id;
                     db.transaction((tx) => {
                       tx.executeSql(
-                        'UPDATE states SET place = ? WHERE id = ?',
+                        'UPDATE habits SET place = ? WHERE id = ?',
                         [newPlace, iDtoUpdate],
                         (txObj, placeResultSet) => {
-                          if (placeResultSet.rowsAffected > 0 && remainingStates[i]) {
-                            remainingStates[i].place = newPlace;
+                          if (placeResultSet.rowsAffected > 0 && remaininghabits[i]) {
+                            remaininghabits[i].place = newPlace;
                           }
-                          updatedStatesCount++;
-                          if (updatedStatesCount === remainingStatesLength) {
+                          updatedhabitsCount++;
+                          if (updatedhabitsCount === remaininghabitsLength) {
                             resolve();
                           }
                         },
@@ -65,8 +65,8 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
                       );
                     });
                   } else {
-                    updatedStatesCount++;
-                    if (updatedStatesCount === remainingStatesLength) {
+                    updatedhabitsCount++;
+                    if (updatedhabitsCount === remaininghabitsLength) {
                       resolve();
                     }
                   }
@@ -80,7 +80,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
         });
       });
     
-      setStates([...remainingStates]);
+      setHabits([...remaininghabits]);
       setModalVisible(false);
       loadx(!load);
       setIsLoading(false);
@@ -88,23 +88,23 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
 
     const moveLeft = (name) => {
       setIsLoading(true);
-      let existingStates = [...states];
-      let sortedStates = [...states];
-      let nameList = existingStates.filter(c=>c.day==1).map(c=>c.name);
+      let existinghabits = [...habits];
+      let sortedhabits = [...habits];
+      let nameList = existinghabits.filter(c=>c.day==1).map(c=>c.name);
       let nameIndex = nameList.indexOf(name);
       let previousName = nameList[nameIndex-1];
-      let newPlace2 = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
-      let newPlace = existingStates.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
-      let toMoveLeftIndex = existingStates.indexOf(name);
-      let toMoveRightIndex = existingStates.indexOf(previousName);
-      let impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
+      let newPlace2 = existinghabits.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
+      let newPlace = existinghabits.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
+      let toMoveLeftIndex = existinghabits.indexOf(name);
+      let toMoveRightIndex = existinghabits.indexOf(previousName);
+      let impactedDays = existinghabits.filter(c=>c.name==name).map(c=>c.day).length;
       db.transaction(tx=> {
-        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
+        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace, name],
           (txObj, resultSet) => {
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet.rowsAffected > 0) {
-                sortedStates[toMoveRightIndex-1+i] = existingStates[toMoveLeftIndex-1+i];
-                setStates(sortedStates);
+                sortedhabits[toMoveRightIndex-1+i] = existinghabits[toMoveLeftIndex-1+i];
+                setHabits(sortedhabits);
                 
               }
             }
@@ -113,14 +113,14 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
         );
       });
       db.transaction(tx=> {
-        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace2, previousName],
+        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace2, previousName],
           (txObj, resultSet2) => {
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet2.rowsAffected > 0) {
-                [...sortedStates][toMoveLeftIndex-1+i] = existingStates[toMoveRightIndex-1+i];
+                [...sortedhabits][toMoveLeftIndex-1+i] = existinghabits[toMoveRightIndex-1+i];
               }
             }
-            setStates([...sortedStates]);
+            setHabits([...sortedhabits]);
           },
           (txObj, error) => console.log('Error updating data', error)
         );
@@ -132,23 +132,23 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
 
     const moveRight = (name) => {
       setIsLoading(true);
-      let existingStates = [...states];
-      let sortedStates = [...states];
-      let nameList = existingStates.filter(c=>c.day==1).map(c=>c.name);
+      let existinghabits = [...habits];
+      let sortedhabits = [...habits];
+      let nameList = existinghabits.filter(c=>c.day==1).map(c=>c.name);
       let nameIndex = nameList.indexOf(name);
       let nextName = nameList[nameIndex+1];
-      let newPlace2 = existingStates.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
-      let newPlace = existingStates.filter(c=>(c.name==nextName && c.day==1)).map(c=>c.place)[0];
-      let toMoveRightIndex = existingStates.indexOf(name);
-      let toMoveLeftIndex = existingStates.indexOf(nextName);
-      let impactedDays = existingStates.filter(c=>c.name==name).map(c=>c.day).length;
+      let newPlace2 = existinghabits.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
+      let newPlace = existinghabits.filter(c=>(c.name==nextName && c.day==1)).map(c=>c.place)[0];
+      let toMoveRightIndex = existinghabits.indexOf(name);
+      let toMoveLeftIndex = existinghabits.indexOf(nextName);
+      let impactedDays = existinghabits.filter(c=>c.name==name).map(c=>c.day).length;
       db.transaction(tx=> {
-        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
+        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace, name],
           (txObj, resultSet) => {
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet.rowsAffected > 0) {
-                sortedStates[toMoveLeftIndex-1+i] = existingStates[toMoveRightIndex-1+i];
-                setStates(sortedStates);
+                sortedhabits[toMoveLeftIndex-1+i] = existinghabits[toMoveRightIndex-1+i];
+                setHabits(sortedhabits);
                 
               }
             }
@@ -157,14 +157,14 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
         );
       });
       db.transaction(tx=> {
-        tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace2, nextName],
+        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace2, nextName],
           (txObj, resultSet2) => {
             for (var i=1; i<impactedDays+1;i++){
             if (resultSet2.rowsAffected > 0) {
-                [...sortedStates][toMoveRightIndex-1+i] = existingStates[toMoveLeftIndex-1+i];
+                [...sortedhabits][toMoveRightIndex-1+i] = existinghabits[toMoveLeftIndex-1+i];
               }
             }
-            setStates([...sortedStates]);
+            setHabits([...sortedhabits]);
           },
           (txObj, error) => console.log('Error updating data', error)
         );
@@ -206,7 +206,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
               
             </TouchableWithoutFeedback>
           </TouchableOpacity>
-          <ChangeIndName db={db} data={data} changeModalVisible={changeModalVisible} setChangeModalVisible={setChangeModalVisible} states={states} setStates={setStates} load={load} loadx={loadx} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+          <ChangeHabitName db={db} data={data} changeModalVisible={changeModalVisible} setChangeModalVisible={setChangeModalVisible} habits={habits} setHabits={setHabits} load={load} loadx={loadx} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
           <Modal
             animationType="none"
             transparent={true}
@@ -283,7 +283,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
       },
   });
   
-  export default IndicatorMenu;
+  export default HabitMenu;
   
   
   

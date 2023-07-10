@@ -17,7 +17,6 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
     const [picked, setPicked] = useState<string>('white');
     const [colorPickerVisible, setColorPickerVisible] = useState(false);
     const [selectedType, setSelectedType] = useState('white');
-    console.warn(sleep);
     
     const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
 

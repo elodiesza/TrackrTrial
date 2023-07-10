@@ -4,23 +4,23 @@ import IsLoading from './IsLoading';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
-const ChangeIndName = ({db, data, changeModalVisible, setChangeModalVisible, states, setStates, load, loadx, modalVisible, setModalVisible}) => {
+const ChangeHabitName = ({db, data, changeModalVisible, setChangeModalVisible, habits, sethabits, load, loadx, modalVisible, setModalVisible}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState(null);
     const {control, handleSubmit, reset} = useForm();
     const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
     const EditInd = (name) => {
-        let indStates=[...states];
+        let indhabits=[...habits];
           db.transaction(tx=> {
-            tx.executeSql('UPDATE states SET name = ? WHERE name = ?', [value, name],
+            tx.executeSql('UPDATE habits SET name = ? WHERE name = ?', [value, name],
               (txObj, resultSet) => {
                 for (var i=1; i<DaysInMonth+1;i++){
                 if (resultSet.rowsAffected > 0) {
-                    indStates.filter(c=>c.name==name)[i].name = value;
+                    indhabits.filter(c=>c.name==name)[i].name = value;
                   }
                 }
-                setStates(indStates);
+                sethabits(indhabits);
               },
               (txObj, error) => console.log('Error updating data', error)
             );
@@ -135,5 +135,5 @@ const styles = StyleSheet.create({
     },
   });
 
-export default ChangeIndName;
+export default ChangeHabitName;
 

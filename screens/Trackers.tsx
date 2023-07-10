@@ -6,7 +6,7 @@ import TrackersElement from '../components/TrackersElement';
 
 const width = Dimensions.get('window').width;
 
-const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, setMoods, sleep, setSleep}) => {
+const Trackers = ({db, habits, tags, setHabits, setTags, load, loadx, moods, setMoods, sleep, setSleep}) => {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -19,13 +19,13 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, set
 
 
   useEffect(() => {
-    if (states.filter(c=>(c.year==year && c.month==month-1))=="") {
+    if (habits.filter(c=>(c.year==year && c.month==month-1))=="") {
       setFirstMonth(true);
     }
     else{
       setFirstMonth(false);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+1))=="") {
+    if (habits.filter(c=>(c.year==year && c.month==month+1))=="") {
       setLastMonth(true);
     }
     else{
@@ -41,7 +41,7 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, set
     else {
       setMonth(month-1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month-2))==""){
+    if (habits.filter(c=>(c.year==year && c.month==month-2))==""){
       setFirstMonth(true);
     }
     setLastMonth(false);
@@ -55,7 +55,7 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, set
     else {
       setMonth(month+1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+2))==""){
+    if (habits.filter(c=>(c.year==year && c.month==month+2))==""){
       setLastMonth(true);
     }
     setFirstMonth(false);
@@ -65,14 +65,14 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, set
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={displayMonth==true?firstMonth? undefined:()=>LastMonth(states):(states.filter(c=>c.year==year-1).length==0? undefined: ()=>(setYear(year-1), setMonth(12-states.filter(c=>c.year==year+1).length)))}>
+        <Pressable onPress={displayMonth==true?firstMonth? undefined:()=>LastMonth(habits):(habits.filter(c=>c.year==year-1).length==0? undefined: ()=>(setYear(year-1), setMonth(12-habits.filter(c=>c.year==year+1).length)))}>
           <Feather name='chevron-left' size={40} style={{right:30}} color={displayMonth==true?firstMonth? 'lightgray':'black':'lightgray'}/>
         </Pressable>
         <Pressable onPress={()=>setDisplayMonth(!displayMonth)}>
           <Text style={{fontSize:10, textAlign:'center'}}>{displayMonth==true?moment(new Date(year,1,1)).format('YYYY'):moment(new Date(0,month,1)).format('MMMM')}</Text>
           <Text style={{fontSize:22, textAlign:'center'}}>{displayMonth==true?moment(new Date(0,month,1)).format('MMMM'):moment(new Date(year,1,1)).format('YYYY')}</Text>
         </Pressable>
-        <Pressable onPress={displayMonth==true?lastMonth? undefined:NextMonth:(states.filter(c=>c.year==year+1).length==0? undefined: ()=>(setYear(year+1), setMonth(states.filter(c=>c.year==year+1).length-1)))}>
+        <Pressable onPress={displayMonth==true?lastMonth? undefined:NextMonth:(habits.filter(c=>c.year==year+1).length==0? undefined: ()=>(setYear(year+1), setMonth(habits.filter(c=>c.year==year+1).length-1)))}>
           <Feather name='chevron-right' size={40} style={{left:30}} color={displayMonth==true?lastMonth?'lightgray':'black':'lightgray'}/>
         </Pressable>
       </View>
@@ -82,8 +82,8 @@ const Trackers = ({db, states, tags, setStates, setTags, load, loadx, moods, set
       month={month} 
       load={load} 
       loadx={loadx} 
-      setStates={setStates} 
-      states={states}
+      setHabits={setHabits} 
+      habits={habits}
       tags={tags}
       setTags={setTags}
       moods={moods}

@@ -7,7 +7,7 @@ import CalendarElement from '../components/CalendarElement';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function Calendar({db, states, tags, setStates, setTags, tasks, setTasks, load, loadx}) {
+export default function Calendar({db, habits, tags, setHabits, setTags, tasks, setTasks, load, loadx}) {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,13 +24,13 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
 
 
   useEffect(() => {
-    if (states.filter(c=>(c.year==year && c.month==month-1))==undefined) {
+    if (habits.filter(c=>(c.year==year && c.month==month-1))==undefined) {
       setFirstMonth(true);
     }
     else{
       setFirstMonth(false);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+1))==undefined) {
+    if (habits.filter(c=>(c.year==year && c.month==month+1))==undefined) {
       setLastMonth(true);
     }
     else{
@@ -48,7 +48,7 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
     else {
       setMonth(month-1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month-2))==""){
+    if (habits.filter(c=>(c.year==year && c.month==month-2))==""){
       setFirstMonth(true);
     }
     setLastMonth(false);
@@ -62,7 +62,7 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
     else {
       setMonth(month+1);
     }
-    if (states.filter(c=>(c.year==year && c.month==month+1))==""){
+    if (habits.filter(c=>(c.year==year && c.month==month+1))==""){
       setLastMonth(true);
     }
     setFirstMonth(false);
@@ -81,14 +81,14 @@ export default function Calendar({db, states, tags, setStates, setTags, tasks, s
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={displayMonth==true? ()=>LastMonth(states): ()=>setYear(year-1)}>
+        <Pressable onPress={displayMonth==true? ()=>LastMonth(habits): ()=>setYear(year-1)}>
           <Feather name='chevron-left' size={40} style={{right:30}} color={'black'}/>
         </Pressable>
         <Pressable onPress={()=>setDisplayMonth(!displayMonth)}>
           <Text style={{fontSize:10, textAlign:'center'}}>{displayMonth==true?moment(new Date(year,1,1)).format('YYYY'):moment(new Date(0,month,1)).format('MMMM')}</Text>
           <Text style={{fontSize:22, textAlign:'center'}}>{displayMonth==true?moment(new Date(0,month,1)).format('MMMM'):moment(new Date(year,1,1)).format('YYYY')}</Text>
         </Pressable>
-        <Pressable onPress={displayMonth==true? ()=>NextMonth(states): ()=>setYear(year+1)}>
+        <Pressable onPress={displayMonth==true? ()=>NextMonth(habits): ()=>setYear(year+1)}>
           <Feather name='chevron-right' size={40} style={{left:30}} color={'black'}/>
         </Pressable>
       </View>

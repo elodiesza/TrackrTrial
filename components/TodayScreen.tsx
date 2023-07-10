@@ -7,7 +7,7 @@ import AddMood from './AddMood';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, moods, setMoods, sleep, setSleep, load, loadx}) => {
+const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx}) => {
 
     var today = new Date();
     var year = today.getFullYear();
@@ -16,7 +16,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
     const [isLoading, setIsLoading] = useState(false);
 
 
-    const allNames = states.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
+    const allNames = habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
 
     if (isLoading) {
@@ -28,15 +28,15 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
       }
 
     const updateState = (id) => {
-        let existingStates=[...states];
-        const indexToUpdate = existingStates.findIndex(state => state.id === id);
-        if (existingStates[indexToUpdate].state==0){
+        let existinghabits=[...habits];
+        const indexToUpdate = existinghabits.findIndex(state => state.id === id);
+        if (existinghabits[indexToUpdate].state==0){
           db.transaction(tx=> {
-            tx.executeSql('UPDATE states SET state = ? WHERE id = ?', [1, id],
+            tx.executeSql('UPDATE habits SET state = ? WHERE id = ?', [1, id],
               (txObj, resultSet) => {
                 if (resultSet.rowsAffected > 0) {
-                  existingStates[indexToUpdate].state = 1;
-                  setStates(existingStates);
+                  existinghabits[indexToUpdate].state = 1;
+                  setHabits(existinghabits);
                 }
               },
               (txObj, error) => console.log('Error updating data', error)
@@ -45,11 +45,11 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
         }
         else {
           db.transaction(tx=> {
-            tx.executeSql('UPDATE states SET state = ? WHERE id = ?', [0, id],
+            tx.executeSql('UPDATE habits SET state = ? WHERE id = ?', [0, id],
               (txObj, resultSet) => {
                 if (resultSet.rowsAffected > 0) {
-                  existingStates[indexToUpdate].state = 0;
-                  setStates(existingStates);
+                  existinghabits[indexToUpdate].state = 0;
+                  setHabits(existinghabits);
                 }
               },
               (txObj, error) => console.log('Error updating data', error)
@@ -61,8 +61,8 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, states, setStates, mo
     const showTitle = (ind) => {
       return (
         <View>
-          <Pressable onPress={()=>updateState(states.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0])} style={{ height: 75, width:25*1.25, transform: [{ skewX: '-45deg' },{scale: 1.25}], left: 60 }}>
-            <IndicatorTableTitleToday name={ind.item} state={states.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.state)[0]} tags={tags} states={states} year={year} month={month}/>
+          <Pressable onPress={()=>updateState(habits.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0])} style={{ height: 75, width:25*1.25, transform: [{ skewX: '-45deg' },{scale: 1.25}], left: 60 }}>
+            <IndicatorTableTitleToday name={ind.item} state={habits.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.state)[0]} tags={tags} habits={habits} year={year} month={month}/>
           </Pressable>
         </View>
       );

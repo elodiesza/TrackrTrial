@@ -7,7 +7,7 @@ import Color from '../components/Color';
 import IsLoading from './IsLoading';
 
 
-function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, states, setStates, tags, setTags}) {
+function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tags, setTags}) {
 
   const [isLoading, setIsLoading] = useState(true);
   const {control, handleSubmit, reset} = useForm();
@@ -63,13 +63,13 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
 
   const addState = async (data) => {
     let existingTags = [...tags];
-    let existingStates = [...states]; 
-    var newPlace = existingStates.filter(c => c.day === 1).map(c => c.name).length;
+    let existinghabits = [...habits]; 
+    var newPlace = existinghabits.filter(c => c.day === 1).map(c => c.name).length;
     if(addTag=='Add Tag' || (selectedTag==null && selectedTag!=='Add a new Tag')){
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              'INSERT INTO habits (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
               [data.name, year, month, i, 0, type, 0, newPlace],
               (txtObj, stateResultSet) => {
                 const newStateId = stateResultSet.insertId;
@@ -84,8 +84,8 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                   tag: 0,
                   place: newPlace,
                 };
-                existingStates.push(newState);
-                setStates(existingStates); // Update the state with the new array of states
+                existinghabits.push(newState);
+                setHabits(existinghabits); // Update the state with the new array of habits
                 loadx(!load);
               }
             );
@@ -97,7 +97,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              'INSERT INTO habits (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
               [data.name, year, month, i, 0, type, tempTag, newPlace],
               (txtObj, stateResultSet) => {
                 const newStateId = stateResultSet.insertId;
@@ -112,8 +112,8 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                   tag: tempTag,
                   place: newPlace,
                 };
-                existingStates.push(newState);
-                setStates(existingStates); 
+                existinghabits.push(newState);
+                setHabits(existinghabits); 
                 loadx(!load);
               }
             );
@@ -134,7 +134,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
               for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
                 db.transaction((tx) => {
                   tx.executeSql(
-                    'INSERT INTO states (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    'INSERT INTO habits (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                     [data.name, year, month, i, 0, type, tagId, newPlace],
                     (txtObj, stateResultSet) => {
                       const newStateId = stateResultSet.insertId;
@@ -150,8 +150,8 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                         place: newPlace,
                       };
                       console.warn(picked);
-                      existingStates.push(newState);
-                      setStates(existingStates); // Update the state with the new array of states
+                      existinghabits.push(newState);
+                      setHabits(existinghabits); // Update the state with the new array of habits
                     }
                   );
                 });
@@ -182,7 +182,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible)}} activeOpacity={1}>
         <TouchableWithoutFeedback>
           <View style={styles.container}>
-              <Text>Insert new Indicator</Text>
+              <Text style={{marginBottom:10}}>Create a new Habit</Text>
               <Controller
               control= {control}
               name="name"
@@ -193,7 +193,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, sta
                     onChangeText={onChange}
                     autoCapitalize = {"characters"}
                     onBlur={onBlur}
-                    placeholder=""
+                    placeholder="NAME"
                     style={[styles.input,{height:40, borderColor: error ? 'red' : '#e8e8e8'}]}
                   />
                   {error && (

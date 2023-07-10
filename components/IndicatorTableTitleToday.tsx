@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const IndicatorTableTitleToday = ({name, state, tags, states, year, month}) => {
+const IndicatorTableTitleToday = ({name, state, tags, habits, year, month}) => {
 
-    const IndicatorTag = states.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==1)).map(c=>c.tag)[0];
+    const IndicatorTag = habits.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==1)).map(c=>c.tag)[0];
     const IndicatorColor = IndicatorTag==0 ? 'white' : tags.filter(c=>c.id==IndicatorTag).map(c=>c.color)[0];
 
     return (
