@@ -7,6 +7,7 @@ import IndicatorMenu from '../modal/IndicatorMenu';
 import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
 import moment from 'moment';
+import SleepTypeColors from '../constants/SleepTypeColors';
 
 const width = Dimensions.get('window').width;
 
@@ -318,9 +319,14 @@ function colorMixer(rgbA, rgbB, amountToMix){
                 <View style={styles.dialogBox}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
                   <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
-                  <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
-                    <Text>Delete</Text>
-                  </TouchableOpacity>
+                  <View style={{flexDirection:'row', flex:1}}>
+                    <TouchableOpacity onPress={() => setSleepModalVisible(!sleepModalVisible)} style={[styles.button,{backgroundColor: 'lightgray', marginLeft : 29}]}>
+                      <Text>Update</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray', marginLeft : 20}]}>
+                      <Text>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -330,8 +336,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
     }
 
     const showSleepQuality = (item,index) => {
-      const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
-      let sleepQuality = sleepTypes.filter(c=>(c.type==item)).map(c=>c.color)[0];
+      let sleepQuality = SleepTypeColors.filter(c=>(c.type==item)).map(c=>c.color)[0];
       return  (
         <View>
           <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: sleep.filter(c=>(c.year==year && c.month==month)).length==0? 'white': sleepQuality==null? 'white' : sleepQuality }}/>
@@ -349,7 +354,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
               <TouchableWithoutFeedback>
                 <View style={styles.dialogBox}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
-                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx}/>
+                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
                   <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
                     <Text>Delete</Text>
                   </TouchableOpacity>

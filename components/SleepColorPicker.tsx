@@ -1,12 +1,10 @@
 import React from 'react';
 import Color from './Color';
 import { View, StyleSheet, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback, FlatList } from 'react-native';
-
+import SleepTypes from '../constants/SleepTypeColors';
 
 const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPickerVisible,picked,setPicked,sleep,setSleep,year,month,day,setSleepModalVisible,sleepModalVisible}) => {
-  const colorChoice =  ['green','yellowgreen','yellow','orange','red'];
-  const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
-
+ 
   const SleepType = (item) => (
     <TouchableOpacity onPress={()=>{addSleepType(item)}}>
       <Color color={item.item} />
@@ -15,7 +13,7 @@ const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPicker
 
   const addSleepType = (item) => {
     let existingSleep = [...sleep];
-    let pickedType = sleepTypes.filter(c=>c.color==item.item).map(c=>c.type)[0];
+    let pickedType = SleepTypes.filter(c=>c.color==item.item).map(c=>c.type)[0];
     setPicked(item.color);  
     if (sleep.filter((c) => c.year == year && c.month == month && c.day == day).length == 0) {
       db.transaction((tx) => {
@@ -65,7 +63,7 @@ const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPicker
               <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setColorPickerVisible(!colorPickerVisible)}} activeOpacity={1}>
                 <TouchableWithoutFeedback>
                   <View style={styles.colorPicker}>
-                    <FlatList data={colorChoice} renderItem={SleepType} horizontal={true}/>
+                    <FlatList data={SleepTypes.map(c=>c.color)} renderItem={SleepType} horizontal={true}/>
                   </View>
                 </TouchableWithoutFeedback>
               </TouchableOpacity>

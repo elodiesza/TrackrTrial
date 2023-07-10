@@ -35,7 +35,11 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
         date.setDate(date.getDate() + 1);
       }
     }
-
+    if (days.length<42) {
+      for (let i=days.length; i<42; i++) {
+        days.push(0);
+      }
+    }
     return days;
   }
 
@@ -48,7 +52,7 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
   var line5 = () => { 
     let list=[];
     if (daysLength>28) {
-        for (let i=0; i<(daysLength-28);i++){
+        for (let i=0; i<7;i++){
           list.push(GetDaysInMonth(month)[28+i]);
         }
         for (let i=0; i<(35-daysLength);i++){
@@ -63,10 +67,10 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
   }
   var line6 = () => { 
     let list=[];
-    if (daysLength>35) {
+    if (daysLength>34) {
 
         for (let i=0; i<7;i++){
-          list.push(GetDaysInMonth(month)[34+i]);
+          list.push(GetDaysInMonth(month)[35+i]);
         }
       return(list)
     }

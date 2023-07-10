@@ -11,12 +11,13 @@ const width = Dimensions.get('window').width;
 const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSleepModalVisible,sleepModalVisible}) => {
 
     const [isLoading, setIsLoading] = useState(false);
-    const [sleepTime,setSleepTime] = useState(new Date());
-    const [wakeupTime,setWakeupTime] = useState(new Date());
+    const [sleepTime,setSleepTime] = useState(new Date(year,month-1,day,23,0,0));
+    const [wakeupTime,setWakeupTime] = useState(new Date(year,month-1,day,7,0,0));
     const [showDatePicker, setShowDatePicker] = useState(true);
     const [picked, setPicked] = useState<string>('white');
     const [colorPickerVisible, setColorPickerVisible] = useState(false);
     const [selectedType, setSelectedType] = useState('white');
+    console.warn(sleep);
     
     const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
 
@@ -115,6 +116,18 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
               sleepModalVisible={sleepModalVisible==undefined? undefined : setSleepModalVisible}
             />
             <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
+                <Text>YTD SLEEP TIME</Text>
+                <DateTimePicker
+                    value={sleepTime}
+                    mode="time"
+                    display="default"
+                    onChange={onChangeSleep}
+                    minuteInterval={30}
+                    style={{marginRight:8}}
+                />
+                <Pressable onPress={addSleep} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
+            </View>
+            <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
                 <Text>WAKE-UP TIME</Text>
                 <DateTimePicker
                     value={wakeupTime}
@@ -122,23 +135,9 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
                     display="default"
                     onChange={onChangeWakeup}
                     minuteInterval={30}
-                    timeZoneOffsetInMinutes={9*60}
                     style={{marginRight:8}}
                 />
                 <Pressable onPress={addWakeup} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
-            </View>
-            <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
-                <Text>SLEEP TIME</Text>
-                <DateTimePicker
-                    value={sleepTime}
-                    mode="time"
-                    display="default"
-                    onChange={onChangeSleep}
-                    minuteInterval={30}
-                    timeZoneOffsetInMinutes={9*60}
-                    style={{marginRight:8}}
-                />
-                <Pressable onPress={addSleep} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
             </View>
         </View>
     </SafeAreaView>

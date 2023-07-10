@@ -6,6 +6,7 @@ import moment from 'moment';
 import SleepLog from './Statistics/SleepLog';
 import Mood from './Statistics/Mood';
 import Swiper from 'react-native-swiper';
+import Habits from './Statistics/Habits';
 
 const width = Dimensions.get('window').width;
 
@@ -65,39 +66,6 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods
   };
 
 
-
-  const IndList = ({item}) => {
-    let gauge=0;
-    for (var i=0;i<DaysInMonth(year,month);i++){
-      gauge = gauge + states.filter(c=>(c.name==item.name && c.month==month && c.year==year)).map(c=>c.state)[i];
-    }
-    gauge=gauge/DaysInMonth(year,month);
-    let lastMonthGauge=0;
-    for (var i=0;i<DaysInMonth(year,month-1);i++){
-      lastMonthGauge = lastMonthGauge + states.filter(c=>(c.name==item.name && c.month==month-1 && c.year==year)).map(c=>c.state)[i];
-    }
-    lastMonthGauge=lastMonthGauge/DaysInMonth(year,month-1);
-    let progress=(gauge-lastMonthGauge)*100;
-    return(
-      <View style={{width:width}}>
-        <View style={{flex:1, width: width, height:40, justifyContent:'center', paddingLeft:20, backgroundColor: tags.filter(c=>c.id==item.tag).map(c=>c.color)[0], opacity:0.2}}/>
-        <View style={{flex:1, width: width*gauge, height:40, justifyContent:'center',position:'absolute', paddingLeft:20, backgroundColor: tags.filter(c=>c.id==item.tag).map(c=>c.color)[0], opacity:0.7}}/>
-        <View style={{flex:1, flexDirection:'row', width: width, height:40, justifyContent:'center', paddingLeft:20,position:'absolute'}}>
-          <View style={{flex:9, justifyContent:'center'}}>
-            <Text style={{textAlignVertical:'center'}}>
-              {item.name}
-            </Text>
-          </View>
-          <View style={{flex:1, justifyContent:'center'}}>
-            <Text style={{textAlignVertical:'center',textAlign:'right',right:10, color: lastMonthGauge.toString()=='NaN'?'black':((progress<1 && progress>-1)? 'black': progress>0? 'green':'red')}}>
-              {lastMonthGauge.toString()=='NaN'?'':((progress<0 && progress>-1)? "0%": progress>1? "+"+progress.toFixed(0)+"%":progress.toFixed(0)+"%")}
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
   if (!states || states.length === 0) {
     // Render loading state or placeholder component
     return (
@@ -123,15 +91,7 @@ const Statistics = ({states, tags, setStates, setTags, sleep, load, loadx, moods
       </View>
       <View style={styles.body}>
         <Swiper horizontal={true} showsButtons={false} showsPagination={true} loop={false}>
-          <View style={{flex:1}}>
-            <View style={{height:400}}>
-              <FlatList
-                data={states.filter(c=>(c.day==1 && c.month==month && c.year==year))}
-                renderItem={(item)=>IndList(item)}
-                keyExtractor={(_, index) => index.toString()}
-              />
-            </View>
-          </View>
+          <Habits states={states} month={month} year={year} tags={tags}/>
           <Mood moods={moods.filter(c=>(c.year==year && c.month==month))} daysInMonth={DaysInMonth(year,month)}/>
           <SleepLog sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
         </Swiper>
