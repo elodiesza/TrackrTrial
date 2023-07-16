@@ -1,14 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable,TouchableOpacity, Dimensions } from 'react-native';
 
-const IndicatorTableTitle = ({name, tags, habits, year, month, setModalVisible}) => {
-
-    const IndicatorTag = habits.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==1)).map(c=>c.tag)[0];
-    const IndicatorColor = IndicatorTag==0 ? 'white' : tags.filter(c=>c.id==IndicatorTag).map(c=>c.color)[0];
+const IndicatorTableTitle = ({name, habits, year, month, setModalVisible}) => {
 
     return (
             <TouchableOpacity onPress={()=>setModalVisible(name)} style={{width:1, height:1}}>
-                <View style={[styles.polygon, {backgroundColor: IndicatorColor}]} /><Text numberOfLines={1} style={styles.indText}>{name}</Text>
+                <View style={[styles.polygon, {backgroundColor: 'white'}]} /><Text numberOfLines={1} style={styles.indText}>{name}</Text>
             </TouchableOpacity>
        );     
 };

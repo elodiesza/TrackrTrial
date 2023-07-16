@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { FlatList, ScrollView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-
+import { colors } from '../../styles';
 
 const width = Dimensions.get('window').width;
 
@@ -10,23 +10,27 @@ const Habits = ({ habits, month, year, tags }) => {
 
     const IndList = ({item}) => {
         let gauge=0;
-        for (var i=0;i<DaysInMonth(year,month);i++){
-          gauge = gauge + habits.filter(c=>(c.name==item.name && c.month==month && c.year==year)).map(c=>c.state)[i];
+        if(habits.filter(c=>(c.name==item.name && c.month==month && c.year==year)).length==DaysInMonth(year,month)){
+          for (var i=0;i<DaysInMonth(year,month);i++){
+            gauge = gauge + habits.filter(c=>(c.name==item.name && c.month==month && c.year==year)).map(c=>c.state)[i];
+          }
+          gauge=gauge/DaysInMonth(year,month);
         }
-        gauge=gauge/DaysInMonth(year,month);
         let lastMonthGauge=0;
-        for (var i=0;i<DaysInMonth(year,month-1);i++){
-          lastMonthGauge = lastMonthGauge + habits.filter(c=>(c.name==item.name && c.month==month-1 && c.year==year)).map(c=>c.state)[i];
+        if (habits.filter(c=>(c.name==item.name && c.month==month-1 && c.year==year)).length>0){
+          for (var i=0;i<DaysInMonth(year,month-1);i++){
+            lastMonthGauge = lastMonthGauge + habits.filter(c=>(c.name==item.name && c.month==month-1 && c.year==year)).map(c=>c.state)[i];
+          }
+          lastMonthGauge=lastMonthGauge/DaysInMonth(year,month-1);
         }
-        lastMonthGauge=lastMonthGauge/DaysInMonth(year,month-1);
         let progress=(gauge-lastMonthGauge)*100;
         return(
           <View style={{width:width}}>
-            <View style={{flex:1, width: width, height:40, justifyContent:'center', paddingLeft:20, backgroundColor: tags.filter(c=>c.id==item.tag).map(c=>c.color)[0], opacity:0.2}}/>
-            <View style={{flex:1, width: width*gauge, height:40, justifyContent:'center',position:'absolute', paddingLeft:20, backgroundColor: tags.filter(c=>c.id==item.tag).map(c=>c.color)[0], opacity:0.7}}/>
-            <View style={{flex:1, flexDirection:'row', width: width, height:40, justifyContent:'center', paddingLeft:20,position:'absolute'}}>
+            <View style={{flex:1, width: width, height:40, justifyContent:'center', backgroundColor: tags.filter(c=>c.id==item.tag).length>0?tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]:colors.default, opacity:0.2}}/>
+            <View style={{flex:1, width: gauge=="NaN"? 0:width*gauge, height:40, justifyContent:'center',position:'absolute', backgroundColor: tags.filter(c=>c.id==item.tag).length>0?tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]:colors.default, opacity:0.7}}/>
+            <View style={{flex:1, flexDirection:'row', width: width, height:40, justifyContent:'center',position:'absolute'}}>
               <View style={{flex:9, justifyContent:'center'}}>
-                <Text style={{textAlignVertical:'center'}}>
+                <Text style={{textAlignVertical:'center', left:20}}>
                   {item.name}
                 </Text>
               </View>

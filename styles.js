@@ -5,7 +5,7 @@ const height = Dimensions.get('window').height;
 
 export const colors = {
     white: '#ffffff',
-    default: '#000000',
+    default: '#D3DDDF',
     defaultlight: '#eff3f4',
     defaultmedium: '#000000',
     red: '#FF6347',
@@ -64,8 +64,8 @@ export const container = StyleSheet.create({
     },
     body: {
         flex:1,
-        alignContent: 'center',
-        justifyContent: 'center',
+        alignContent: 'flex-start',
+        justifyContent: 'flex-start',
         backgroundColor: colors.defaultlight,
     },
     subcategory: {

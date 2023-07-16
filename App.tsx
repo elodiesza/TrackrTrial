@@ -29,6 +29,9 @@ export default function App() {
   const [tags, setTags] = useState([]);
   const [moods, setMoods] = useState([]);
   const [sleep, setSleep] = useState([]);
+  const [states, setStates] = useState([]);
+  const [scales, setScales] = useState([]);
+  const [times, setTimes] = useState([]);
 
 
 useEffect(() => {
@@ -78,6 +81,33 @@ useEffect(() => {
     (txObj, error) => console.log('error selecting habits')
     );
   });
+  db.transaction(tx => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, item TEXT, color TEXT)')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM states', null,
+    (txObj, resultSet) => setStates(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting states')
+    );
+  });
+  db.transaction(tx => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS scales (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, min INTEGER, max INTEGER, mincolor TAXT, maxcolor TEXT, unit TEXT)')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM scales', null,
+    (txObj, resultSet) => setScales(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting scales')
+    );
+  });
+  db.transaction(tx => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS times (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, min INTEGER, max INTEGER, mincolor TAXT, maxcolor TEXT)')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM times', null,
+    (txObj, resultSet) => setTimes(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting times')
+    );
+  });
   setIsLoading(false);
 
 },[load]);
@@ -106,7 +136,7 @@ useEffect(() => {
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

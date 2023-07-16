@@ -92,6 +92,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
     else {
       setIsLoading(false); // Set loading state to false if the data is already present
     }
+    console.warn('habits', habits);
   }, []);
 
   useEffect(() => {
@@ -204,7 +205,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
       return (
         <View>
           <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37 }}>
-            <IndicatorTableTitle name={ind.item} tags={tags} habits={habits} year={year} month={month} setModalVisible={setModalVisible}/>
+            <IndicatorTableTitle name={ind.item} habits={habits} year={year} month={month} setModalVisible={setModalVisible}/>
           </Pressable>
           {showhabits(ind.item)}
           <HabitMenu
