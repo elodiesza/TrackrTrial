@@ -1,0 +1,18 @@
+import { View, Text, StyleSheet, Pressable, SafeAreaView } from 'react-native';
+import { container } from '../styles';
+import Svg, { Path } from 'react-native-svg';
+
+function Tab({zindex,color,title}) {
+
+const pathData = `M 0 40 Q 15 40, 20 30 L 30,10 Q 35 0, 45 0 H 140 Q 150 0, 155 10 L 165 30 Q 170 40, 180 40 `;
+  return (
+    <View style={[container.container,{zIndex: zindex, backgroundColor:'transparent',height:40,flexDirection:'row', alignItems:'flex-end',width:180}]}>
+        <Svg>
+            <Path d={pathData} fill={color} strokeWidth={1} stroke={'black'}  />
+        </Svg>
+        <Text style={{position:'absolute', bottom:8}}> {title} </Text>
+    </View>
+  );
+}
+
+export default Tab;

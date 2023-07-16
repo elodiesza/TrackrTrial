@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import IndicatorTableTitleToday from './IndicatorTableTitleToday';
 import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
+import { container } from '../styles';
 
 
 const width = Dimensions.get('window').width;
@@ -69,17 +70,12 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, mo
     };
 
 
-
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={container.body}>
       <View style={{flex:1}}>
         <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} load={load} loadx={loadx} setMoodModalVisible={undefined}/>
       </View>
       <View style={{flex:1, width:width}}>
-        <Text>
-          Today's habits completion
-        </Text>
         <FlatList
           horizontal
           data={uniqueNames}
@@ -88,9 +84,6 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, mo
         />
       </View>
       <View style={{flex:1, width:width}}>
-        <Text>
-          Sleep Log
-        </Text>
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
       </View>
     </SafeAreaView>

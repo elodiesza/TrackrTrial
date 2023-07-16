@@ -77,18 +77,6 @@ const Statistics = ({habits, tags, setHabits, setTags, sleep, load, loadx, moods
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Pressable onPress={displayMonth==true?firstMonth? undefined:()=>LastMonth(habits):(habits.filter(c=>c.year==year-1).length==0? undefined: ()=>(setYear(year-1), setMonth(12-habits.filter(c=>c.year==year+1).length)))}>
-          <Feather name='chevron-left' size={40} style={{right:30}} color={displayMonth==true?firstMonth? 'lightgray':'black':'lightgray'}/>
-        </Pressable>
-        <Pressable onPress={()=>setDisplayMonth(!displayMonth)}>
-          <Text style={{fontSize:10, textAlign:'center'}}>{displayMonth==true?moment(new Date(year,1,1)).format('YYYY'):moment(new Date(0,month,1)).format('MMMM')}</Text>
-          <Text style={{fontSize:22, textAlign:'center'}}>{displayMonth==true?moment(new Date(0,month,1)).format('MMMM'):moment(new Date(year,1,1)).format('YYYY')}</Text>
-        </Pressable>
-        <Pressable onPress={displayMonth==true?lastMonth? undefined:NextMonth:(habits.filter(c=>c.year==year+1).length==0? undefined: ()=>(setYear(year+1), setMonth(habits.filter(c=>c.year==year+1).length-1)))}>
-          <Feather name='chevron-right' size={40} style={{left:30}} color={displayMonth==true?lastMonth?'lightgray':'black':'lightgray'}/>
-        </Pressable>
-      </View>
       <View style={styles.body}>
         <Swiper horizontal={true} showsButtons={false} showsPagination={true} loop={false}>
           <Habits habits={habits} month={month} year={year} tags={tags}/>

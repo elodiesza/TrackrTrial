@@ -1,37 +1,24 @@
 import * as React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Trackers from './screens/Trackers';
 import Calendar from './screens/Calendar';
 import Settings from './screens/Settings';
-import Statistics from './screens/Statistics';
 import Today from './screens/Today';
+import Analytics from './screens/Analytics';
+import Tracks from './screens/Tracks';
 import Account from './screens/Settings/Account';
 import About from './screens/Settings/About';
 import Help from './screens/Settings/Help';
 import Feather from '@expo/vector-icons/Feather';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SimpleLineIcons } from '@expo/vector-icons';
 import { useEffect,useState } from 'react';
 import * as SQLite from 'expo-sqlite';
 
-const Stack = createNativeStackNavigator();
 
-function SettingsNavigator() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
-      <Stack.Screen name="Account" component={Account} options={{ headerShown: false }} />
-      <Stack.Screen name="About" component={About} options={{ headerShown: false }} />
-      <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  );
-}
 
 
 const Tab = createBottomTabNavigator();
-
-
 
 export default function App() {
   const [db,setDb] = useState(SQLite.openDatabase('example.db'));
@@ -98,35 +85,35 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Today">
-        <Tab.Screen name="Statistics" children={()=><Statistics habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} sleep={sleep} load={load} loadx={loadx} moods={moods}/>} 
+        <Tab.Screen name="Analytics" children={()=><Analytics/>} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
               <Feather name="activity" size={28} />  
             </View>)}}
         />
-        <Tab.Screen name="Trackers" children={()=><Trackers db={db} habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>} 
+        <Tab.Screen name="Tracks" children={()=><Tracks/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
-            <Feather name="check-square" size={28} />  
+            <SimpleLineIcons name="notebook" size={28} />  
           </View>)}}
         />
         <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>} 
-        options={{ headerShown: false, tabBarShowLabel: false,
+        options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
             <Feather name="calendar" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="SettingsNavigator" component={SettingsNavigator}
+        <Tab.Screen name="Settings" component={Settings}
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>

@@ -1,15 +1,26 @@
-import { FlatList, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
+import { FlatList, StyleSheet, Text, View, SafeAreaView,Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import Swiper from 'react-native-swiper';
 import TodayTasks from '../components/TodayTasks';
 import TodayScreen from '../components/TodayScreen';
+import { container } from '../styles';
+import { Feather } from '@expo/vector-icons';
+import moment from 'moment';
 
 
 const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx}) => {
 
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
+  const [date, setDate] = useState(today);
 
+  const NextDay = () => {
+    setDate(new Date(date.setDate(date.getDate()+1)));
+  };
+
+  const PreviousDay = () => {
+    setDate(new Date(date.setDate(date.getDate()-1)));
+  };
 
   if (isLoading) {
     return (
@@ -20,10 +31,21 @@ const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, se
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={container.container}>
+      <View style={container.header}>
+        <Pressable onPress={PreviousDay}>
+          <Feather name='chevron-left' size={40} />
+        </Pressable>
+        <Text style={container.headerdate}>
+          {moment(date).format('dddd, DD MMMM YYYY')}
+        </Text>
+        <Pressable onPress={NextDay}>
+          <Feather name='chevron-right' size={40}/>
+        </Pressable>
+      </View>
       <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
         <TodayScreen db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>
-        <TodayTasks db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} load={load} loadx={loadx}/>
+        <TodayTasks db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} load={load} loadx={loadx} date={date} setDate={setDate}/>
       </Swiper>
     </SafeAreaView>
   );
@@ -31,10 +53,3 @@ const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, se
 
 export default Today;
 
-const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    alignContent: 'center',
-    justifyContent: 'center',
-  },
-});

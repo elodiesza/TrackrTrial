@@ -2,6 +2,7 @@ import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text,
 import { useState, useEffect } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Sad from '../assets/images/icons/sad.png';
 import Angry from '../assets/images/icons/angry.png';
 import Happy from '../assets/images/icons/happy.png';
@@ -9,6 +10,7 @@ import Productive from '../assets/images/icons/productive.png';
 import Sick from '../assets/images/icons/sick.png';
 import Stressed from '../assets/images/icons/stressed.png';
 import Bored from '../assets/images/icons/bored.png';
+import {colors} from '../styles.js';
 
 const width = Dimensions.get('window').width;
 
@@ -48,28 +50,30 @@ const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalV
 
   return (
     <View style={styles.container}>
-        <Text>Today's mood</Text>
         <View style={{flexDirection:'row', justifyContent:'center'}}>
             <TouchableOpacity onPress={()=>{updateMood('productive');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                <Image source={Productive} style={styles.mood} />
+              <MaterialCommunityIcons name="emoticon-devil" size={40} color={colors.green}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{updateMood('happy');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                <Image source={Happy} style={styles.mood} />
+              <MaterialCommunityIcons name="emoticon" size={40} color={colors.yellowgreen}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{updateMood('sick');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                <Image source={Sick} style={styles.mood} />
+              <MaterialCommunityIcons name="emoticon-sick" size={40} color={colors.yellow}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{updateMood('stressed');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                <Image source={Stressed} style={styles.mood} />
+              <MaterialCommunityIcons name="emoticon-confused" size={40} color={colors.orange}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{updateMood('angry');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                <Image source={Angry} style={styles.mood} />
+              <MaterialCommunityIcons name="emoticon-angry" size={40} color={colors.red}/>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <MaterialCommunityIcons name="emoticon-happy" size={40} color={colors.pink}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{updateMood('bored');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                <Image source={Bored} style={styles.mood} />
+              <MaterialCommunityIcons name="emoticon-neutral" size={40} color={colors.purple}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{updateMood('sad');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                <Image source={Sad} style={styles.mood} />
+              <MaterialCommunityIcons name="emoticon-sad" size={40} color={colors.lightblue}/>
             </TouchableOpacity>     
         </View>
     </View>

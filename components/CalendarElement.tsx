@@ -1,12 +1,14 @@
 import { TouchableOpacity, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { useState } from 'react';
 import Swiper from 'react-native-swiper'
 import MonthlyTasks from '../components/MonthlyTasks';
+import TrackersElement from './TrackersElement';
+import Statistics from '../screens/Statistics';
+import { container } from '../styles';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks}) {
+export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -106,7 +108,7 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
 
   const CalendarLine = (line) => {
     return (
-      <View style={styles.container}>
+      <View style={container.body}>
           <FlatList
             data={line}
             renderItem={({item}) => CalendarCell(item)}
@@ -130,13 +132,17 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
   );
 
   return (
-    <View style={styles.container}>
-        <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
+    <View style={container.body}>
+        <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
+          <Statistics habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} sleep={sleep} load={load} loadx={loadx} moods={moods}/>
+          <TrackersElement db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>
+          <View style={{flex:1}}>
           <FlatList
             data={daysLines}
             renderItem={({item}) => CalendarLine(item)}
             keyExtractor={item => item.id}
           />
+          </View>
           <MonthlyTasks db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month} tasks={tasks} setTasks={setTasks}/>
         </Swiper>
     </View>
@@ -151,19 +157,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     width: width/7,
     height: (8/10)*(height/6),
-  },
-  header: {
-    flex:1,
-    marginTop: 48,
-    alignContent: 'center',
-    justifyContent: 'center',
-    width: width,
-    flexDirection: 'row',
-  },
-  container: {
-    flex:14,
-    alignContent: 'center',
-    justifyContent: 'center',
   },
   task: {
     width: width/7-1,

@@ -47,6 +47,7 @@ const Habits = ({ habits, month, year, tags }) => {
                 data={habits.filter(c=>(c.day==1 && c.month==month && c.year==year))}
                 renderItem={(item)=>IndList(item)}
                 keyExtractor={(_, index) => index.toString()}
+                scrollEnabled={false}
             />
         </View>
     </View>

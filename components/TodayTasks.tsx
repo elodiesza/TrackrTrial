@@ -6,10 +6,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import moment from 'moment';
 import Color from './Color';
+import { container} from '../styles';
+
 
 const width = Dimensions.get('window').width;
 
-export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx}) {
+function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setDate}) {
   const today = new Date();
   const month = today.getMonth();
   const year = today.getFullYear();
@@ -18,7 +20,6 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [date, setDate] = useState(today);
   
   useEffect(() => {
   
@@ -281,13 +282,6 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
     )
   };
 
-  const NextDay = () => {
-    setDate(new Date(date.setDate(date.getDate()+1)));
-  };
-
-  const PreviousDay = () => {
-    setDate(new Date(date.setDate(date.getDate()-1)));
-  };
 
   const dailyData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==0));
   const recurringData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==1));
@@ -315,20 +309,9 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
 
   return (
     <>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable onPress={PreviousDay}>
-            <Feather name='chevron-left' size={40} />
-          </Pressable>
-          <Text>
-            {moment(date).format('dddd, DD MMMM YYYY')}
-          </Text>
-          <Pressable onPress={NextDay}>
-            <Feather name='chevron-right' size={40}/>
-          </Pressable>
-        </View>
-        <View style={styles.tasktitle}>
-          <Text style={styles.titletext}>
+      <View style={container.body}>
+        <View style={container.subcategory}>
+          <Text style={container.subcategorytext}>
             TODAY'S TASKS
           </Text>
         </View>
@@ -338,8 +321,8 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
-        <View style={styles.tasktitle}>
-          <Text style={styles.titletext}>
+        <View style={container.subcategory}>
+          <Text style={container.subcategorytext}>
             DAILY RECURRING TASKS
           </Text>
         </View>
@@ -369,6 +352,7 @@ export default function TodayTasks({db, tasks, setTasks, tags, setTags, load, lo
     </>
   );
 }
+export default TodayTasks;
 
 const styles = StyleSheet.create({
   container: {
@@ -407,13 +391,6 @@ const styles = StyleSheet.create({
     textAlign:'left',
     marginLeft: 5,
     textAlignVertical: 'center',
-  },
-  tasktitle: {
-    width: width,
-    height: 45,
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray',
-    justifyContent: 'center',
   },
   titletext: {
     marginLeft: 20,

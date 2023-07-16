@@ -8,6 +8,7 @@ import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
 import moment from 'moment';
 import SleepTypeColors from '../constants/SleepTypeColors';
+import { container } from '../styles';
 
 const width = Dimensions.get('window').width;
 
@@ -427,8 +428,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
     }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.container,{width: width}]}>
+    <View style={[container.body,{width: width}]}>
       {isLoading ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <ActivityIndicator size="large" color="blue" /> 
@@ -489,8 +489,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
         <View pointerEvents="none" style={{display: year==thisYear?(month==thisMonth?'flex':'none'):'none',position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >
       )}
-      </View>
-      {/*<Button title='remove thismonth indicators' onPress={removeDbMonth} />
+            {/*<Button title='remove thismonth indicators' onPress={removeDbMonth} />
       <Button title='remove Indicators' onPress={removeDb} />
       <Button title='remove Tags' onPress={removeTagsDb} /> */}
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
@@ -507,7 +506,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
         tags={tags}
         setTags={setTags}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

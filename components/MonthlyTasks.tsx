@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Color from './Color';
 import NewMTask from '../modal/NewMTask';
+import { container } from '../styles';
 
 
 const width = Dimensions.get('window').width;
@@ -317,9 +318,9 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
 
   return (
     <>
-      <View style={styles.container}>
-        <View style={styles.tasktitle}>
-          <Text style={styles.titletext}>
+      <View style={container.body}>
+        <View style={container.subcategory}>
+          <Text style={container.subcategorytext}>
             MONTHLY TASKS
           </Text>
         </View>
@@ -329,8 +330,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
-        <View style={styles.tasktitle}>
-          <Text style={styles.titletext}>
+        <View style={container.subcategory}>
+          <Text style={container.subcategorytext}>
             MONTHLY RECURRING TASKS
           </Text>
         </View>

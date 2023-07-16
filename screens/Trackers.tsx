@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import moment from 'moment';
 import TrackersElement from '../components/TrackersElement';
+import { container } from '../styles';
 
 const width = Dimensions.get('window').width;
 
@@ -63,8 +64,8 @@ const Trackers = ({db, habits, tags, setHabits, setTags, load, loadx, moods, set
 
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={container.container}>
+      <View style={container.header}>
         <Pressable onPress={displayMonth==true?firstMonth? undefined:()=>LastMonth(habits):(habits.filter(c=>c.year==year-1).length==0? undefined: ()=>(setYear(year-1), setMonth(12-habits.filter(c=>c.year==year+1).length)))}>
           <Feather name='chevron-left' size={40} style={{right:30}} color={displayMonth==true?firstMonth? 'lightgray':'black':'lightgray'}/>
         </Pressable>
@@ -76,21 +77,9 @@ const Trackers = ({db, habits, tags, setHabits, setTags, load, loadx, moods, set
           <Feather name='chevron-right' size={40} style={{left:30}} color={displayMonth==true?lastMonth?'lightgray':'black':'lightgray'}/>
         </Pressable>
       </View>
-      <TrackersElement 
-      db={db} 
-      year={year} 
-      month={month} 
-      load={load} 
-      loadx={loadx} 
-      setHabits={setHabits} 
-      habits={habits}
-      tags={tags}
-      setTags={setTags}
-      moods={moods}
-      setMoods={setMoods}
-      sleep={sleep} 
-      setSleep={setSleep}
-      />
+      <View style={{flex:1}}>
+
+      </View>
     </SafeAreaView>
   );
 }
