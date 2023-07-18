@@ -44,7 +44,7 @@ const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, se
         </Pressable>
       </View>
       <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
-        <TodayScreen db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>
+        <TodayScreen db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx} year={date.getFullYear()} month={date.getMonth()} day={date.getDate()}/>
         <TodayTasks db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} load={load} loadx={loadx} date={date} setDate={setDate}/>
       </Swiper>
     </SafeAreaView>

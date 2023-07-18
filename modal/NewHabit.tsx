@@ -1,37 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Platform, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
-import TagPicker from '../components/TagPicker';
-import ColorPicker from '../components/ColorPicker';
-import Color from '../components/Color';
-import IsLoading from './IsLoading';
+import { container,colors } from '../styles';
 
 
-function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tags, setTags}) {
+function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits}) {
 
-  const [isLoading, setIsLoading] = useState(true);
+
   const {control, handleSubmit, reset} = useForm();
-  const [tagDisplay, setTagDisplay] = useState<"none" | "flex" | undefined>('none');
-  const [addTag, setAddTag] = useState('Add Tag');
-  const [selectedTag, setSelectedTag] = useState(null)
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState([]);    
-  const [tagIndex, setTagIndex] = useState(0); 
-  const [picked, setPicked] = useState<string>('white');
-  const [colorPickerVisible, setColorPickerVisible] = useState(false);
-  const [isStateCreationComplete, setIsStateCreationComplete] = useState(false);
-
-  const colorChoice =  ['#dc143c','#ffa500','#ffff00','#9acd32','#2e8b57',
-  '#afeeee', '#4169e1', '#ba55d3', '#c71585', '#ffc0cb',
-  '#ffffff', '#f5f5f5','#e6e6fa','#a0522d','#ffebcd'];
-
-  const TagColor = ({item}) => (
-    <TouchableOpacity onPress={() => (setPicked(item),setColorPickerVisible(!colorPickerVisible))}>
-      <Color color={item}/>
-    </TouchableOpacity>
-  );
-  
 
   const [type, setType] = useState(0);
   var today = new Date();
@@ -41,22 +17,10 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
 
 
   useEffect(() => {
-
-    let existingTags = [...tags];
-    let newArray=existingTags.map((item) => {
-      return {label: item.tag, value: item.tag}})
-    setItems(newArray)
-
-    setIsLoading(false);
-
-  },[load]);
-
-
-  useEffect(() => {
-    if (!addModalVisible) {
+    if (!newHabitVisible) {
       reset();
     }
-  }, [addModalVisible, reset]);
+  }, [newHabitVisible, reset]);
 
 
   const addState = async (data) => {
@@ -87,7 +51,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
             );
         });
       }
-      
+    setNewHabitVisible(false);
     setAddModalVisible(false);
     loadx(!load);
   };
@@ -97,15 +61,15 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
     <Modal
       animationType="slide"
       transparent={true}
-      visible={addModalVisible}
+      visible={newHabitVisible}
       onRequestClose={() => {
-        setAddModalVisible(!addModalVisible);
+        setNewHabitVisible(!newHabitVisible);
         loadx(!load);
       }}
     > 
-      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible)}} activeOpacity={1}>
+      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible),setNewHabitVisible(!newHabitVisible)}} activeOpacity={1}>
         <TouchableWithoutFeedback>
-          <View style={styles.container}>
+          <View style={container.modal}>
               <Text style={{marginBottom:10}}>Create a new Habit</Text>
               <Controller
               control= {control}
@@ -118,7 +82,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
                     autoCapitalize = {"characters"}
                     onBlur={onBlur}
                     placeholder="NAME"
-                    style={[styles.input,{height:40, borderColor: error ? 'red' : '#e8e8e8'}]}
+                    style={[container.textinput,{borderColor: error ? 'red' : '#e8e8e8'}]}
                   />
                   {error && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
@@ -154,8 +118,8 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
                     <Text>Good</Text>
                 </Pressable>
               </View>
-              <Pressable onPress={handleSubmit(addState)} style={styles.submit}><Text>CREATE</Text></Pressable>
-            <Text style={{color: 'lightgray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
+              <Pressable onPress={handleSubmit(addState)} style={container.button}><Text>CREATE</Text></Pressable>
+            <Text style={{color: 'gray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
           </View> 
         </TouchableWithoutFeedback>
       </TouchableOpacity>
@@ -163,30 +127,13 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
   );
 };
 
-export default NewIndicator;
+export default NewHabit;
 
 const styles = StyleSheet.create({
-  container: {
-    width: '70%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: 'lightgray',
-    borderRadius: 10,
-    paddingVertical: 15,
-  },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  input: {
-    width: '70%',
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: 'lightgray',
-    paddingHorizontal: 10,
   },
   submit: {
     width: '70%',
@@ -204,11 +151,11 @@ const styles = StyleSheet.create({
     alignItems:'center', 
     justifyContent: 'center', 
     height: 30,
-    borderColor: 'lightgray', 
+    borderColor:  colors.blue, 
     borderRadius: 10,
   },
   typeContainer: {
-    width: '70%',
+    width: '100%',
     flexDirection:'row',
     borderWidth: 1,
     borderColor: 'gray',

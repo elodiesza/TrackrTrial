@@ -8,12 +8,9 @@ import { container } from '../styles';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx}) => {
+const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day}) => {
 
-    var today = new Date();
-    var year = today.getFullYear();
-    var month = today.getMonth();
-    var day = today.getDate();
+
     const [isLoading, setIsLoading] = useState(false);
 
 

@@ -2,7 +2,7 @@ import { StyleSheet,ActivityIndicator, Modal, TouchableWithoutFeedback, Alert, P
 import React, { useState, useCallback, useEffect } from 'react';
 import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
-import NewHabit from '../modal/NewHabit';
+import NewIndicator from '../modal/NewIndicator';
 import HabitMenu from '../modal/HabitMenu';
 import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
@@ -12,7 +12,7 @@ import { container } from '../styles';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep}) {
+export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep, states, setStates}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -496,7 +496,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
       </ TouchableOpacity> 
-      <NewHabit
+      <NewIndicator
         addModalVisible={addModalVisible===true}
         setAddModalVisible={setAddModalVisible}
         load={load}
@@ -506,6 +506,8 @@ function colorMixer(rgbA, rgbB, amountToMix){
         setHabits={setHabits}
         tags={tags}
         setTags={setTags}
+        states={states}
+        setStates={setStates}
       />
     </View>
   );

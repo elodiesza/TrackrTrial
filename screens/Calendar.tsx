@@ -6,7 +6,7 @@ import { container } from '../styles';
 import { Feather } from '@expo/vector-icons';
 
 const height = Dimensions.get('window').height;
-const Calendar = ({db, habits, tags, setHabits, setTags, tasks, setTasks, load, loadx, moods, setMoods, sleep, setSleep}) => {
+const Calendar = ({db, habits, tags, setHabits, setTags, tasks, setTasks, load, loadx, moods, setMoods, sleep, setSleep, states, setStates}) => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,7 +88,7 @@ const Calendar = ({db, habits, tags, setHabits, setTags, tasks, setTasks, load, 
           <Feather name='chevron-right' size={40} style={{left:30}} color={'black'}/>
         </Pressable>
       </View>
-      <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags} setTags={setTags} load={load} loadx={loadx} db={db} setTasks={setTasks} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep}/>
+      <CalendarElement year={year} month={month} day={day} tasks={tasks} tags={tags} setTags={setTags} load={load} loadx={loadx} db={db} setTasks={setTasks} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates}/>
     </SafeAreaView>
   );
 };

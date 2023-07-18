@@ -1,8 +1,20 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback, FlatList } from 'react-native';
+import Color from './Color';
+import { colors } from '../styles';
 
-const ColorPicker = ( {TagColor, colorChoice, colorPickerVisible, setColorPickerVisible} ) => {
+const ColorPicker = ( {colorPickerVisible, setColorPickerVisible, picked, setPicked} ) => {
     
+  const colorChoice=[colors.red,colors.orange,colors.yellow,colors.yellowgreen,colors.green,
+    colors.blue,colors.turquoise,colors.purple,colors.magenta,colors.pink,colors.beige,colors.brown,colors.white,colors.gray,colors.black];
+
+  const TagColor = ({ item }) => {
+    return (
+      <TouchableOpacity onPress={() => (setPicked(item), setColorPickerVisible(!setColorPickerVisible))}>
+        <Color color={item} />
+      </TouchableOpacity>
+    );
+  };
     return (
         <Modal
               animationType="slide"
