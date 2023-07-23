@@ -13,7 +13,7 @@ import Color from './Color';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords}) {
+export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -325,7 +325,6 @@ function colorMixer(rgbA, rgbB, amountToMix){
 
     const showstates = (name) => {
       const stateslist = staterecords.filter(c=>(c.name==name && c.year==year && c.month==month));
-      console.warn(stateslist);
       return stateslist.map((item,index) => {
         return ( 
           <View key={index}>
@@ -378,11 +377,17 @@ function colorMixer(rgbA, rgbB, amountToMix){
     };
     
 
-    const showNumber = (day) => {
+    const showNumber = ({item}) => {
       return  (
+        <View style={{width:50,height:25, justifyContent:'center',flexDirection:'row'}}>
           <View style={{width:25,height:25, justifyContent:'center'}}>
-            <Text style={{textAlign:'right', marginRight: 3, textAlignVertical:'center'}}>{day.item}</Text>
+            <Text style={{textAlign:'right', marginRight: 3, textAlignVertical:'center'}}>{item.day}</Text>
           </View>
+          <View style={{width:25,height:25, justifyContent:'center'}}>
+            <Text style={{color: colors.defaultdark, textAlign:'center', marginRight: 3, textAlignVertical:'center'}}>{item.dayoftheweek}</Text>
+          </View>
+        </View>
+
         )   
     }
 
@@ -574,9 +579,11 @@ function colorMixer(rgbA, rgbB, amountToMix){
     };
 
     const listDays = () => {
-      var arr= [];
+      let arr= [];
+      let dayoftheweek='';
       for (let i=1; i<=DaysInMonth(year,month);i++) {
-        arr.push(i);
+        dayoftheweek=moment(new Date(year,month,i)).format('ddd').slice(0,1);
+        arr.push({"day":i,"dayoftheweek":dayoftheweek});
       }
       return (arr);
     }
@@ -595,7 +602,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
               data={listDays()}
               renderItem={(item)=>(showNumber(item))}
               keyExtractor={(_, index) => index.toString()}
-              style={{marginTop:75,width:25,flexDirection:'row'}}
+              style={{marginTop:75,width:50,flexDirection:'row'}}
               scrollEnabled={false}
             />
           </View>

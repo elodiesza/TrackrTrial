@@ -4,11 +4,12 @@ import IndicatorTableTitleToday from './IndicatorTableTitleToday';
 import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
 import { container } from '../styles';
+import DiaryElement from './DiaryElement';
 
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day}) => {
+const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary}) => {
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -82,6 +83,18 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, mo
       </View>
       <View style={{flex:1, width:width}}>
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
+      </View>
+      <View style={{flex:1, width:width}}>
+        <DiaryElement 
+          db={db}
+          diary={diary}
+          setDiary={setDiary}
+          year={year}
+          month={month}
+          day={day}
+          load={load}
+          loadx={loadx}
+          />
       </View>
     </SafeAreaView>
   );

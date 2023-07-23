@@ -27,7 +27,9 @@ export default function App() {
   const [states, setStates] = useState([]);
   const [staterecords, setStaterecords] = useState([]);
   const [scales, setScales] = useState([]);
+  const [scalerecords, setScalerecords] = useState([]);
   const [times, setTimes] = useState([]);
+  const [diary, setDiary] = useState([]);
 
 useEffect(() => {
   setIsLoading(true);
@@ -85,6 +87,16 @@ useEffect(() => {
     (txObj, error) => console.log('error selecting states')
     );
   });
+  db.transaction((tx) => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS staterecords (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, item TEXT, UNIQUE(name,year,month,day))')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM staterecords', null,
+    (txObj, resultSet) => setStaterecords(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting state records')
+    );
+  });
+
   db.transaction(tx => {
     tx.executeSql('CREATE TABLE IF NOT EXISTS scales (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, min INTEGER, max INTEGER, mincolor TAXT, maxcolor TEXT, unit TEXT)')
   });
@@ -92,6 +104,15 @@ useEffect(() => {
     tx.executeSql('SELECT * FROM scales', null,
     (txObj, resultSet) => setScales(resultSet.rows._array),
     (txObj, error) => console.log('error selecting scales')
+    );
+  });
+  db.transaction((tx) => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS scalerecords (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, value INTEGER, UNIQUE(name,year,month,day))')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM scalerecords', null,
+    (txObj, resultSet) => setScalerecords(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting stale records')
     );
   });
   db.transaction(tx => {
@@ -104,13 +125,13 @@ useEffect(() => {
     );
   });
 
-  db.transaction((tx) => {
-    tx.executeSql('CREATE TABLE IF NOT EXISTS staterecords (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, item TEXT, UNIQUE(name,year,month,day))')
+  db.transaction(tx => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS diary (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, notes TEXT, img1 TEXT, img2 TEXT, img3 TEXT, img4 TEXT)')
   });
   db.transaction(tx => {
-    tx.executeSql('SELECT * FROM staterecords', null,
-    (txObj, resultSet) => setStaterecords(resultSet.rows._array),
-    (txObj, error) => console.log('error selecting state records')
+    tx.executeSql('SELECT * FROM diary', null,
+    (txObj, resultSet) => setDiary(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting diary')
     );
   });
 
@@ -135,14 +156,35 @@ useEffect(() => {
             <SimpleLineIcons name="notebook" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Today" children={()=><Today db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} load={load} loadx={loadx}/>} 
+        <Tab.Screen name="Today" children={()=><Today db={db} 
+        tasks={tasks} setTasks={setTasks} 
+        tags={tags} setTags={setTags} 
+        habits={habits} setHabits={setHabits} 
+        moods={moods} setMoods={setMoods} 
+        sleep={sleep} setSleep={setSleep} 
+        load={load} loadx={loadx}
+        scales={scales} setScales={setScales} 
+        scalerecords={scalerecords} setScalerecords={setScalerecords}
+        diary={diary} setDiary={setDiary}
+        />} 
         options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} 
+        tasks={tasks} setTasks={setTasks} 
+        setHabits={setHabits} setTags={setTags} 
+        load={load} loadx={loadx} 
+        moods={moods} setMoods={setMoods} 
+        sleep={sleep} setSleep={setSleep} 
+        states={states} setStates={setStates} 
+        staterecords={staterecords} setStaterecords={setStaterecords}
+        scales={scales} setScales={setScales} 
+        scalerecords={scalerecords} setScalerecords={setScalerecords}
+        diary={diary} setDiary={setDiary}
+        />} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>

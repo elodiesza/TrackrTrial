@@ -7,7 +7,7 @@ export const colors = {
     white: '#ffffff',
     default: '#D3DDDF',
     defaultlight: '#eff3f4',
-    defaultmedium: '#000000',
+    defaultdark: '#ADBBBD',
     red: '#FF6347',
     orange: '#ffa500',
     yellow: '#ffff00',

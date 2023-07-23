@@ -8,7 +8,7 @@ import { container } from '../styles';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords}) {
+export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -99,7 +99,7 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
           <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
         </View>
         <View style={{flex:1, justifyContent: 'flex-end'}}>
-          <FlatList data={monthTodo(tasks, year, month, date)}
+          <FlatList data={monthTodo(tasks.filter(c=>c.recurring==false), year, month, date)}
           horizontal={false} scrollEnabled={true} renderItem={RenderTaskItem} bounces={false} />
         </View>
       </View>
@@ -135,7 +135,17 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
     <View style={container.body}>
         <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
           <Statistics year={year} month={month} habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} sleep={sleep} load={load} loadx={loadx} moods={moods}/>
-          <TrackersElement db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>
+          <TrackersElement db={db} load={load} loadx={loadx} 
+          tags={tags} setTags={setTags} 
+          year={year} month={month} 
+          habits={habits} setHabits={setHabits} 
+          moods={moods} setMoods={setMoods} 
+          sleep={sleep} setSleep={setSleep} 
+          states={states} setStates={setStates} 
+          staterecords={staterecords} setStaterecords={setStaterecords}
+          scales={scales} setScales={setScales} 
+          scalerecords={scalerecords} setScalerecords={setScalerecords}
+          />
           <View style={{flex:1}}>
           <FlatList
             data={daysLines}

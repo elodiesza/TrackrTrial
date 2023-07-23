@@ -1,21 +1,11 @@
 import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
-import { useState, useEffect } from 'react';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Sad from '../assets/images/icons/sad.png';
-import Angry from '../assets/images/icons/angry.png';
-import Happy from '../assets/images/icons/happy.png';
-import Productive from '../assets/images/icons/productive.png';
-import Sick from '../assets/images/icons/sick.png';
-import Stressed from '../assets/images/icons/stressed.png';
-import Bored from '../assets/images/icons/bored.png';
 import {colors} from '../styles.js';
 
 const width = Dimensions.get('window').width;
 
 const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalVisible}) => {
-    
+
     const updateMood = (mood) => {
         let existingMoods=[...moods];
         if (existingMoods.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0){
