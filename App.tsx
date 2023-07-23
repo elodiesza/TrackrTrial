@@ -7,15 +7,10 @@ import Settings from './screens/Settings';
 import Today from './screens/Today';
 import Analytics from './screens/Analytics';
 import Tracks from './screens/Tracks';
-import Account from './screens/Settings/Account';
-import About from './screens/Settings/About';
-import Help from './screens/Settings/Help';
 import Feather from '@expo/vector-icons/Feather';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { useEffect,useState } from 'react';
 import * as SQLite from 'expo-sqlite';
-
-
 
 
 const Tab = createBottomTabNavigator();
@@ -30,9 +25,9 @@ export default function App() {
   const [moods, setMoods] = useState([]);
   const [sleep, setSleep] = useState([]);
   const [states, setStates] = useState([]);
+  const [staterecords, setStaterecords] = useState([]);
   const [scales, setScales] = useState([]);
   const [times, setTimes] = useState([]);
-
 
 useEffect(() => {
   setIsLoading(true);
@@ -108,6 +103,17 @@ useEffect(() => {
     (txObj, error) => console.log('error selecting times')
     );
   });
+
+  db.transaction((tx) => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS staterecords (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, item TEXT, UNIQUE(name,year,month,day))')
+  });
+  db.transaction(tx => {
+    tx.executeSql('SELECT * FROM staterecords', null,
+    (txObj, resultSet) => setStaterecords(resultSet.rows._array),
+    (txObj, error) => console.log('error selecting state records')
+    );
+  });
+
   setIsLoading(false);
 
 },[load]);
@@ -136,7 +142,7 @@ useEffect(() => {
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates}/>} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} tasks={tasks} setTasks={setTasks} setHabits={setHabits} setTags={setTags} load={load} loadx={loadx} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
