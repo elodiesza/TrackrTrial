@@ -8,7 +8,7 @@ import { container } from '../styles';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates}) {
+export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -135,7 +135,7 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
     <View style={container.body}>
         <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
           <Statistics year={year} month={month} habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} sleep={sleep} load={load} loadx={loadx} moods={moods}/>
-          <TrackersElement db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates}/>
+          <TrackersElement db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month} habits={habits} setHabits={setHabits} moods={moods} setMoods={setMoods} sleep={sleep} setSleep={setSleep} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>
           <View style={{flex:1}}>
           <FlatList
             data={daysLines}

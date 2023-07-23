@@ -7,8 +7,11 @@ import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
 
 
-function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, states, setStates}) {
-
+function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, states, setStates, staterecords, setStaterecords}) {
+  var today = new Date();
+  var month = today.getMonth();
+  var year = today.getFullYear();
+  const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
   const {control, handleSubmit, reset} = useForm();
   const [itemlist, setItemlist] = useState([{ colorPickerVisible: false, picked: '', value: undefined }]);
@@ -22,7 +25,6 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
     });
     loadx(!load);
   }
-
 
   
   const AddItemtolist = () => {
@@ -58,6 +60,29 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
                 };
                 existingstates.push(newState);
                 setStates(existingstates); 
+              }
+            );
+        });
+      }
+
+    let existingrecords = [...staterecords]; 
+      for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
+        db.transaction((tx) => {
+            tx.executeSql(
+              'INSERT INTO staterecords (name, year, month, day, item) VALUES (?, ?, ?, ?, ?)',
+              [data.name, year, month, i, ''],
+              (txtObj, stateResultSet2) => {
+                const newStateId = stateResultSet2.insertId;
+                const newState = {
+                  id: newStateId,
+                  name: data.name,
+                  year: year,
+                  month: month,
+                  day: i,
+                  item: '',
+                };
+                existingrecords.push(newState);
+                setStaterecords(existingrecords); 
                 loadx(!load);
               }
             );
@@ -209,6 +234,8 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
                 contentContainerStyle={{width:"100%", alignItems:'center', justifyContent:'center'}}
             />
               <Pressable onPress={handleSubmit(addState)} style={container.button}><Text>CREATE</Text></Pressable>
+              <Pressable onPress={removeDb} style={container.button}><Text>detete STATES</Text></Pressable>
+
             <Text style={{color: 'gray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
           </View> 
         </TouchableWithoutFeedback>
@@ -218,60 +245,3 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
 };
 
 export default NewState;
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  submit: {
-    width: '70%',
-    borderWidth: 1,
-    borderColor: 'lightblue',
-    backgroundColor: 'lightgray',
-    borderRadius: 8,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  type: {
-    flex: 1/3, 
-    alignItems:'center', 
-    justifyContent: 'center', 
-    height: 30,
-    borderColor:  colors.blue, 
-    borderRadius: 10,
-  },
-  typeContainer: {
-    width: '100%',
-    flexDirection:'row',
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 10,
-    marginVertical: 5,
-  },
-  color: {
-    width: 30,
-    height: 30,
-    borderWidth: 1,
-    borderRadius: 15,
-    borderColor: 'lightgray',
-  },
-  colorPicker: {
-    flex: 1, 
-    position: 'absolute',
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    borderWidth: 2,
-    borderColor: 'lightgray',
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    padding: 15,
-  }
-});
-
-

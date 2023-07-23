@@ -8,11 +8,12 @@ import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
 import moment from 'moment';
 import SleepTypeColors from '../constants/SleepTypeColors';
-import { container } from '../styles';
+import { container,colors } from '../styles';
+import Color from './Color';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep, states, setStates}) {
+export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -26,11 +27,18 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
   const [selectedSleepIndex, setSelectedSleepIndex] = useState(-1);
   const [moodModalVisible, setMoodModalVisible] = useState(false);
   const [selectedMoodIndex, setSelectedMoodIndex] = useState(-1);
+  const [stateModalVisible, setStateModalVisible] = useState(false);
+  const [selectedStateIndex, setSelectedStateIndex] = useState(-1);
+  const [selectedStateName, setSelectedStateName] = useState('');
+  const [selectedStateId, setSelectedStateId] = useState('');
+  const [selectedStateItem, setSelectedStateItem] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const [updatedhabits, setUpdatedhabits] = useState([]);
+  const [updatedstates, setUpdatedstates] = useState([]);
 
   const lastMonthData = habits.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
+  const lastMonthStates = staterecords.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
 
 
   useEffect(() => {
@@ -92,7 +100,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
     else {
       setIsLoading(false); // Set loading state to false if the data is already present
     }
-    console.warn('habits', habits);
+
   }, []);
 
   useEffect(() => {
@@ -102,14 +110,76 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
 
   }, [updatedhabits]);
 
-  //colorChannelA and colorChannelB are ints ranging from 0 to 255
+
+  useEffect(() => {
+    if (staterecords.filter(c => c.year === thisYear && c.month === thisMonth).length === 0) {
+      let existingrecords = [...staterecords];
+      let lastMonthrecords = lastMonthStates.filter(c => c.day === 1).map(c => c.name);
+      const insertstates = async () => {
+        const promises = [];
+      for (let j = 0; j < lastMonthrecords.length; j++) {
+        const name = lastMonthrecords[j];
+
+        for (let i = 1; i <= DaysInMonth(thisYear, thisMonth); i++) {
+          promises.push(
+          new Promise((resolve, reject) => {
+            db.transaction(tx => {
+              tx.executeSql(
+                'INSERT INTO staterecords (name, year, month, day, item) VALUES (?, ?, ?, ?, ?)',
+                [name, thisYear, thisMonth, i, ''],
+                (txtObj, stateResultSet) => {
+                  const newState = {
+                    id: stateResultSet.insertId,
+                    name: name,
+                    year: thisYear,
+                    month: thisMonth,
+                    day: i,
+                    item: '',
+                  };
+                  existingrecords.push(newState);
+                  resolve(newState);
+                },
+                (_, error) => {
+                  console.log(error);
+                  reject(error);
+                }
+              );
+            });
+          })
+          );
+        }
+      }
+      return Promise.all(promises);
+      };
+      insertstates()
+        .then(newstates => {
+          setUpdatedstates([...updatedstates, ...newstates]);
+          setIsLoading(false); 
+        })
+        .catch(error => {
+          console.log(error);
+          setIsLoading(false); 
+        });
+    } 
+    else {
+      setIsLoading(false); // Set loading state to false if the data is already present
+    }
+
+  }, []);
+
+  useEffect(() => {
+
+      setStaterecords(updatedstates); // Update the habits state variable
+      loadx(!load);
+
+  }, [updatedstates]);
+
+
 function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
   var channelA = colorChannelA*amountToMix;
   var channelB = colorChannelB*(1-amountToMix);
   return parseInt(channelA+channelB);
 }
-//rgbA and rgbB are arrays, amountToMix ranges from 0.0 to 1.0
-//example (red): rgbA = [255,0,0]
 function colorMixer(rgbA, rgbB, amountToMix){
   var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
   var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
@@ -154,9 +224,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
       });
     };
 
-
-
-    const updateState = (id) => {
+    const updateHabit = (id) => {
       let existinghabits=[...habits];
       const indexToUpdate = existinghabits.findIndex(state => state.id === id);
       if (existinghabits[indexToUpdate].state==0){
@@ -187,27 +255,56 @@ function colorMixer(rgbA, rgbB, amountToMix){
       }
     };
 
+    const updateState = (id,item) => {
+      let existingstates=[...staterecords];
+      console.warn(id, item);
+      const indexToUpdate = existingstates.findIndex(state => state.id === id);
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE staterecords SET item = ? WHERE id = ?', [item, id],
+            (txObj, resultSet) => {
+              if (resultSet.rowsAffected > 0) {
+                existingstates[indexToUpdate].item = item;
+                setStaterecords(existingstates);
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        setSelectedStateIndex(-1);
+              setSelectedStateId('');
+              setSelectedStateName('');
+              setSelectedStateItem('');
+              setStateModalVisible(!stateModalVisible);
+              loadx(!load);
+    };
+
     const showhabits = (ind) => {
       const filteredhabits = habits.filter(c=>(c.name==ind && c.year==year && c.month==month));
       return filteredhabits.map((state,index) => {
         return ( 
           <View key={index}>
-            <TouchableOpacity onPress={()=> updateState(state.id)}>
+            <TouchableOpacity onPress={()=> updateHabit(state.id)}>
               <View style={[styles.cell, { backgroundColor : filteredhabits[index].state==1 ? '#242424' : 'white' }]} />
             </TouchableOpacity>
           </View>
         )
       })
     }
-    
+ 
+    const showHabitsColumns = (ind) => {
+      return (
+        <View>
+          {showhabits(ind.item)}
+        </View>
+      );
+    };   
 
     const showTitle = (ind) => {
       return (
         <View>
-          <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37 }}>
+          <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:25 }}>
             <IndicatorTableTitle name={ind.item} habits={habits} year={year} month={month} setModalVisible={setModalVisible}/>
           </Pressable>
-          {showhabits(ind.item)}
           <HabitMenu
             data={ind.item}
             modalVisible={modalVisible === ind.item}
@@ -221,6 +318,61 @@ function colorMixer(rgbA, rgbB, amountToMix){
             loadx={loadx}
             load={load}
           />
+        </View>
+      );
+    };
+
+
+    const showstates = (name) => {
+      const stateslist = staterecords.filter(c=>(c.name==name && c.year==year && c.month==month));
+      console.warn(stateslist);
+      return stateslist.map((item,index) => {
+        return ( 
+          <View key={index}>
+            <TouchableOpacity onPress={()=>{setSelectedStateItem(item.item);setSelectedStateId(item.id);setSelectedStateIndex(index);setSelectedStateName(name);setStateModalVisible(true)}}>
+              <View style={[styles.cell, { backgroundColor : item.item==""?  colors.white : states.filter(c=>(c.name==item.name && c.item==item.item)).map(c=>c.color)[0]}]}/>
+            </TouchableOpacity>
+            <Modal
+            animationType="none"
+            transparent={true}
+            visible={selectedStateIndex === index && stateModalVisible}
+            onRequestClose={() => {
+              setSelectedStateIndex(-1);
+              setSelectedStateId('');
+              setSelectedStateName('');
+              setSelectedStateItem('');
+              setStateModalVisible(!stateModalVisible);
+              loadx(!load);
+            }}
+            >
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedStateItem('');setSelectedStateId('');setStateModalVisible(!stateModalVisible);setSelectedStateIndex(-1);setSelectedStateName('');}} activeOpacity={1}>
+              <TouchableWithoutFeedback>
+                <View style={styles.dialogBox}>
+                  <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} state</Text>
+                  <FlatList
+                    horizontal
+                    data={states.filter(c => c.name === selectedStateName).map(c => c.color)}
+                    renderItem={({item}) => (
+                      <TouchableOpacity onPress={()=>updateState(selectedStateId,states.filter(c =>( c.name === selectedStateName && c.color==item)).map(c => c.item)[0])}>
+                        <Color color={item}/>
+                      </TouchableOpacity>
+                    )}
+                    keyExtractor={item => item.color}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            </TouchableOpacity>
+          </Modal>
+          </View>
+        )
+      })
+    }
+    
+
+    const showStatesColumns = (name) => {
+      return (
+        <View>
+          {showstates(name.item)}
         </View>
       );
     };
@@ -244,7 +396,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
           transparent={true}
           visible={selectedMoodIndex === index && moodModalVisible}
           onRequestClose={() => {
-            setSelectedSleepIndex(-1);
+            setSelectedMoodIndex(-1);
             setMoodModalVisible(!moodModalVisible);
             loadx(!load);
           }}
@@ -389,8 +541,9 @@ function colorMixer(rgbA, rgbB, amountToMix){
     };
 
 
-    const allNames = habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
-    const uniqueNames = [...new Set (allNames)];
+    const habitsNames = [...new Set (habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))];
+    const uniqueStatesNames = [...new Set (states.map(c=>c.name))];
+    const uniqueNames = [...new Set([ ...uniqueStatesNames, ...habitsNames])];
 
     const thismonthMoods = (year,month) =>{
       var arr= [];
@@ -477,14 +630,36 @@ function colorMixer(rgbA, rgbB, amountToMix){
                   scrollEnabled={false}
                 />
             </View>
-            <FlatList
-              horizontal
-              data={uniqueNames}
-              renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
-              keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
-              contentContainerStyle={{paddingRight:75}}
-            />
-            
+            <View>
+              <FlatList
+                horizontal
+                data={uniqueNames}
+                renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
+                keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
+                contentContainerStyle={{paddingRight:75}}
+              />
+              <View style={{flexDirection:'row',alignItems:'flex-start'}}> 
+                <View>
+                  <FlatList
+                    horizontal
+                    data={uniqueStatesNames}
+                    renderItem={uniqueStatesNames!==null?(name)=>showStatesColumns(name):undefined}
+                    keyExtractor={(_, index) => index.toString()}
+                    scrollEnabled={false}
+                  />
+                </View>
+                <View>
+                  <FlatList
+                    horizontal
+                    data={habitsNames}
+                    renderItem={habitsNames!==null?(name)=>showHabitsColumns(name):undefined}
+                    keyExtractor={(_, index) => index.toString()}
+                    scrollEnabled={false}
+                  />
+                </View>
+                
+              </View>
+            </View>
           </ScrollView>
         </View>
         <View pointerEvents="none" style={{display: year==thisYear?(month==thisMonth?'flex':'none'):'none',position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
@@ -508,6 +683,8 @@ function colorMixer(rgbA, rgbB, amountToMix){
         setTags={setTags}
         states={states}
         setStates={setStates}
+        staterecords={staterecords}
+        setStaterecords={setStaterecords}
       />
     </View>
   );

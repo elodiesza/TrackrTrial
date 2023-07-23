@@ -6,7 +6,7 @@ import { container } from '../styles';
 
 
 
-function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tags, setTags, states, setStates}) {
+function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tags, setTags, states, setStates, staterecords, setStaterecords}) {
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -50,7 +50,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
                 <Text style={container.buttontext}>STICKER</Text>
               </Pressable>
               <NewHabit newHabitVisible={newHabitVisible} setNewHabitVisible={setNewHabitVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits}/>
-              <NewState newStateVisible={newStateVisible} setNewStateVisible={setNewStateVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits} states={states} setStates={setStates}/>
+              <NewState newStateVisible={newStateVisible} setNewStateVisible={setNewStateVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>
 
           </View> 
         </TouchableWithoutFeedback>
