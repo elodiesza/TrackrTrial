@@ -7,7 +7,7 @@ import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
 
 
-function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, states, setStates, staterecords, setStaterecords}) {
+function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddModalVisible, load, loadx, db, states, setStates, staterecords, setStaterecords}) {
   var today = new Date();
   var month = today.getMonth();
   var year = today.getFullYear();

@@ -2,16 +2,18 @@ import { useState, useEffect } from 'react';
 import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import NewHabit from './NewHabit';
 import NewState from './NewState';
+import NewScale from './NewScale';
 import { container } from '../styles';
 
 
 
-function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tags, setTags, states, setStates, staterecords, setStaterecords}) {
+function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tags, setTags, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
 
   const [isLoading, setIsLoading] = useState(true);
 
   const [newHabitVisible, setNewHabitVisible] = useState(false);
   const [newStateVisible, setNewStateVisible] = useState(false);
+  const [newScaleVisible, setNewScaleVisible] = useState(false);
 
   const [type, setType] = useState(0);
   var today = new Date();
@@ -40,7 +42,7 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
               <Pressable onPress={()=>{setNewStateVisible(true)}} style={container.button}>
                 <Text style={container.buttontext}>STATE</Text>
               </Pressable>
-              <Pressable onPress={()=>setNewHabitVisible} style={container.button}>
+              <Pressable onPress={()=>{setNewScaleVisible(true)}} style={container.button}>
                 <Text style={container.buttontext}>SCALE</Text>
               </Pressable>
               <Pressable onPress={()=>setNewHabitVisible} style={container.button}>
@@ -51,7 +53,8 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
               </Pressable>
               <NewHabit newHabitVisible={newHabitVisible} setNewHabitVisible={setNewHabitVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits}/>
               <NewState newStateVisible={newStateVisible} setNewStateVisible={setNewStateVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>
-
+              <NewScale newScaleVisible={newScaleVisible} setNewScaleVisible={setNewScaleVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits} 
+              scales={scales} setScales={setScales} scalerecords={scalerecords} setScalerecords={setScalerecords}/>
           </View> 
         </TouchableWithoutFeedback>
       </TouchableOpacity>

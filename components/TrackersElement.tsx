@@ -322,7 +322,6 @@ function colorMixer(rgbA, rgbB, amountToMix){
       );
     };
 
-
     const showstates = (name) => {
       const stateslist = staterecords.filter(c=>(c.name==name && c.year==year && c.month==month));
       return stateslist.map((item,index) => {
@@ -367,7 +366,6 @@ function colorMixer(rgbA, rgbB, amountToMix){
       })
     }
     
-
     const showStatesColumns = (name) => {
       return (
         <View>
@@ -376,7 +374,6 @@ function colorMixer(rgbA, rgbB, amountToMix){
       );
     };
     
-
     const showNumber = ({item}) => {
       return  (
         <View style={{width:50,height:25, justifyContent:'center',flexDirection:'row'}}>
@@ -692,6 +689,8 @@ function colorMixer(rgbA, rgbB, amountToMix){
         setStates={setStates}
         staterecords={staterecords}
         setStaterecords={setStaterecords}
+        scales={scales} setScales={setScales} 
+        scalerecords={scalerecords} setScalerecords={setScalerecords}
       />
     </View>
   );
