@@ -79,11 +79,10 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                 const newScale = {
                   id: newScaleId,
                   name: data.name,
-                  min: addValue? data.valueMin : undefined,
-                  max: addValue? data.valueMax : undefined,
-                  mincolor: addColor? pickedMin : undefined,
-                  maxcolor: addColor? pickedMax : undefined,
-                  unit: addUnit? data.unit : undefined,
+                  year: year,
+                  month: month,
+                  day: i,
+                  value: undefined,
                 };
                 existingrecords.push(newScale);
                 setScalerecords(existingrecords); 

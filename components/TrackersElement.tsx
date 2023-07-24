@@ -10,6 +10,7 @@ import moment from 'moment';
 import SleepTypeColors from '../constants/SleepTypeColors';
 import { container,colors } from '../styles';
 import Color from './Color';
+import AddScale from './AddScale';
 
 const width = Dimensions.get('window').width;
 
@@ -32,13 +33,21 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
   const [selectedStateName, setSelectedStateName] = useState('');
   const [selectedStateId, setSelectedStateId] = useState('');
   const [selectedStateItem, setSelectedStateItem] = useState('');
+  const [scaleModalVisible, setScaleModalVisible] = useState(false);
+  const [selectedScaleIndex, setSelectedScaleIndex] = useState(-1);
+  const [selectedScaleName, setSelectedScaleName] = useState('');
+  const [selectedScaleId, setSelectedScaleId] = useState('');
+  const [selectedScaleItem, setSelectedScaleItem] = useState('');
+  const [scaleValue, setScaleValue] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   const [updatedhabits, setUpdatedhabits] = useState([]);
   const [updatedstates, setUpdatedstates] = useState([]);
+  const [updatedscales, setUpdatedscales] = useState([]);
 
   const lastMonthData = habits.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
   const lastMonthStates = staterecords.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
+  const lastMonthScales = scalerecords.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
 
 
   useEffect(() => {
@@ -174,6 +183,11 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
 
   }, [updatedstates]);
 
+  function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
+     : null;
+  }
 
 function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
   var channelA = colorChannelA*amountToMix;
@@ -278,6 +292,28 @@ function colorMixer(rgbA, rgbB, amountToMix){
               loadx(!load);
     };
 
+    const updateScale = (id,item) => {
+      let existingscales=[...scalerecords];
+      const indexToUpdate = existingscales.findIndex(c => c.id === id);
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE scalerecords SET value = ? WHERE id = ?', [item, id],
+            (txObj, resultSet) => {
+              if (resultSet.rowsAffected > 0) {
+                existingscales[indexToUpdate].value = item;
+                setScalerecords(existingscales);
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        setSelectedScaleIndex(-1);
+        setSelectedScaleId('');
+        setSelectedScaleName('');
+        setSelectedScaleItem('');
+        setScaleModalVisible(!scaleModalVisible);
+        loadx(!load);
+    };
+
     const showhabits = (ind) => {
       const filteredhabits = habits.filter(c=>(c.name==ind && c.year==year && c.month==month));
       return filteredhabits.map((state,index) => {
@@ -366,10 +402,61 @@ function colorMixer(rgbA, rgbB, amountToMix){
       })
     }
     
+    const showscales = (name) => {
+      const scaleslist = scalerecords.filter(c=>(c.name==name && c.year==year && c.month==month));
+      const mincolor = hexToRgb(scales.filter(c=>c.name==name).map(c=>c.mincolor)[0]);
+      const maxcolor = hexToRgb(scales.filter(c=>c.name==name).map(c=>c.maxcolor)[0]);
+      const minvalue = scales.filter(c=>c.name==name).map(c=>c.min)[0];
+      const maxvalue = scales.filter(c=>c.name==name).map(c=>c.max)[0];
+      return scaleslist.map((item,index) => {
+        const amountomix = (maxvalue-item.value)/(maxvalue-minvalue);
+        const colormix = colorMixer(mincolor,maxcolor,amountomix);
+        return ( 
+          <View key={index}>
+            <TouchableOpacity onPress={()=>{setSelectedScaleItem(item.value);setSelectedScaleId(item.id);setSelectedScaleIndex(index);setSelectedScaleName(name);setScaleModalVisible(true)}}>
+              <View style={[styles.cell, { backgroundColor : item.value==undefined? colors.white : colormix}]}>
+                <Text>{item.value}</Text>
+              </View>
+            </TouchableOpacity>
+            <Modal
+            animationType="none"
+            transparent={true}
+            visible={selectedScaleIndex === index && scaleModalVisible}
+            onRequestClose={() => {
+              setSelectedScaleIndex(-1);
+              setSelectedScaleId('');
+              setSelectedScaleName('');
+              setSelectedScaleItem('');
+              setScaleModalVisible(!scaleModalVisible);
+              loadx(!load);
+            }}
+            >
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedScaleItem('');setSelectedScaleId('');setScaleModalVisible(!scaleModalVisible);setSelectedScaleIndex(-1);setSelectedScaleName('');}} activeOpacity={1}>
+              <TouchableWithoutFeedback>
+                <View style={[container.modal,{height:130, width: 200}]}>
+                  <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} scale</Text>
+                  <AddScale name={name} scales={scales} setScales={setScales} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setScaleModalVisible={setScaleModalVisible}/> 
+                </View>
+              </TouchableWithoutFeedback>
+            </TouchableOpacity>
+          </Modal>
+          </View>
+        )
+      })
+    }
+
     const showStatesColumns = (name) => {
       return (
         <View>
           {showstates(name.item)}
+        </View>
+      );
+    };
+
+    const showScalesColumns = (name) => {
+      return (
+        <View>
+          {showscales(name.item)}
         </View>
       );
     };
@@ -545,7 +632,8 @@ function colorMixer(rgbA, rgbB, amountToMix){
 
     const habitsNames = [...new Set (habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))];
     const uniqueStatesNames = [...new Set (states.map(c=>c.name))];
-    const uniqueNames = [...new Set([ ...uniqueStatesNames, ...habitsNames])];
+    const uniqueScalesNames = [...new Set (scales.map(c=>c.name))];
+    const uniqueNames = [...new Set([ ...uniqueScalesNames, ...uniqueStatesNames, ...habitsNames])];
 
     const thismonthMoods = (year,month) =>{
       var arr= [];
@@ -643,6 +731,15 @@ function colorMixer(rgbA, rgbB, amountToMix){
                 contentContainerStyle={{paddingRight:75}}
               />
               <View style={{flexDirection:'row',alignItems:'flex-start'}}> 
+                <View>
+                  <FlatList
+                    horizontal
+                    data={uniqueScalesNames}
+                    renderItem={uniqueScalesNames!==null?(name)=>showScalesColumns(name):undefined}
+                    keyExtractor={(_, index) => index.toString()}
+                    scrollEnabled={false}
+                  />
+                </View>
                 <View>
                   <FlatList
                     horizontal
