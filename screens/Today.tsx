@@ -8,7 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 
 
-const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary}) => {
+const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) => {
 
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
