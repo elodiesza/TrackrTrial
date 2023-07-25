@@ -1,10 +1,14 @@
 import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {colors} from '../styles.js';
+import { useState } from 'react';
 
 const width = Dimensions.get('window').width;
 
 const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalVisible}) => {
+
+  const mood=moods.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.mood).length==0?
+  '':moods.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.mood)[0];
 
     const updateMood = (mood) => {
         let existingMoods=[...moods];
@@ -40,31 +44,22 @@ const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalV
 
   return (
     <View style={styles.container}>
-        <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <TouchableOpacity onPress={()=>{updateMood('productive');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-              <MaterialCommunityIcons name="emoticon-devil" size={40} color={colors.green}/>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('happy');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-              <MaterialCommunityIcons name="emoticon" size={40} color={colors.yellowgreen}/>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('sick');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-              <MaterialCommunityIcons name="emoticon-sick" size={40} color={colors.yellow}/>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('stressed');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-              <MaterialCommunityIcons name="emoticon-confused" size={40} color={colors.orange}/>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('angry');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-              <MaterialCommunityIcons name="emoticon-angry" size={40} color={colors.red}/>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <MaterialCommunityIcons name="emoticon-happy" size={40} color={colors.pink}/>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('bored');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-              <MaterialCommunityIcons name="emoticon-neutral" size={40} color={colors.purple}/>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{updateMood('sad');setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-              <MaterialCommunityIcons name="emoticon-sad" size={40} color={colors.lightblue}/>
-            </TouchableOpacity>     
+        <View style={{flex:1, flexDirection:'row', justifyContent:'center'}}>
+            <View style={{flex:1, marginTop: 10, height: 40, width:width, position:'absolute',alignItems:'center'}}>
+              <FlatList
+                data={[{"name":"productive","color":colors.green,"icon":"emoticon-devil"},{"name":"happy","color":colors.yellowgreen,"icon":"emoticon"},{"name":"sick","color":colors.yellow,"icon":"emoticon-sick"},{"name":"stressed","color":colors.orange,"icon":"emoticon-confused"},{"name":"angry","color":colors.red,"icon":"emoticon-angry"},{"name":"bored","color":colors.purple,"icon":"emoticon-neutral"},{"name":"sad","color":colors.lightblue,"icon":"emoticon-sad"}]}
+                renderItem={({item}) => 
+                <View style={{flex:1, paddingLeft:1}}>
+                  <View style={{marginHorizontal: 6,marginTop: 1, width:38, height:38, backgroundColor:mood==item.name?colors.black:colors.blue, borderRadius:20}}/>
+                  <TouchableOpacity style={{marginHorizontal: 6,position:'absolute'}} onPress={()=>{updateMood(item.name);setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
+                    <MaterialCommunityIcons name={item.icon} size={40} color={mood==item.name?item.color:colors.default}/>
+                  </TouchableOpacity>
+                </View>}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal={true}
+                scrollEnabled={false}
+              />
+            </View>
         </View>
     </View>
   );
