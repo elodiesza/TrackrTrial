@@ -5,8 +5,8 @@ import { colors } from '../styles';
 
 const ColorPicker = ( {colorPickerVisible, setColorPickerVisible, picked, setPicked} ) => {
     
-  const colorChoice=[colors.red,colors.orange,colors.yellow,colors.yellowgreen,colors.green,
-    colors.blue,colors.turquoise,colors.purple,colors.magenta,colors.pink,colors.beige,colors.brown,colors.white,colors.gray,colors.black];
+  const colorChoice=[colors.primary.red,colors.primary.orange,colors.primary.yellow,colors.primary.yellowgreen,colors.primary.green,
+    colors.primary.blue,colors.primary.turquoise,colors.primary.purple,colors.primary.magenta,colors.primary.pink,colors.primary.beige,colors.primary.brown,colors.primary.default,colors.primary.gray,colors.primary.black];
 
   const TagColor = ({ item }) => {
     return (

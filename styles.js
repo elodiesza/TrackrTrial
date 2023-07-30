@@ -30,27 +30,27 @@ export const colors = {
     },
     pale:{
         white: '#ffffff',
-        default: '#D3DDDF',
-        defaultlight: '#eff3f4',
-        defaultdark: '#ADBBBD',
-        red: '#FF6347',
-        orange: '#ffa500',
-        yellow: '#ffff00',
-        yellowgreen: '#9acd32',
-        green: '#2e8b57',
-        turquoise: '#afeeee',
-        royalblue: '#4169e1',
-        lightblue: '#ADD8E6',
-        blue: '#007AFF',
-        lavender: '#e6e6fa',
-        purple: '#ba55d3',
-        magenta: '#c71585',
-        pink: '#ffc0cb',
-        brown: '#a0522d',
-        beige: '#ffebcd',
-        gray: '#d3d3d3',  
-        black: '#000000',
-        transparent: '#000000',
+        default: '#eff3f4',
+        defaultlight: '#ffffff',
+        defaultdark: '#D3DDDF',
+        red: '#FFC9BF',
+        orange: '#FFDEA0',
+        yellow: '#FFFFBC',
+        yellowgreen: '#E5FFB0',
+        green: '#A8F8CB',
+        turquoise: '#E5FFFF',
+        royalblue: '#CBD8FF',
+        lightblue: '#F0FBFF',
+        blue: '#C3DFFF',
+        lavender: '#F6F6FF',
+        purple: '#F9E2FF',
+        magenta: '#FFDEF3',
+        pink: '#FFECF0',
+        brown: '#FFD9C6',
+        beige: '#FFF8EF',
+        gray: '#F2F2F2',  
+        black: '#828282',
+        transparent: '#ffffff',
     }
 };
 export const container = StyleSheet.create({
@@ -174,7 +174,7 @@ export const container = StyleSheet.create({
 
 export const paleColor = (color) => {
   // Extract the base color and pale color group name (e.g., "white" and "primary" from "#ffffff")
-  const colorGroup = color.substring(1); // Remove the '#' symbol
+  const colorGroup = color==undefined? colors.primary.default.substring(1) : color.substring(1); // Remove the '#' symbol
   const baseColor = Object.keys(colors.primary).find((key) => colors.primary[key] === `#${colorGroup}`);
 
   // If the base color is found, get its corresponding paler color from the "pale" sub-object
@@ -183,7 +183,7 @@ export const paleColor = (color) => {
   }
 
   // If the base color is not found or there's no paler color, return the default color
-  return colors.primary.default;
+  return colors.primary.defaultlight;
 };
 
 

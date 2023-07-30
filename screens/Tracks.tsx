@@ -9,6 +9,7 @@ import Task from '../components/Task';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import ProgressBar from '../components/ProgressBar';
 import NewProgress from '../modal/NewProgress';
+import NewTrack from '../modal/NewTrack';
 
 
 const width = Dimensions.get('window').width;
@@ -20,48 +21,22 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
     const thisMonth = today.getMonth();
     const day = today.getDate();
 
-    function hexToRgbLight(hex) {
-        var result = hex.includes("#")? /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex) : /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec("#ffffff");
-        if (result) {
-            // Parse each component from hexadecimal to decimal and add 20 to each value
-            if (parseInt(result[1], 16)<230 || parseInt(result[1], 16)<230 || parseInt(result[1], 16)<230){
-                var red = parseInt(result[1], 16) + 100;
-                var green = parseInt(result[2], 16) + 100;
-                var blue = parseInt(result[3], 16) + 100;
-            }
-            else{
-                var red = parseInt(result[1], 16) + 5;
-                var green = parseInt(result[2], 16) + 5;
-                var blue = parseInt(result[3], 16) + 5;
-            }
-        
-            // Ensure that each RGB value remains within the range of 0 to 255
-            red = Math.min(red, 255);
-            green = Math.min(green, 255);
-            blue = Math.min(blue, 255);
-        
-            // Construct the modified RGB string
-            return "rgb(" + red + "," + green + "," + blue + ")";
-        } else {
-            return null;
-        }
-    }
-
 
     const tabstitles =[... new Set(tags.map(c => c.tag))];
     const tabstitleslength = tabstitles.length;
     const [selectedTab, setSelectedTab] = useState(tabstitles[tabstitleslength-1]);
     const [selectedTabColor, setSelectedTabColor] = useState(tags.filter(c=>c.tag==selectedTab).map(c=>c.color)[0]);
-    const [lighterColor, setLighterColor] = useState(hexToRgbLight(selectedTabColor));
+    const [lighterColor, setLighterColor] = useState(paleColor(selectedTabColor));
     const [newSectionVisible, setNewSectionVisible] = useState(false);
+    const [newTrackVisible, setNewTrackVisible] = useState(false);
     const [newTaskVisible, setNewTaskVisible] = useState(false);
     const [newProgressVisible, setNewProgressVisible] = useState(false);
     const [selectedSection, setSelectedSection] = useState('');
 
     useEffect(()=>{
         setSelectedTabColor(tags.filter(c=>c.tag==selectedTab).map(c=>c.color)[0]);
-        setLighterColor(hexToRgbLight(selectedTabColor));
-    },[selectedTab])
+        setLighterColor(paleColor(selectedTabColor));
+    },[selectedTab, tags])
 
     const TransferDaily = (id) => {
         let existingTasks = [...tasks];
@@ -88,11 +63,11 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
         })
     }
 
-    const deleteProgress = () => {
+    const deleteTags = () => {
         db.transaction(tx => {
-          tx.executeSql('DROP TABLE IF EXISTS progress', null,
-            (txObj, resultSet) => setProgress([]),
-            (txObj, error) => console.log('error deleting progress')
+          tx.executeSql('DROP TABLE IF EXISTS tags', null,
+            (txObj, resultSet) => setTags([]),
+            (txObj, error) => console.log('error deleting tags')
           );
         });
       }
@@ -138,7 +113,7 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
             <View style={[container.header,{borderBottomWidth:0}]}>
                 <Text style={{fontSize:20}}>TRACKS</Text>
             </View>
-            <View style={{height:41, zIndex:1, bottom:-1}}>
+            <View style={{height:41, zIndex:1, bottom:-1, flexDirection:'row'}}>
                 <FlatList
                     data={tags}
                     renderItem={({item,index}) =>  <TabItem item={item} index={index} selected={selectedTab==item.tag?-1:0} />}
@@ -147,13 +122,16 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
                     contentContainerStyle={{flexDirection:'row-reverse',left:30}}
                     showsHorizontalScrollIndicator={false}
                 />
+                <TouchableOpacity style={{flex:1,justifyContent: 'center', bottom:50, position: 'absolute', right: 15}}>
+                    <Feather onPress={()=>setNewTrackVisible(true)} name='plus-circle' size={40} color={colors.primary.blue} />
+                </TouchableOpacity> 
             </View>
-            <View style={[container.body,{borderTopWidth:1, justifyContent:'flex-start', borderTopColor: colors.primary.black, backgroundColor: hexToRgbLight(selectedTabColor)}]}>  
+            <View style={[container.body,{borderTopWidth:1, justifyContent:'flex-start', borderTopColor: colors.primary.black, backgroundColor: paleColor(selectedTabColor)}]}>  
                 <FlatList
                     data={sections.filter(c=>c.track==selectedTab)}
                     renderItem={({item,index}) => 
                     <View>
-                        <View style={[container.section,{flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: hexToRgbLight(selectedTabColor)}]}> 
+                        <View style={[container.section,{flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: paleColor(selectedTabColor)}]}> 
                             <Text>{item.section}</Text>
                             <Pressable style={{position:'absolute',right:10}}>
                                 <MaterialIcons name="keyboard-arrow-down" size={25}/>
@@ -210,7 +188,8 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
                     </TouchableOpacity> 
                 </View>
                 <NewSection db={db} sections={sections} setSections={setSections} track={selectedTab} newSectionVisible={newSectionVisible} setNewSectionVisible={setNewSectionVisible}/>
-                <Button title="delete progress" onPress={deleteProgress}/>
+                <Button title="delete tags" onPress={deleteTags}/>
+                <NewTrack db={db} tags={tags} setTags={setTags} newTrackVisible={newTrackVisible} setNewTrackVisible={setNewTrackVisible} setSelectedTab={setSelectedTab}/>
             </View>
         </SafeAreaView>
     );
