@@ -4,45 +4,54 @@ const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
 export const colors = {
-    white: '#ffffff',
-    default: '#D3DDDF',
-    defaultlight: '#eff3f4',
-    defaultdark: '#ADBBBD',
-    red: '#FF6347',
-    orange: '#ffa500',
-    yellow: '#ffff00',
-    yellowgreen: '#9acd32',
-    green: '#2e8b57',
-    turquoise: '#afeeee',
-    royalblue: '#4169e1',
-    lightblue: '#ADD8E6',
-    blue: '#007AFF',
-    lavender: '#e6e6fa',
-    purple: '#ba55d3',
-    magenta: '#c71585',
-    pink: '#ffc0cb',
-    brown: '#a0522d',
-    beige: '#ffebcd',
-    gray: '#d3d3d3',  
-    black: '#000000',
-    transparent: '#000000',
-    palered: '#000000',
-    paleorange: '#000000',
-    paleyellow: '#000000',
-    paleyellowgreen: '#000000',
-    palegreen: '#000000',
-    paleturquoise: '#000000',
-    paleroyalblue: '#000000',
-    paleblue: '#000000',
-    palelightblue: '#000000',
-    palelavender: '#000000',
-    palepurple: '#000000',
-    palemagenta: '#000000',
-    palepink: '#000000',
-    palebrown: '#000000',
-    palebeige: '#000000',
-    palegray: '#f5f5f5',
-    paleblack: '#000000',
+    primary:{
+        white: '#ffffff',
+        default: '#D3DDDF',
+        defaultlight: '#eff3f4',
+        defaultdark: '#ADBBBD',
+        red: '#FF6347',
+        orange: '#ffa500',
+        yellow: '#ffff00',
+        yellowgreen: '#9acd32',
+        green: '#2e8b57',
+        turquoise: '#afeeee',
+        royalblue: '#4169e1',
+        lightblue: '#ADD8E6',
+        blue: '#007AFF',
+        lavender: '#e6e6fa',
+        purple: '#ba55d3',
+        magenta: '#c71585',
+        pink: '#ffc0cb',
+        brown: '#a0522d',
+        beige: '#ffebcd',
+        gray: '#d3d3d3',  
+        black: '#000000',
+        transparent: '#000000',
+    },
+    pale:{
+        white: '#ffffff',
+        default: '#D3DDDF',
+        defaultlight: '#eff3f4',
+        defaultdark: '#ADBBBD',
+        red: '#FF6347',
+        orange: '#ffa500',
+        yellow: '#ffff00',
+        yellowgreen: '#9acd32',
+        green: '#2e8b57',
+        turquoise: '#afeeee',
+        royalblue: '#4169e1',
+        lightblue: '#ADD8E6',
+        blue: '#007AFF',
+        lavender: '#e6e6fa',
+        purple: '#ba55d3',
+        magenta: '#c71585',
+        pink: '#ffc0cb',
+        brown: '#a0522d',
+        beige: '#ffebcd',
+        gray: '#d3d3d3',  
+        black: '#000000',
+        transparent: '#000000',
+    }
 };
 export const container = StyleSheet.create({
     
@@ -50,7 +59,7 @@ export const container = StyleSheet.create({
         flex:1,
         alignContent: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.white,
+        backgroundColor: colors.primary.white,
     },
     header: {
         width: width,
@@ -66,7 +75,7 @@ export const container = StyleSheet.create({
         flex:1,
         alignContent: 'flex-start',
         justifyContent: 'flex-start',
-        backgroundColor: colors.defaultlight,
+        backgroundColor: colors.primary.defaultlight,
     },
     subcategory: {
         width: width,
@@ -74,7 +83,7 @@ export const container = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'gray',
         justifyContent: 'center',
-        backgroundColor: colors.white,
+        backgroundColor: colors.primary.white,
     },
     subcategorytext: {
         marginLeft: 20,
@@ -92,9 +101,9 @@ export const container = StyleSheet.create({
         height:40,
         width: "100%",
         borderWidth:1,
-        borderColor: colors.blue,
+        borderColor: colors.primary.blue,
         borderRadius: 10,
-        backgroundColor: colors.default,
+        backgroundColor: colors.primary.default,
         justifyContent: 'center',
         alignItems: 'center',
         margin:5,
@@ -105,14 +114,14 @@ export const container = StyleSheet.create({
     },
     modal:{
         width: "70%",
-        backgroundColor: colors.defaultlight,
-        borderColor: colors.black,
+        backgroundColor: colors.primary.defaultlight,
+        borderColor: colors.primary.black,
         borderWidth: 1,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
-        shadowColor: colors.black,
+        shadowColor: colors.primary.black,
         shadowRadius: 5,
         shadowOffset: { width: 5, height: 5 },
         shadowOpacity: 0.2,
@@ -122,10 +131,62 @@ export const container = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         height:40,
-        borderColor: colors.black,
+        borderColor: colors.primary.black,
         paddingHorizontal:10,
         backgroundColor: 'white',
         marginTop: 5,
         marginBottom: 5,
     },
+    section:{
+        width: "100%",
+        height:40,
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        paddingHorizontal: 10,
+        borderBottomWidth:1,
+        borderBottomColor: colors.primary.gray,
+    },
+    tasktext: {
+        textAlign:'left',
+        marginLeft: 5,
+        textAlignVertical: 'center',
+    },
+    taskcontainer: {
+        width: width,
+        flexDirection: 'row',
+        height: 45,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        backgroundColor: 'white',
+        paddingLeft: 10,
+    },
+    checkbox: {
+        width: 25,
+        height: 25,
+        borderWidth: 1,
+        borderColor: 'black',
+        marginLeft: 30,
+    }
 });
+
+
+
+export const paleColor = (color) => {
+  // Extract the base color and pale color group name (e.g., "white" and "primary" from "#ffffff")
+  const colorGroup = color.substring(1); // Remove the '#' symbol
+  const baseColor = Object.keys(colors.primary).find((key) => colors.primary[key] === `#${colorGroup}`);
+
+  // If the base color is found, get its corresponding paler color from the "pale" sub-object
+  if (baseColor && colors.pale[baseColor]) {
+    return colors.pale[baseColor];
+  }
+
+  // If the base color is not found or there's no paler color, return the default color
+  return colors.primary.default;
+};
+
+
+
+
+

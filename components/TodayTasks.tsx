@@ -1,17 +1,15 @@
-import { StyleSheet, Button, TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
+import { TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import NewTask from '../modal/NewTask';
 import { Feather } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import moment from 'moment';
-import Color from './Color';
 import { container} from '../styles';
+import Task from './Task';
 
 
 const width = Dimensions.get('window').width;
 
-function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setDate}) {
+function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setDate, sections}) {
   const today = new Date();
   const month = today.getMonth();
   const year = today.getFullYear();
@@ -256,33 +254,6 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
     }
   };
 
-  const Task = ({item}) => {
-    let taskTime= item.time=="null"? "":moment(item.time).format('HH:mm');
-    return(
-        <View style={styles.taskcontainer}>
-          <Pressable onPress={()=> updateTaskState(item.id)}>
-            <MaterialCommunityIcons name={item.taskState===0 ? 'checkbox-blank-outline' : (
-              item.taskState===1 ? 'checkbox-intermediate' : (
-              item.taskState===2 ? 'checkbox-blank' :
-              'arrow-right-bold-box-outline')
-            )} size={35} />
-          </Pressable>
-          <View style={{flex:6}}>
-            <Text style={styles.tasktext}>
-              {item.task}
-            </Text>
-          </View>
-          <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
-              <Text style={{fontSize:10}}>{taskTime=="Invalid date"?"":taskTime}</Text>
-          </View>
-          <View style={{flex:1}}>
-            <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />
-          </View>
-        </View>
-    )
-  };
-
-
   const dailyData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==0));
   const recurringData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==1));
 
@@ -315,8 +286,13 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
             TODAY'S TASKS
           </Text>
         </View>
-        <SwipeListView style={styles.dailyTasks} data={dailyData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
-          renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
+        <SwipeListView 
+          data={dailyData} 
+          scrollEnabled={true} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
+          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} tag={item.tag} time={item.time} section={undefined} />} 
+          renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} 
+          bounces={false} 
           rightOpenValue={-80}
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
@@ -326,7 +302,10 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
             DAILY RECURRING TASKS
           </Text>
         </View>
-        <SwipeListView style={styles.recurringTasks} data={recurringData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
+        <SwipeListView 
+          data={recurringData} 
+          scrollEnabled={true} 
+          renderItem={({ item }) => <Task item={item} />} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-80}
           disableRightSwipe={true}
@@ -347,62 +326,12 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
         tasks={tasks}
         setTasks={setTasks}
         tags={tags}
-        setTags={setTags}
+        track={undefined}
+        section={undefined}
+        selectedDate={date}
+        tracksScreen={false}
       />
     </>
   );
 }
 export default TodayTasks;
-
-const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    alignContent: 'center',
-    justifyContent: 'center',
-  },
-  header:{
-    width:width,
-    height:40,
-    borderBottomWidth:1,
-    borderColor:'gray',
-    justifyContent:'center',
-    flexDirection:'row',
-    alignContent:'center',
-    alignItems:'center',
-  },
-  checkbox: {
-    width: 25,
-    height: 25,
-    borderWidth: 1,
-    borderColor: 'black',
-    marginLeft: 30,
-  },
-  taskcontainer: {
-    width: width,
-    flexDirection: 'row',
-    height: 45,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    backgroundColor: 'white',
-    paddingLeft: 20,
-  },
-  tasktext: {
-    textAlign:'left',
-    marginLeft: 5,
-    textAlignVertical: 'center',
-  },
-  titletext: {
-    marginLeft: 20,
-    fontSize: 20,
-    color: 'gray',
-    fontWeight: 'bold',
-    textAlignVertical: 'center',
-  },
-  dailyTasks:{
-    flex:4,
-  },
-  recurringTasks:{
-    flex:1,
-  }
-});

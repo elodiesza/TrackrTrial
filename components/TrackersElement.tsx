@@ -11,6 +11,7 @@ import SleepTypeColors from '../constants/SleepTypeColors';
 import { container,colors } from '../styles';
 import Color from './Color';
 import AddScale from './AddScale';
+import UpdateState from '../modal/UpdateState';
 
 const width = Dimensions.get('window').width;
 

@@ -18,6 +18,8 @@ const useDatabase = () => {
   const [scalerecords, setScalerecords] = useState([]);
   const [times, setTimes] = useState([]);
   const [diary, setDiary] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [progress, setProgress] = useState([]);
 
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, tag INTEGER, time TEXT, UNIQUE(task,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, tag INTEGER, time TEXT, section TEXT, UNIQUE(task,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tasks', null,
@@ -123,7 +125,27 @@ const useDatabase = () => {
       (txObj, error) => console.log('error selecting diary')
       );
     });
-  
+
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS sections (id INTEGER PRIMARY KEY AUTOINCREMENT, section TEXT, track TEXT)')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM sections', null,
+      (txObj, resultSet) => setSections(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting section')
+      );
+    });
+ 
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS progress (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, track TEXT, list TEXT, progress INTEGER, rate INTEGER)')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM progress', null,
+      (txObj, resultSet) => setProgress(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting progress')
+      );
+    });
+
     setIsLoading(false);
   
   },[load]);
@@ -144,6 +166,8 @@ const useDatabase = () => {
     diary,
     load,
     db,
+    sections,
+    progress,
     loadx,
     setHabits,
     setTasks,
@@ -157,7 +181,9 @@ const useDatabase = () => {
     setTimes,
     setDiary,
     setDb,
-    setIsLoading
+    setIsLoading,
+    setSections,
+    setProgress,
   };
 };
 

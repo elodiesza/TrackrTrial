@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import SleepColorPicker from './SleepColorPicker';
+import { container } from '../styles';
 
 
 
@@ -96,7 +97,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={container.body}>
         <View style={{flexDirection:'row', justifyContent:'center'}}>
             <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {alignSelf:'center',backgroundColor: sleepTypes.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0]}]}/>
             <SleepColorPicker
@@ -124,7 +125,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
                     minuteInterval={30}
                     style={{marginRight:8}}
                 />
-                <Pressable onPress={addSleep} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
+                <Pressable onPress={addSleep} style={container.button}><Text>SAVE</Text></Pressable>
             </View>
             <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
                 <Text>WAKE-UP TIME</Text>
@@ -136,7 +137,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
                     minuteInterval={30}
                     style={{marginRight:8}}
                 />
-                <Pressable onPress={addWakeup} style={styles.sleepSave}><Text>SAVE</Text></Pressable>
+                <Pressable onPress={addWakeup} style={container.button}><Text>SAVE</Text></Pressable>
             </View>
         </View>
     </SafeAreaView>
@@ -146,21 +147,6 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
 export default AddSleepLog;
 
 const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    alignContent: 'center',
-    justifyContent: 'center',
-  },
-  sleepSave: {
-    width: 100,
-    borderColor: 'black',
-    borderWidth: 1,
-    borderRadius: 8,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-  },
   color: {
     width: 30,
     height: 30,

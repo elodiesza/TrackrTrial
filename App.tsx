@@ -31,6 +31,8 @@ export default function App() {
     diary,
     load,
     db,
+    sections,
+    progress,
     loadx,
     setTags,
     setHabits,
@@ -43,7 +45,9 @@ export default function App() {
     setScalerecords,
     setDiary,
     setDb,
-    setIsLoading
+    setIsLoading,
+    setSections,
+    setProgress,
   } = useDatabase();
 
 
@@ -57,7 +61,11 @@ export default function App() {
               <Feather name="activity" size={28} />  
             </View>)}}
         />
-        <Tab.Screen name="Tracks" children={()=><Tracks/>} 
+        <Tab.Screen name="Tracks" children={()=><Tracks 
+        tags={tags} setTags={setTags} db={db}
+        sections={sections} setSections={setSections}
+        tasks={tasks} setTasks={setTasks}
+        progress={progress} setProgress={setProgress}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -74,6 +82,9 @@ export default function App() {
         scales={scales} setScales={setScales} 
         scalerecords={scalerecords} setScalerecords={setScalerecords}
         diary={diary} setDiary={setDiary}
+        staterecords={staterecords} setStaterecords={setStaterecords}
+        states={states} setStates={setStates}
+        sections={sections}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (

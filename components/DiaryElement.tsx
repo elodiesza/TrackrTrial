@@ -62,11 +62,11 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
 
     return (
         <View style={[container.body,{justifyContent:'center'}]}>
-            <View style={[styles.textBox,{borderColor:  updatenotesDisplay ? colors.defaultdark : colors.blue}]}>
+            <View style={[styles.textBox,{borderColor:  updatenotesDisplay ? colors.primary.defaultdark : colors.primary.blue}]}>
                 <View style={{flex:1, margin:10, flexDirection:'row'}}>
                     <ScrollView style={{flex:1}}>
                         <View style={{flex:1, display: updatenotesDisplay? "none" : "flex"}}>
-                            <Text style={{color: colors.defaultdark}}>
+                            <Text style={{color: colors.primary.defaultdark}}>
                                 {displayedDiary}
                             </Text>
                         </View>
@@ -96,23 +96,23 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
                     </ScrollView>
                     <View style={{alignItems:'center'}}>
                         <Pressable style={{display: updatenotesDisplay? "none":"flex"}} onPress={()=>setUpdatenotesDisplay(!updatenotesDisplay)}>
-                            <MaterialCommunityIcons name="fountain-pen-tip" size={40} color={colors.blue} />
+                            <MaterialCommunityIcons name="fountain-pen-tip" size={40} color={colors.primary.blue} />
                         </Pressable>
                         <Pressable style={{display: updatenotesDisplay? "flex":"none"}} onPress={()=>setUpdatenotesDisplay(!updatenotesDisplay)}>
-                            <MaterialIcons name="cancel" size={40} color={colors.blue} />
+                            <MaterialIcons name="cancel" size={40} color={colors.primary.blue} />
                         </Pressable>
                         <Pressable onPress={handleSubmit(UpdateDiary)} style={{display: updatenotesDisplay ? "flex" : "none"}}>
-                            <Feather name="send" size={32} color={colors.blue} />
+                            <Feather name="send" size={32} color={colors.primary.blue} />
                         </Pressable>
                     </View>
                 </View>
                 <View style={{width: '100%', padding:15, height:60, flexDirection:'row', alignItems:'center'}}>
                     <View style={{flex:1, flexDirection:'row'}}>
-                        <View style={{width:40,height:40, borderColor: colors.blue, borderWidth:1, backgroundColor: colors.white, marginRight:10}}/>
-                        <View style={{width:40,height:40, borderColor: colors.blue, borderWidth:1, backgroundColor: colors.white, marginRight:10}}/>
-                        <View style={{width:40,height:40, borderColor: colors.blue, borderWidth:1, backgroundColor: colors.white, marginRight:10}}/>
+                        <View style={{width:40,height:40, borderColor: colors.primary.blue, borderWidth:1, backgroundColor: colors.primary.white, marginRight:10}}/>
+                        <View style={{width:40,height:40, borderColor: colors.primary.blue, borderWidth:1, backgroundColor: colors.primary.white, marginRight:10}}/>
+                        <View style={{width:40,height:40, borderColor: colors.primary.blue, borderWidth:1, backgroundColor: colors.primary.white, marginRight:10}}/>
                     </View>
-                    <MaterialCommunityIcons name="camera" size={35} color={colors.blue} />
+                    <MaterialCommunityIcons name="camera" size={35} color={colors.primary.blue} />
                 </View>
             </View>
         </View>

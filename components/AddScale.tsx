@@ -7,9 +7,8 @@ import { useForm, Controller, set } from 'react-hook-form';
 
 const width = Dimensions.get('window').width;
 
-const AddScale = ({ name, scales, setScales, scalerecords, setScalerecords, db,year,month,day, load, loadx, setScaleModalVisible}) => {
+const AddScale = ({ name, scalerecords, setScalerecords, db,year,month,day, load, loadx, setScaleModalVisible}) => {
     const {control, handleSubmit, reset} = useForm();
-    const [scaleValue, setScaleValue] = useState(0);
 
     const updateScale = (data) => {
         const existingrecords = [...scalerecords];
@@ -31,38 +30,38 @@ const AddScale = ({ name, scales, setScales, scalerecords, setScalerecords, db,y
     };
 
   return (
-    <View style={{alignContent:'center', justifyContent:'center', marginTop:10}}>
-        <Text style={{textAlign:'center'}}>{name}</Text>
+    <View style={{height:70, marginTop:10}}>
+            <Text style={{textAlign:'center'}}>{name}</Text>
         <View style={{flex:1, flexDirection: 'row', width:'100%', alignItems: 'center', justifyContent:'center'}}>
             <Controller
-                        control= {control}
-                        name="value"
-                        render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-                            <>
-                            <TextInput
-                                value={value}
-                                onChangeText={(text) => {// Remove any non-numeric characters using a regular expression
-                                    const intValue = text.replace(/\D/g, '');
-                                    // Set the cleaned integer value back to the input field
-                                    onChange(intValue);}}
-                                onBlur={onBlur}
-                                placeholder="value"
-                                style={[container.textinput,{width: 80, borderColor: error ? 'red' : '#e8e8e8'}]}
-                            />
-                            {error && (
-                                <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
-                            )}
-                            </>
+                control= {control}
+                name="value"
+                render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
+                    <>
+                        <TextInput
+                            value={value}
+                            onChangeText={(text) => {// Remove any non-numeric characters using a regular expression
+                                const intValue = text.replace(/\D/g, '');
+                                // Set the cleaned integer value back to the input field
+                                onChange(intValue);}}
+                            onBlur={onBlur}
+                            placeholder="value"
+                            style={[container.textinput,{width: 80, borderColor: error ? 'red' : '#e8e8e8'}]}
+                        />
+                        {error && (
+                            <Text style={{color: colors.primary.red, alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
                         )}
-                        rules={{
-                            required: 'Input a value',
-                            validate: (value) => {
-                                if (!/^\d*$/.test(value)) {
-                                return 'Please enter a valid integer';
-                                }
-                                return true;
-                            },
-                        }}
+                        </>
+                    )}
+                    rules={{
+                        required: 'Input a value',
+                        validate: (value) => {
+                            if (!/^\d*$/.test(value)) {
+                            return 'Please enter a valid integer';
+                            }
+                            return true;
+                        },
+                }}
             />
             <Pressable onPress={handleSubmit(updateScale)} style={[container.button,{width:40}]}>
                 <Feather name="chevron-right" size={30} />

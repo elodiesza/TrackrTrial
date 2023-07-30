@@ -16,8 +16,8 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
     const {control, handleSubmit, reset} = useForm();
     const [colorPickerVisibleMin, setColorPickerVisibleMin] = useState(false);
     const [colorPickerVisibleMax, setColorPickerVisibleMax] = useState(false);
-    const [pickedMin, setPickedMin] = useState(colors.white);
-    const [pickedMax, setPickedMax] = useState(colors.white);
+    const [pickedMin, setPickedMin] = useState(colors.primary.white);
+    const [pickedMax, setPickedMax] = useState(colors.primary.white);
     const [valueMin, setValueMin] = useState(0);
     const [valueMax, setValueMax] = useState(0);
     const [addColor, setAddColor] = useState(false);
@@ -94,7 +94,6 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
     setNewScaleVisible(false);
     setAddModalVisible(false);
     loadx(!load);
-
   };
 
 
@@ -113,7 +112,7 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
             <View style={container.modal}>
                 <View style={{width:"100%",flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginBottom:10}}>
                     <Pressable onPress={() => setNewScaleVisible(!newScaleVisible)}>
-                        <MaterialIcons name="keyboard-arrow-left" size={25} color={colors.blue}/>
+                        <MaterialIcons name="keyboard-arrow-left" size={25} color={colors.primary.blue}/>
                     </Pressable>
                     <Text style={{left:20}}>NEW Scale</Text>
                 </View>
@@ -155,14 +154,14 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                 />
                 <View style={{width:"100%", flexDirection:'row', justifyContent:'flex-start', alignItems:'center'}}>
                     <Pressable onPress={()=>setAddColor(true)}>
-                        <MaterialCommunityIcons style={{display: addColor? "none":"flex"}} name="checkbox-blank-outline" size={25} color={colors.blue} />
+                        <MaterialCommunityIcons style={{display: addColor? "none":"flex"}} name="checkbox-blank-outline" size={25} color={colors.primary.blue} />
                     </Pressable>
                     <Pressable onPress={()=>setAddColor(false)}>
-                        <MaterialCommunityIcons style={{display: addColor? "flex":"none"}} name="checkbox-marked" size={25} color={colors.blue} />
+                        <MaterialCommunityIcons style={{display: addColor? "flex":"none"}} name="checkbox-marked" size={25} color={colors.primary.blue} />
                     </Pressable>
-                    <Text style={{marginLeft:10, color: addColor? colors.black : colors.gray}}>MIN</Text>
+                    <Text style={{marginLeft:10, color: addColor? colors.primary.black : colors.primary.gray}}>MIN</Text>
                     <Pressable onPress={addColor? ()=>setColorPickerVisibleMin(true) : undefined}>
-                        <Color color={addColor? pickedMin : colors.gray} />
+                        <Color color={addColor? pickedMin : colors.primary.gray} />
                     </Pressable>
                     <ColorPicker
                     colorPickerVisible={colorPickerVisibleMin}
@@ -170,9 +169,9 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                     picked={pickedMin}
                     setPicked={setPickedMin}
                     />
-                    <Text style={{marginLeft:10, color: addColor? colors.black : colors.gray}}>MAX</Text>
+                    <Text style={{marginLeft:10, color: addColor? colors.primary.black : colors.primary.gray}}>MAX</Text>
                     <Pressable onPress={addColor? ()=>setColorPickerVisibleMax(true) : undefined}>
-                        <Color color={addColor? pickedMax : colors.gray} />
+                        <Color color={addColor? pickedMax : colors.primary.gray} />
                     </Pressable>
                     <ColorPicker
                         colorPickerVisible={colorPickerVisibleMax}
@@ -183,12 +182,12 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                 </View>
                 <View style={{width:"100%", flexDirection:'row', justifyContent:'flex-start', alignItems:'center'}}>
                     <Pressable onPress={()=>setAddValue(true)}>
-                        <MaterialCommunityIcons style={{display: addValue? "none":"flex"}} name="checkbox-blank-outline" size={25} color={colors.blue} />
+                        <MaterialCommunityIcons style={{display: addValue? "none":"flex"}} name="checkbox-blank-outline" size={25} color={colors.primary.blue} />
                     </Pressable>
                     <Pressable onPress={()=>setAddValue(false)}>
-                        <MaterialCommunityIcons style={{display: addValue? "flex":"none"}} name="checkbox-marked" size={25} color={colors.blue} />
+                        <MaterialCommunityIcons style={{display: addValue? "flex":"none"}} name="checkbox-marked" size={25} color={colors.primary.blue} />
                     </Pressable>
-                    <Text style={{marginHorizontal:10, color: addValue? colors.black : colors.gray}}>MIN</Text>
+                    <Text style={{marginHorizontal:10, color: addValue? colors.primary.black : colors.primary.gray}}>MIN</Text>
                     <Controller
                     control= {control}
                     name="valueMin"
@@ -220,7 +219,7 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                           },
                     }}
                     />
-                    <Text style={{marginHorizontal:10, color: addValue? colors.black : colors.gray}}>MAX</Text>
+                    <Text style={{marginHorizontal:10, color: addValue? colors.primary.black : colors.primary.gray}}>MAX</Text>
                     <Controller
                     control= {control}
                     name="valueMax"
@@ -256,12 +255,12 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                 </View>
                 <View style={{width:"100%", flexDirection:'row', justifyContent:'flex-start', alignItems:'center'}}>
                     <Pressable onPress={()=>setAddUnit(true)}>
-                        <MaterialCommunityIcons style={{display: addUnit? "none":"flex"}} name="checkbox-blank-outline" size={25} color={colors.blue} />
+                        <MaterialCommunityIcons style={{display: addUnit? "none":"flex"}} name="checkbox-blank-outline" size={25} color={colors.primary.blue} />
                     </Pressable>
                     <Pressable onPress={()=>setAddUnit(false)}>
-                        <MaterialCommunityIcons style={{display: addUnit? "flex":"none"}} name="checkbox-marked" size={25} color={colors.blue} />
+                        <MaterialCommunityIcons style={{display: addUnit? "flex":"none"}} name="checkbox-marked" size={25} color={colors.primary.blue} />
                     </Pressable>
-                    <Text style={{marginHorizontal:10, color: addUnit? colors.black : colors.gray}}>UNIT</Text>
+                    <Text style={{marginHorizontal:10, color: addUnit? colors.primary.black : colors.primary.gray}}>UNIT</Text>
                     <Controller
                         control= {control}
                         name="unit"

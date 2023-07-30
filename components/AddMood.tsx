@@ -47,12 +47,12 @@ const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalV
         <View style={{flex:1, flexDirection:'row', justifyContent:'center'}}>
             <View style={{flex:1, marginTop: 10, height: 40, width:width, position:'absolute',alignItems:'center'}}>
               <FlatList
-                data={[{"name":"productive","color":colors.green,"icon":"emoticon-devil"},{"name":"happy","color":colors.yellowgreen,"icon":"emoticon"},{"name":"sick","color":colors.yellow,"icon":"emoticon-sick"},{"name":"stressed","color":colors.orange,"icon":"emoticon-confused"},{"name":"angry","color":colors.red,"icon":"emoticon-angry"},{"name":"bored","color":colors.purple,"icon":"emoticon-neutral"},{"name":"sad","color":colors.lightblue,"icon":"emoticon-sad"}]}
+                data={[{"name":"productive","color":colors.primary.green,"icon":"emoticon-devil"},{"name":"happy","color":colors.primary.yellowgreen,"icon":"emoticon"},{"name":"sick","color":colors.primary.yellow,"icon":"emoticon-sick"},{"name":"stressed","color":colors.primary.orange,"icon":"emoticon-confused"},{"name":"angry","color":colors.primary.red,"icon":"emoticon-angry"},{"name":"bored","color":colors.primary.purple,"icon":"emoticon-neutral"},{"name":"sad","color":colors.primary.lightblue,"icon":"emoticon-sad"}]}
                 renderItem={({item}) => 
                 <View style={{flex:1, paddingLeft:1}}>
-                  <View style={{marginHorizontal: 6,marginTop: 1, width:38, height:38, backgroundColor:mood==item.name?colors.black:colors.blue, borderRadius:20}}/>
+                  <View style={{marginHorizontal: 6,marginTop: 1, width:38, height:38, backgroundColor:mood==item.name?colors.primary.black:colors.primary.blue, borderRadius:20}}/>
                   <TouchableOpacity style={{marginHorizontal: 6,position:'absolute'}} onPress={()=>{updateMood(item.name);setMoodModalVisible==undefined? undefined:setMoodModalVisible(false);}}>
-                    <MaterialCommunityIcons name={item.icon} size={40} color={mood==item.name?item.color:colors.default}/>
+                    <MaterialCommunityIcons name={item.icon} size={40} color={mood==item.name?item.color:colors.primary.default}/>
                   </TouchableOpacity>
                 </View>}
                 keyExtractor={(item, index) => index.toString()}
