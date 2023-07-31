@@ -61,7 +61,7 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
     
 
     return (
-        <View style={[container.body,{justifyContent:'center'}]}>
+        <View style={[container.body,{justifyContent:'center', backgroundColor:colors.primary.white}]}>
             <View style={[styles.textBox,{borderColor:  updatenotesDisplay ? colors.primary.defaultdark : colors.primary.blue}]}>
                 <View style={{flex:1, margin:10, flexDirection:'row'}}>
                     <ScrollView style={{flex:1}}>

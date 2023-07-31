@@ -33,6 +33,8 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
       });
       setIsLoading(false);
     },[load]);
+
+
     
     useEffect(() => {
       if (!isLoading && tasks.length > 0 && logs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined) {
@@ -291,7 +293,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
           scrollEnabled={true} 
           renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
           sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} track={item.track} 
-          time={item.time} section={undefined} trackScreen={false}/>} 
+          time={item.time} section={item.section} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} 
           bounces={false} 
           rightOpenValue={-80}
@@ -314,9 +316,10 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
+                <Button title='remove Tasks' onPress={removeDb} />
        {/* <Button title='Add yesterdayLog' onPress={addLog} />
         <Button title='remove Todays log' onPress={removeTodayLog} />
-        <Button title='remove Tasks' onPress={removeDb} />
+
         <Button title='remove Logs' onPress={removelogDb} /> */}
       </View>
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>

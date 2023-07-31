@@ -16,35 +16,34 @@ const width = Dimensions.get('window').width;
 
 function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, progress, setProgress}) {
 
+    console.warn(tasks);
+
     const today= new Date();
     const thisYear = today.getFullYear();
     const thisMonth = today.getMonth();
     const day = today.getDate();
-
-
     const tabstitles =[... new Set(tracks.map(c => c.track))];
     const tabstitleslength = tabstitles.length;
-    const [selectedTab, setSelectedTab] = useState(tabstitles[tabstitleslength-1]);
-    const [selectedTabColor, setSelectedTabColor] = useState(tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
-    const [lighterColor, setLighterColor] = useState(paleColor(selectedTabColor));
+    const [selectedTab, setSelectedTab] = useState(tabstitles.length==0?undefined:tabstitles[tabstitleslength-1]);
+    const [selectedTabColor, setSelectedTabColor] = useState(selectedTab==undefined? colors.primary.default:tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
     const [newSectionVisible, setNewSectionVisible] = useState(false);
     const [newTrackVisible, setNewTrackVisible] = useState(false);
     const [newTaskVisible, setNewTaskVisible] = useState(false);
     const [newProgressVisible, setNewProgressVisible] = useState(false);
     const [selectedSection, setSelectedSection] = useState('');
 
-    useEffect(()=>{
-        setSelectedTabColor(tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
-        setLighterColor(paleColor(selectedTabColor));
-    },[selectedTab, tracks])
+    useEffect(() => {
+        setSelectedTabColor(selectedTab==undefined? colors.primary.default:tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
+    }, [selectedTab,tracks]);
 
     const TransferDaily = (id) => {
         let existingTasks = [...tasks];
         let toTransfer = tasks.filter(c=>(c.id==id))[0];
+        let toTransferSelection = tasks.filter(c=>(c.id==id)).map(c=>c.section)[0];
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,toTransfer.track,null],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,false,toTransfer.track,undefined,toTransferSelection],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, track:toTransfer.track, time:null});
+            existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, monthly:false, track:toTransfer.track, time:undefined, section:toTransferSelection});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
@@ -52,8 +51,8 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         })
         db.transaction(tx => {
           tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
-            (txObj, resultSet) => {
-              if (resultSet.rowsAffected > 0) {
+            (txObj, resultSet2) => {
+              if (resultSet2.rowsAffected > 0) {
                 let existingTasks = [...tasks].filter(task => task.id !== id);
                 setTasks(existingTasks);
               }
@@ -76,7 +75,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         <View style={{ flex: 1, backgroundColor: 'green', flexDirection: 'row' }}>
             <View style={{ width: width - 50, paddingRight: 12, justifyContent: 'center', alignItems: 'flex-end', backgroundColor: colors.primary.yellowgreen }}>
                 <Pressable onPress={()=>TransferDaily(id)}>
-                <Feather name="calendar" size={25} color={'white'} />
+                    <Feather name="calendar" size={25} color={'white'} />
                 </Pressable>
             </View>
             <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: 'darkred' }}>
@@ -107,6 +106,79 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         );
     };
 
+    const DeleteTrack = () => {
+        const id = tracks.filter((c) => c.track == selectedTab).map((c) => c.id)[0];
+        console.warn(id)
+        db.transaction(
+            (tx) => {
+            tx.executeSql(
+                'DELETE FROM sections WHERE track = ?',
+                [id],
+                (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                    let existingSections = [...sections].filter((c) => c.track !== selectedTab);
+                    setSections(existingSections);
+                }
+                },
+                (txObj, error) => console.log(error)
+            );
+            }
+        );
+
+        db.transaction(
+            (tx) => {
+            tx.executeSql(
+                'DELETE FROM tasks WHERE track = ?',
+                [id],
+                (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                    let existingTasks = [...tasks].filter((c) => c.track !== selectedTab);
+                    setTasks(existingTasks);
+                }
+                },
+                (txObj, error) => console.log(error)
+            );
+            }
+        );
+
+        db.transaction(
+            (tx) => {
+            tx.executeSql(
+                'DELETE FROM tracks WHERE id = ?',
+                [id],
+                (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                    let existingTracks = [...tracks].filter((c) => c.id !== id);
+                    setTracks(existingTracks);
+                    setSelectedTab(existingTracks.map(c=>c.track)[0]);
+                }
+                },
+                (txObj, error) => console.log(error)
+            );
+            }
+        );
+        setSelectedTabColor(colors.pale.default);
+    };
+
+    const DeleteSection = () => {
+        const id= sections.filter(c=>c.section==selectedSection).map(c=>c.id)[0];
+            db.transaction(tx=> {
+              tx.executeSql('DELETE FROM sections WHERE id = ?', [id],
+                (txObj, resultSet) => {
+                  if (resultSet.rowsAffected > 0) {
+                    let existingSections = [...sections].filter(c=>c.id!==id);
+                    let existingTasks = [...tasks].filter(c=>(c.section!==selectedSection));
+                    let existingProgress = [...progress].filter(c=>(c.section!==selectedSection));
+                    setSections(existingSections);
+                    setTasks(existingTasks);
+                    setProgress(existingProgress);
+                  }
+                },
+                (txObj, error) => console.log(error)
+            );       
+        })   
+    };
+
     return (
 
         <SafeAreaView style={container.container}>
@@ -127,6 +199,18 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                 </TouchableOpacity> 
             </View>
             <View style={[container.body,{borderTopWidth:1, justifyContent:'flex-start', borderTopColor: colors.primary.black, backgroundColor: paleColor(selectedTabColor)}]}>  
+                <View style={{ display: selectedTab==undefined? "none":"flex", width: "100%", height: 35, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                    <View style={{justifyContent: 'center', alignItems: 'flex-end', marginVertical: 2, marginHorizontal: 2 }}>
+                        <TouchableOpacity>
+                            <Feather onPress={()=>DeleteTrack()} name='trash-2' size={30} color={colors.primary.blue} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ justifyContent: 'center', alignItems: 'flex-end', marginVertical: 2, marginHorizontal: 2 }}>
+                        <TouchableOpacity onPress={()=>setNewSectionVisible(true)}>
+                            <Feather name='plus-circle' size={30} color={colors.primary.blue} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <FlatList
                     data={sections.filter(c=>c.track==selectedTab)}
                     renderItem={({item,index}) => 
@@ -138,11 +222,11 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             </Pressable>
                         </View>
                         <SwipeListView
-                            data={tasks.filter(c=>c.section==item.section)}
+                            data={tasks.filter(c=>(c.section==item.section && c.track==selectedTab))}
                             renderItem={({item,index}) =>
                             <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
                             sections={sections} date={undefined} section={item.section} task={item.task} 
-                            taskState={item.taskState} time={undefined} track={item.track} id={index} trackScreen={true}/>
+                            taskState={item.taskState} time={undefined} track={selectedTab} id={item.id} trackScreen={true}/>
                             }
                             renderHiddenItem={({ item }) => <TaskSwipeItem id={item.id} />} 
                             bounces={false} 
@@ -164,9 +248,9 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             keyExtractor= {(item,index) => index.toString()}
                         />
                         <View style={{flex:1, backgroundColor: colors.primary.white, flexDirection:'row', justifyContent:'flex-end'}}>
-                            <TouchableOpacity style={{justifyContent: 'center', alignItems:'flex-end',marginVertical:2, marginHorizontal:2}}>
-                                <Feather name='plus-circle' size={30} color={colors.primary.blue} />
-                            </TouchableOpacity> 
+                            <TouchableOpacity onPress={()=>{DeleteSection();setSelectedSection(item.section)}} style={{justifyContent: 'center', alignItems:'flex-end',marginVertical:2, marginHorizontal:2}}>
+                                <Feather name='trash-2' size={30} color={colors.primary.blue} />
+                            </TouchableOpacity>  
                             <TouchableOpacity onPress={()=>{setNewProgressVisible(true);setSelectedSection(item.section)}} style={{justifyContent: 'center', alignItems:'flex-end',marginVertical:2, marginHorizontal:2}}>
                                 <Entypo name="progress-two" size={30} color={colors.primary.blue} />
                             </TouchableOpacity>
@@ -182,14 +266,9 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                     contentContainerStyle={{width:"100%"}}
                     showsHorizontalScrollIndicator={false}
                 />
-                <View style={{width:"100%", height:60, justifyContent:'flex-end'}}>
-                    <TouchableOpacity style={{justifyContent: 'center', bottom:10, position: 'absolute', right: 15, flex: 1}}>
-                        <Feather onPress={()=>setNewSectionVisible(true)} name='plus-circle' size={40} color={colors.primary.blue} />
-                    </TouchableOpacity> 
-                </View>
                 <NewSection db={db} sections={sections} setSections={setSections} track={selectedTab} newSectionVisible={newSectionVisible} setNewSectionVisible={setNewSectionVisible}/>
                 <Button title="delete tracks" onPress={deletetracks}/>
-                <NewTrack db={db} tracks={tracks} setTracks={setTracks} newTrackVisible={newTrackVisible} setNewTrackVisible={setNewTrackVisible} setSelectedTab={setSelectedTab}/>
+                <NewTrack db={db} tracks={tracks} setTracks={setTracks} newTrackVisible={newTrackVisible} setNewTrackVisible={setNewTrackVisible} setSelectedTab={setSelectedTab} setSelectedTabColor={setSelectedTabColor}/>
             </View>
         </SafeAreaView>
     );

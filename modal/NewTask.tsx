@@ -41,6 +41,7 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, trac
 
   const addTask = async (data) => {
     let existingTasks = [...tasks]; 
+    setDate(pageDate);  
     console.warn(data);
     db.transaction((tx) => {
       tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'),tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'),0,recurring?1:0,false,track,addTime=='Add Time'?null:time.toString(),section==undefined?undefined:section],

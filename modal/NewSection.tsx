@@ -69,8 +69,8 @@ function NewSection({db, sections, setSections, track, newSectionVisible, setNew
                     message: 'Task should be at least 3 characters long',
                     },
                     maxLength: {
-                    value: 12,
-                    message: 'Task should be max 12 characters long',
+                    value: 32,
+                    message: 'Task should be max 32 characters long',
                     },
                     validate: (name) => {
                     if (name.includes('  ')) {

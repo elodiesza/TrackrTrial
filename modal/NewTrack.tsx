@@ -7,7 +7,7 @@ import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
 
 
-function NewTrack({newTrackVisible, setNewTrackVisible, db, tracks, setTracks, setSelectedTab}) {
+function NewTrack({newTrackVisible, setNewTrackVisible, db, tracks, setTracks, setSelectedTab, setSelectedTabColor}) {
 
 
   const {control, handleSubmit, reset} = useForm();
@@ -40,6 +40,7 @@ function NewTrack({newTrackVisible, setNewTrackVisible, db, tracks, setTracks, s
             );
         });
     setSelectedTab(data.name);
+    setSelectedTabColor(picked);
     setPicked('');
     setNewTrackVisible(false);
   };

@@ -3,22 +3,23 @@ import { useState, useEffect } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
 import { container} from '../styles';
+import Color from './Color';
+import { colors } from '../styles';
 
 
 const width = Dimensions.get('window').width;
 
 function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, taskState, id ,track, time, section, trackScreen}) {
 
-  const [isLoading, setIsLoading] = useState(true);
 
   const updateTaskState = (id) => {
     let existingTasks=[...tasks];
-    const indexToUpdate = existingTasks.findIndex(task => task.id === id);
+    const indexToUpdate = existingTasks.findIndex(c => c.id === id);
     let postponedTask = existingTasks[indexToUpdate].task;
-    let nextDay= new Date(Math.floor(date.getTime()+(1000*60*60*24)));
-    let nextDayYear = nextDay.getFullYear();
-    let nextDayMonth = nextDay.getMonth();
-    let nextDayDay = nextDay.getDate();
+    let nextDay= date==undefined? undefined:new Date(Math.floor(date.getTime()+(1000*60*60*24)));
+    let nextDayYear = date==undefined? undefined:nextDay.getFullYear();
+    let nextDayMonth = date==undefined? undefined:nextDay.getMonth();
+    let nextDayDay = date==undefined? undefined:nextDay.getDate();
     let copytrack=existingTasks[indexToUpdate].track;
     let copyTime=existingTasks[indexToUpdate].time;
     if (existingTasks[indexToUpdate].taskState==0){
@@ -48,7 +49,7 @@ function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, task
       });
     }
     else if(existingTasks[indexToUpdate].taskState==2){
-      if (existingTasks[indexToUpdate].recurring==0){
+      if (existingTasks[indexToUpdate].recurring==0 && date!==undefined){
         db.transaction(tx=> {
           tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [3, id],
             (txObj, resultSet) => {
@@ -121,12 +122,18 @@ function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, task
       )} size={35} />
     </Pressable>
     <View style={{flex:6}}>
+      <Text style={{marginLeft:5,display:(section==undefined || trackScreen==true)?"none":"flex",color:colors.primary.defaultdark, fontWeight:'bold'}}>
+        {section} >
+      </Text>        
       <Text style={container.tasktext}>
         {task}
       </Text>
     </View>
-    <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
-        <Text style={{fontSize:10}}>{time=="Invalid date"?undefined: time==undefined? undefined:taskTime}</Text>
+    <View style={{display:time==undefined?"none":"flex",width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
+        <Text style={{fontSize:10, right:10}}>{time=="Invalid date"?undefined: time==undefined? undefined:taskTime}</Text>
+    </View>
+    <View style={{display: track==undefined? "none":"flex",width:45,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
+          <Color color={tracks.filter(c=>c.track==track).map(c=>c.color)[0]}/>
     </View>
   </View>
   );

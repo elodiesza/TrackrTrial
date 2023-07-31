@@ -14,7 +14,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
   const today = new Date();
   const thisYear = today.getFullYear();
   const thisMonth = today.getMonth();
-  const day = today.getDate();
+  const thisDay = today.getDate();
   const [isLoading, setIsLoading] = useState(true);
   const [mlogs, setMLogs] = useState([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -79,11 +79,11 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
       }
       else {
         let existingLogs = [...mlogs];  
-        if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
+        if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==thisDay))[0]==undefined && isLoading==false){
           db.transaction(tx => {
-            tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,day],
+            tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,thisDay],
               (txtObj,resultSet)=> {    
-                existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+                existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:thisDay});
                 setMLogs(existingLogs);
               },
             );
@@ -94,12 +94,12 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
   },[isLoading, mlogs]);
 
   const TransferDaily = (id) => {
-    let existingTasks = [...tasks.filter(c=>c.monthly==true)];
-    let toTransfer = tasks.filter(c=>c.monthly==true).filter(c=>(c.id==id))[0];
+    let existingTasks = [...tasks];
+    let toTransfer = tasks.filter(c=>(c.id==id))[0];
     db.transaction((tx) => {
-      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time) values (?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,false,toTransfer.track,null],
+      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,thisDay,toTransfer.taskState,0,false,toTransfer.track,undefined, undefined],
       (txtObj,resultSet)=> {    
-        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth, day:day, taskState:toTransfer.taskState, recurring:0, monthly: false, track:toTransfer.track, time:null});
+        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth, day:thisDay, taskState:toTransfer.taskState, recurring:0, monthly: false, track:toTransfer.track, time:undefined, section:undefined});
         setTasks(existingTasks);
       },
       (txtObj, error) => console.warn('Error inserting data:', error)
@@ -107,8 +107,8 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
     })
     db.transaction(tx => {
       tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
-        (txObj, resultSet) => {
-          if (resultSet.rowsAffected > 0) {
+        (txObj, resultSet2) => {
+          if (resultSet2.rowsAffected > 0) {
             let existingTasks = [...tasks].filter(task => task.id !== id);
             setTasks(existingTasks);
           }
