@@ -1,9 +1,6 @@
 import { StyleSheet, Button, TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
-import NewTask from '../modal/NewTask';
-import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { SwipeListView } from 'react-native-swipe-list-view';
 import moment from 'moment';
 import Color from './Color';
 import { container} from '../styles';
@@ -114,26 +111,6 @@ function Task({db, tasks, setTasks, tags, setTags, sections, date,task, taskStat
   };
   const taskTime= time=="null"? "":moment(time).format('HH:mm');
 
-  const DeleteItem = ({ id }) => (
-    <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
-      <Pressable onPress={ () =>
-        db.transaction(tx=> {
-          tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
-            (txObj, resultSet) => {
-              if (resultSet.rowsAffected > 0) {
-                let existingTasks = [...tasks].filter(task => task.id !==id);
-                setTasks(existingTasks);
-              }
-            },
-            (txObj, error) => console.log(error)
-          );       
-        })  
-      }>
-          <Feather name="trash-2" size={25} color={'white'}/>
-      </Pressable> 
-    </View>
-  );
-
 
   return (
     <View style={container.taskcontainer}>
@@ -151,9 +128,6 @@ function Task({db, tasks, setTasks, tags, setTags, sections, date,task, taskStat
     </View>
     <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
         <Text style={{fontSize:10}}>{time=="Invalid date"?undefined: time==undefined? undefined:taskTime}</Text>
-    </View>
-    <View style={{display: section==undefined?"none":trackScreen?"none":"flex",flex:1}}>
-      <Color color={tags.filter(c=>c.id==tag).map(c=>c.color)[0]} />
     </View>
   </View>
   );

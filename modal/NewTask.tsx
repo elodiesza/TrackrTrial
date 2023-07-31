@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller, set } from 'react-hook-form';
-import ColorPicker from '../components/ColorPicker';
-import TagPicker from '../components/TagPicker';
-import Color from '../components/Color';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 
 function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags, track, section, pageDate, tracksScreen}) {
 
   const {control, handleSubmit, reset} = useForm();
-  const [tagDisplay, setTagDisplay] = useState<"none" | "flex" | undefined>('none');
-  const [addTag, setAddTag] = useState('Add Tag');
-  const [selectedTag, setSelectedTag] = useState(null);
-  const [colorPickerVisible, setColorPickerVisible] = useState(false);
-  const [picked, setPicked] = useState<string>('white');
   const [date, setDate] = useState(pageDate)
   const [showDatePicker, setShowDatePicker] = useState(true);
   const [time, setTime] = useState(new Date())
@@ -25,19 +17,8 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
   const [addTime, setAddTime] = useState('Add Time');
   const [load, loadx] = useState(false);
 
-
   const [recurring, setRecurring] = useState(false);
   const toggleSwitch = () => setRecurring(previousState => !previousState);
-
-
-  const TagColor = ({item}) => (
-    <TouchableOpacity onPress={() => (setPicked(item),setColorPickerVisible(!colorPickerVisible))}>
-      <Color color={item}/>
-    </TouchableOpacity>
-  );
-
-  const existingtag = (tag: string) => selectedTag=== ('Add a new Tag') ? tags.map(c=>c.tag).includes(tag) === false : true || 'this Tag already exists';
-
 
   useEffect(() => {
     if (!addModalVisible) {
@@ -59,30 +40,24 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
     };
 
   const addTask = async (data) => {
-    let existingTags = [...tags];
     let existingTasks = [...tasks]; 
- 
-        db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, tag, time, section) values (?,?,?,?,?,?,?,?,?)',[data.task,tracksScreen?undefined:addDeadline=='Add deadline'?currentDate.getFullYear():moment(date).format('YYYY'),tracksScreen?undefined:addDeadline=='Add deadline'?currentDate.getMonth():moment(date).format('MM')-1,tracksScreen?undefined:addDeadline=='Add deadline'?currentDate.getDate():moment(date).format('DD'),0,recurring?1:0,track,addTime=='Add Time'?null:time.toString(),section==undefined?undefined:section],
-          (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:tracksScreen?undefined:addDeadline=='Add deadline'?currentDate.getFullYear():moment(date).format('YYYY'), month:tracksScreen?undefined:addDeadline=='Add deadline'?currentDate.getMonth():moment(date).format('MM')-1, day:tracksScreen?undefined:addDeadline=='Add deadline'?currentDate.getDate():moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:track, time:addTime=='Add Time'?null:time.toString(), section});
-            setTasks(existingTasks);
-          },
-          (txtObj, error) => console.warn('Error inserting data:', error)
-          );
-        });
-
+    console.warn(data);
+    db.transaction((tx) => {
+      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly, tag, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'),tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'),0,recurring?1:0,false,track,addTime=='Add Time'?null:time.toString(),section==undefined?undefined:section],
+      (txtObj,resultSet)=> {    
+        existingTasks.push({ id: resultSet.insertId, task: data.task, year:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'), month:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1, day:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'), taskState:0, recurring:recurring?1:0, monthly:false, tag:track, time:addTime=='Add Time'?null:time.toString(), section});
+        setTasks(existingTasks);
+      },
+      (txtObj, error) => console.warn('Error inserting data:', error)
+      );
+    });
     setRecurring(false);
     setTime(new Date());
     setAddTime('Add Time');
     setAddDeadline('Add deadline');
-    setDate(new Date());  
-    setAddTag('Add Tag');
-    setTagDisplay('none');
+    setDate(pageDate);  
     setDateDisplay('none');
     setTimeDisplay('none');
-    setSelectedTag(null);
-    setPicked('white');
     setAddModalVisible(false);
     loadx(!load);
   };
@@ -99,12 +74,9 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
         setTime(new Date());
         setAddTime('Add Time');
         setAddDeadline('Add deadline');
-        setDate(new Date());  
-        setAddTag('Add Tag');
-        setTagDisplay('none');
+        setDate(pageDate);  
         setDateDisplay('none');
         setTimeDisplay('none');
-        setSelectedTag(null);
       }}
     > 
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {
@@ -113,12 +85,9 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags
         setTime(new Date());
         setAddTime('Add Time');
         setAddDeadline('Add deadline');
-        setDate(new Date());  
-        setAddTag('Add Tag');
-        setTagDisplay('none');
+        setDate(pageDate);  
         setDateDisplay('none');
         setTimeDisplay('none');
-        setSelectedTag(null);
         }} 
         activeOpacity={1}>
         <TouchableWithoutFeedback>

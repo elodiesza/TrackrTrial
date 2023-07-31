@@ -1,12 +1,12 @@
 import { FlatList, TouchableOpacity, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useState,useEffect } from 'react';
-import moment from 'moment';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Color from './Color';
 import NewMTask from '../modal/NewMTask';
 import { container } from '../styles';
+import Task from './Task';
 
 
 const width = Dimensions.get('window').width;
@@ -18,22 +18,10 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
   const thisMonth = today.getMonth();
   const day = today.getDate();
   const [isLoading, setIsLoading] = useState(true);
-  const [mtasks, setMTasks] = useState([]);
   const [mlogs, setMLogs] = useState([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [date, setDate] = useState(today);
   
   useEffect(() => {
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS mtasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, tag INTEGER, time TEXT, UNIQUE(task,year,month,day))')
-    });
-
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM mtasks', null,
-      (txObj, resultSet) => setMTasks(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting states')
-      );
-    });
     db.transaction(tx => {
       tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
     });
@@ -41,29 +29,15 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM mlogs', null,
       (txObj, resultSet) => setMLogs(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting states')
+      (txObj, error) => console.log('error selecting mlogs')
       );
     });
     setIsLoading(false);
   },[load]);
 
-  useEffect(() => {
-  
-    db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
-    });
-
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM mlogs', null,
-      (txObj, resultSet) => setMLogs(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting states')
-      );
-    });
-    setIsLoading(false);
-  },[load]);
   
   useEffect(() => {
-    if (!isLoading && mtasks.length > 0 && mlogs.filter(c=>(c.year==year && c.month==month))[0]==undefined) {
+    if (!isLoading && tasks.filter(c=>c.monthly==true).length > 0 && mlogs.filter(c=>(c.year==year && c.month==month))[0]==undefined) {
       if(mlogs.length > 0){
       let existingLogs = [...mlogs];  
       if(existingLogs.filter(c=>(c.year==year && c.month==month))[0]==undefined && isLoading==false){
@@ -77,7 +51,7 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
         });
         let lastLogIndex = mlogs.length-1;
         let lastLog = mlogs[lastLogIndex];
-        let existingTasks=[...mtasks];
+        let existingTasks=[...tasks.filter(c=>c.monthly==true)];
 
         let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month));
         existingLogs=[];
@@ -92,16 +66,16 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
               let copyTag=existingRecurringTasks[i].tag;
               let copyTime=existingRecurringTasks[i].time;
               db.transaction(tx => {
-                tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,copyTag,copyTime],
+                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,tag,time) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copyTag,copyTime],
                   (txtObj,resultSet)=> {   
-                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, tag:copyTag, time:copyTime});
-                    setMTasks(existingTasks);
+                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, tag:copyTag, time:copyTime});
+                    setTasks(existingTasks);
                   },
                 );
               });
             }
           }
-          setMTasks(existingTasks);
+          setTasks(existingTasks);
         }
       }
       }
@@ -122,23 +96,23 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
   },[isLoading, mlogs]);
 
   const TransferDaily = (id) => {
-    let existingTasks = [...tasks];
-    let toTransfer = mtasks.filter(c=>(c.id==id))[0];
+    let existingTasks = [...tasks.filter(c=>c.monthly==true)];
+    let toTransfer = tasks.filter(c=>c.monthly==true).filter(c=>(c.id==id))[0];
     db.transaction((tx) => {
-      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,toTransfer.tag,null],
+      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,tag,time) values (?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,false,toTransfer.tag,null],
       (txtObj,resultSet)=> {    
-        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, tag:toTransfer.tag, time:null});
+        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth, day:day, taskState:toTransfer.taskState, recurring:0, monthly: false, tag:toTransfer.tag, time:null});
         setTasks(existingTasks);
       },
       (txtObj, error) => console.warn('Error inserting data:', error)
       );
     })
     db.transaction(tx => {
-      tx.executeSql('DELETE FROM mtasks WHERE id = ?', [id],
+      tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
         (txObj, resultSet) => {
           if (resultSet.rowsAffected > 0) {
-            let existingTasks = [...mtasks].filter(task => task.id !== id);
-            setMTasks(existingTasks);
+            let existingTasks = [...tasks].filter(task => task.id !== id);
+            setTasks(existingTasks);
           }
         },
         (txObj, error) => console.log(error)
@@ -156,11 +130,11 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
       <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: 'darkred' }}>
         <Pressable onPress={() => 
         db.transaction(tx => {
-          tx.executeSql('DELETE FROM mtasks WHERE id = ?', [id],
+          tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
-                let existingTasks = [...mtasks].filter(task => task.id !== id);
-                setMTasks(existingTasks);
+                let existingTasks = [...tasks].filter(task => task.id !== id);
+                setTasks(existingTasks);
               }
             },
             (txObj, error) => console.log(error)
@@ -172,15 +146,7 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     </View>
   );
 
-  const removeDb = () => {
-    db.transaction(tx => {
-      tx.executeSql('DROP TABLE IF EXISTS mtasks', null,
-        (txObj, resultSet) => setMTasks([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    });
-    loadx(!load);
-  }
+
   const removelogDb = () => {
     db.transaction(tx => {
       tx.executeSql('DROP TABLE IF EXISTS mlogs', null,
@@ -192,7 +158,7 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
   }
 
   const updateTaskState = (id) => {
-    let existingTasks=[...mtasks];
+    let existingTasks=[...tasks.filter(c=>c.monthly==true)];
     const indexToUpdate = existingTasks.findIndex(task => task.id === id);
     let postponedTask = existingTasks[indexToUpdate].task;
     let nextDay= new Date(Math.floor(today.getTime()+(1000*60*60*24)));
@@ -203,11 +169,11 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     let copyTime=existingTasks[indexToUpdate].time;
     if (existingTasks[indexToUpdate].taskState==0){
       db.transaction(tx=> {
-        tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [1, id],
+        tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [1, id],
           (txObj, resultSet) => {
             if (resultSet.rowsAffected > 0) {
               existingTasks[indexToUpdate].taskState = 1;
-              setMTasks(existingTasks);
+              setTasks(existingTasks);
             }
           },
           (txObj, error) => console.log('Error updating data', error)
@@ -216,11 +182,11 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     }
     else if(existingTasks[indexToUpdate].taskState==1){
       db.transaction(tx=> {
-        tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [2, id],
+        tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [2, id],
           (txObj, resultSet) => {
             if (resultSet.rowsAffected > 0) {
               existingTasks[indexToUpdate].taskState = 2;
-              setMTasks(existingTasks);
+              setTasks(existingTasks);
             }
           },
           (txObj, error) => console.log('Error updating data', error)
@@ -230,18 +196,18 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     else if(existingTasks[indexToUpdate].taskState==2){
       if (existingTasks[indexToUpdate].recurring==0){
         db.transaction(tx=> {
-          tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [3, id],
+          tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [3, id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
                 existingTasks[indexToUpdate].taskState = 3;
-                setMTasks(existingTasks);
+                setTasks(existingTasks);
               }
             },
             (txObj, error) => console.log('Error updating data', error)
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copyTag,copyTime],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly,tag,time) values (?,?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,true,copyTag,copyTime],
             (txtObj,resultSet)=> {   
               existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, tag:copyTag, time:copyTime});
             },
@@ -250,11 +216,11 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
       }
       else {
         db.transaction(tx=> {
-          tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [0, id],
+          tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [0, id],
             (txObj, resultSet) => {
               if (resultSet.rowsAffected > 0) {
                 existingTasks[indexToUpdate].taskState = 0;
-                setMTasks(existingTasks);
+                setTasks(existingTasks);
               }
             },
             (txObj, error) => console.log('Error updating data', error)
@@ -264,11 +230,11 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     }
     else {
       db.transaction(tx=> {
-        tx.executeSql('UPDATE mtasks SET taskState = ? WHERE id = ?', [0, id],
+        tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [0, id],
           (txObj, resultSet) => {
             if (resultSet.rowsAffected > 0) {
               existingTasks[indexToUpdate].taskState = 0;
-              setMTasks(existingTasks);
+              setTasks(existingTasks);
             }
           },
           (txObj, error) => console.log('Error updating data', error)
@@ -276,11 +242,11 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
       });
       let postponedTaskId = existingTasks.filter(c=>(c.year==nextDayYear && c.month==nextDayMonth && c.day==nextDayDay && c.task==postponedTask)).map(c=>c.id)[0];
       db.transaction(tx=> {
-        tx.executeSql('DELETE FROM mtasks WHERE id = ?', [postponedTaskId],
+        tx.executeSql('DELETE FROM tasks WHERE id = ?', [postponedTaskId],
           (txObj, resultSet) => {
             if (resultSet.rowsAffected > 0) {
-              let existingTasks = [...mtasks].filter(task => task.id !==postponedTaskId);
-              setMTasks(existingTasks);
+              let existingTasks = [...tasks].filter(task => task.id !==postponedTaskId);
+              setTasks(existingTasks);
             }
           },
           (txObj, error) => console.log(error)
@@ -289,32 +255,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     }
   };
 
-  const Task = ({item}) => {
-    return(
-        <View style={styles.taskcontainer}>
-          <Pressable onPress={()=> updateTaskState(item.id)}>
-            <MaterialCommunityIcons name={item.taskState===0 ? 'checkbox-blank-outline' : (
-              item.taskState===1 ? 'checkbox-intermediate' : (
-              item.taskState===2 ? 'checkbox-blank' :
-              'arrow-right-bold-box-outline')
-            )} size={35} />
-          </Pressable>
-          <View style={{flex:6}}>
-            <Text style={styles.tasktext}>
-              {item.task}
-            </Text>
-          </View>
-          <View style={{width:60,height:45,justifyContent:'center', alignContent:'center', alignItems:'flex-end'}}>
-          </View>
-          <View style={{flex:1}}>
-            <Color color={tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]} />
-          </View>
-        </View>
-    )
-  };
-
-  const dailyData = mtasks.filter(c=>(c.year==year && c.month==month && c.recurring==0));
-  const recurringData = mtasks.filter(c=>(c.year==year && c.month==month && c.recurring==1));
+  const dailyData = tasks.filter(c=>(c.year==year && c.month==month && c.recurring==0 && c.monthly==true));
+  const recurringData = tasks.filter(c=>(c.year==year && c.month==month && c.recurring==1 && c.monthly==true));
 
   return (
     <>
@@ -324,7 +266,13 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
             MONTHLY TASKS
           </Text>
         </View>
-        <SwipeListView style={styles.dailyTasks} data={dailyData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
+        <SwipeListView 
+          style={styles.dailyTasks} 
+          data={dailyData} 
+          scrollEnabled={true} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
+          sections={undefined} date={new Date(year,month,1)} task={item.task} taskState={item.taskState} id={item.id} tag={undefined} 
+          time={undefined} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-100}
           disableRightSwipe={true}
@@ -335,7 +283,13 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
             MONTHLY RECURRING TASKS
           </Text>
         </View>
-        <SwipeListView style={styles.recurringTasks} data={recurringData} scrollEnabled={true} renderItem={({ item }) => <Task item={item} />} 
+        <SwipeListView 
+          style={styles.recurringTasks} 
+          data={recurringData} 
+          scrollEnabled={true} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
+          sections={undefined} date={new Date(year,month,1)} task={item.task} taskState={item.taskState} id={item.id} tag={undefined} 
+          time={undefined} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-100}
           disableRightSwipe={true}
@@ -349,8 +303,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
         addModalVisible={addModalVisible===true}
         setAddModalVisible={setAddModalVisible}
         db={db}
-        mtasks={mtasks}
-        setMTasks={setMTasks}
+        tasks={tasks}
+        setTasks={setTasks}
         tags={tags}
         setTags={setTags}
         year={year}

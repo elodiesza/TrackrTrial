@@ -1,47 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller, set } from 'react-hook-form';
-import ColorPicker from '../components/ColorPicker';
-import TagPicker from '../components/TagPicker';
-import Color from '../components/Color';
-import moment from 'moment';
 
-function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, tags, setTags, year, month}) {
+function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags, setTags, year, month}) {
 
   const {control, handleSubmit, reset} = useForm();
-  const [tagDisplay, setTagDisplay] = useState<"none" | "flex" | undefined>('none');
-  const [addTag, setAddTag] = useState('Add Tag');
-  const [selectedTag, setSelectedTag] = useState(null);
-  const [colorPickerVisible, setColorPickerVisible] = useState(false);
-  const [picked, setPicked] = useState<string>('white');
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(true);
-  const [time, setTime] = useState(new Date());
-  const [showTimePicker, setShowTimePicker] = useState(true);
-  const [dateDisplay, setDateDisplay] = useState<"none" | "flex" | undefined>('none');
-  const [addDeadline, setAddDeadline] = useState('Add Deadline');
-  const [timeDisplay, setTimeDisplay] = useState<"none" | "flex" | undefined>('none');
-  const [addTime, setAddTime] = useState('Add Time');
   const [load, loadx] = useState(false);
-
-  var today = new Date();
-  var day = today.getDate();
-
   const [recurring, setRecurring] = useState(false);
   const toggleSwitch = () => setRecurring(previousState => !previousState);
 
-  const colorChoice =  ['#dc143c','#ffa500','#ffff00','#9acd32','#2e8b57',
-  '#afeeee', '#4169e1', '#ba55d3', '#c71585', '#ffc0cb',
-  '#ffffff', '#f5f5f5','#e6e6fa','#a0522d','#ffebcd'];
-
-  const TagColor = ({item}) => (
-    <TouchableOpacity onPress={() => (setPicked(item),setColorPickerVisible(!colorPickerVisible))}>
-      <Color color={item}/>
-    </TouchableOpacity>
-  );
-
-  const existingtag = (tag: string) => selectedTag=== ('Add a new Tag') ? tags.map(c=>c.tag).includes(tag) === false : true || 'this Tag already exists';
-
+console.warn(tasks);
 
   useEffect(() => {
     if (!addModalVisible) {
@@ -50,84 +18,19 @@ function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, ta
   }, [addModalVisible, reset]);
 
 
-
-  
-    const onChange = (event, selectedDate) => {
-      const currentDate = selectedDate || date;
-      setShowDatePicker(Platform.OS === 'ios');
-      setDate(currentDate);
-    };
-
-    const onChange2 = (event, selectedTime) => {
-      const currentTime = selectedTime || time;
-      setShowTimePicker(Platform.OS === 'ios');
-      setTime(currentTime);
-    };
-
   const addTask = async (data) => {
-    let existingTags = [...tags];
-    let existingTasks = [...mtasks]; 
-    if(addTag=='Add Tag' || (selectedTag==null && selectedTag!=='Add a new Tag')){
+    console.warn(data);
+    let existingTasks = [...tasks]; 
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM')-1,addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,0,addTime=='Add Time'?null:time.toString()],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly, tag, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,year,month,undefined,0,recurring?1:0,true,undefined,undefined, undefined],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM')-1, day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:0, time:addTime=='Add Time'?null:time.toString()});
-            setMTasks(existingTasks);
+            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:undefined, taskState:0, recurring:recurring?1:0, monthly:true, tag:undefined, time:undefined, section:undefined});
+            setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
           );
         });
-    }
-    else if (addTag=='Delete Tag' && selectedTag!=='Add a new Tag'){
-      const tempTag = existingTags.filter(c=>c.tag==selectedTag).map(c=>c.id)[0];
-        db.transaction((tx) => {
-          tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM')-1,addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tempTag,addTime=='Add Time'?null:time.toString()],
-          (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM')-1, day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tempTag, time:addTime=='Add Time'?null:time.toString()});
-            setMTasks(existingTasks);
-          },
-          (txtObj, error) => console.warn('Error inserting data:', error)
-        );
-        });
-    }
-    else {
-      try {
-        // Update the tags table
-        await db.transaction(async (tx) => {
-          tx.executeSql(
-            'INSERT INTO tags (tag, color) VALUES (?, ?)',
-            [data.tag, picked],
-            (txtObj, tagResultSet) => {
-              const tagId = tagResultSet.insertId;
-              existingTags.push({ id: tagId, tag: data.tag, color: picked });
-              setTags(existingTags); // Update the state with the new array of tags
-                db.transaction((tx) => {
-                  tx.executeSql('INSERT INTO mtasks (task,year,month,day,taskState,recurring, tag, time) values (?,?,?,?,?,?,?,?)',[data.task,addDeadline=='Add deadline'?year:moment(date).format('YYYY'),addDeadline=='Add deadline'?month:moment(date).format('MM')-1,addDeadline=='Add deadline'?day:moment(date).format('DD'),0,recurring?1:0,tagId,addTime=='Add Time'?null:time.toString()],
-                    (txtObj,resultSet)=> {    
-                      existingTasks.push({ id: resultSet.insertId, task: data.task, year:addDeadline=='Add deadline'?year:moment(date).format('YYYY'), month:addDeadline=='Add deadline'?month:moment(date).format('MM')-1, day:addDeadline=='Add deadline'?day:moment(date).format('DD'), taskState:0, recurring:recurring?1:0, tag:tagId, time:addTime=='Add Time'?null:time.toString()});
-                      setMTasks(existingTasks);
-                    },
-                    (txtObj, error) => console.warn('Error inserting data:', error)
-                  );
-                });
-            }
-          );
-        });
-      } catch (error) {
-        console.warn('Error inserting data:', error);
-      }
-    }
     setRecurring(false);
-    setTime(new Date());
-    setAddTime('Add Time');
-    setAddDeadline('Add deadline');
-    setDate(new Date());  
-    setAddTag('Add Tag');
-    setTagDisplay('none');
-    setDateDisplay('none');
-    setTimeDisplay('none');
-    setSelectedTag(null);
-    setPicked('white');
     setAddModalVisible(false);
     loadx(!load);
   };
@@ -141,29 +44,11 @@ function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, ta
       onRequestClose={() => {
         setAddModalVisible(!addModalVisible);
         setRecurring(false);
-        setTime(new Date());
-        setAddTime('Add Time');
-        setAddDeadline('Add deadline');
-        setDate(new Date());  
-        setAddTag('Add Tag');
-        setTagDisplay('none');
-        setDateDisplay('none');
-        setTimeDisplay('none');
-        setSelectedTag(null);
       }}
     > 
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {
         setAddModalVisible(!addModalVisible);
         setRecurring(false);
-        setTime(new Date());
-        setAddTime('Add Time');
-        setAddDeadline('Add deadline');
-        setDate(new Date());  
-        setAddTag('Add Tag');
-        setTagDisplay('none');
-        setDateDisplay('none');
-        setTimeDisplay('none');
-        setSelectedTag(null);
         }} 
         activeOpacity={1}>
         <TouchableWithoutFeedback>
@@ -187,7 +72,7 @@ function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, ta
                 </>
               )}
               rules={{
-                required: 'Input a Habit',
+                required: 'Input a task',
                 minLength: {
                   value: 3,
                   message: 'Task should be at least 3 characters long',
@@ -199,52 +84,6 @@ function NewTask({addModalVisible, setAddModalVisible, db, mtasks, setMTasks, ta
               }}
               />
               <Switch onValueChange={toggleSwitch} value={recurring}/>
-              <Button title={addTag} onPress={() => (setTagDisplay(tagDisplay==='none'? 'flex' : 'none'), setAddTag(addTag==='Add Tag'? 'Delete Tag' : 'Add Tag'))}/>
-              <View style={{display: tagDisplay, width:'70%', justifyContent: 'center'}}>
-                <View style={{width:'100%', flexDirection: 'row'}}>
-                  <View style={{width: '80%'}}>
-                    <TagPicker load={load} loadx={loadx} tags={tags} selectedTag={selectedTag} setSelectedTag={setSelectedTag}/>
-                  </View>
-                  <View style={{flex:1, alignItems: 'flex-end', justifyContent: 'center'}}>
-                    <Pressable onPress={selectedTag === 'Add a new Tag' ? colorPickerVisible => setColorPickerVisible(true): null} style={[styles.color, {backgroundColor: selectedTag!==null ? (selectedTag=='Add a new Tag' ? picked : tags.filter(c=>c.tag==selectedTag).map(c=>c.color)[0]):'white'}]}/>
-                  </View>
-                  <ColorPicker TagColor={TagColor} colorChoice={colorChoice} colorPickerVisible={colorPickerVisible} setColorPickerVisible={setColorPickerVisible}/>
-                </View>
-                <View style={{width: '100%', alignItems: 'center', justifyContent: 'center', display: (selectedTag==='Add a new Tag' ? 'flex' : 'none')}}>
-                  <Controller
-                  control= {control}
-                  name="tag"
-                  render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-                      <>
-                      <View style={[styles.input,{width:'100%'}]}>
-                          <TextInput
-                              value={selectedTag !== (null||'Add a new Tag') ? selectedTag : value}
-                              onChangeText={onChange}
-                              autoCapitalize = {"characters"}
-                              onBlur={onBlur}
-                              style={[{height:40},{borderColor: error ? 'red' : '#e8e8e8'}]}
-                          />
-                      </View>
-                      {error && (
-                      <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
-                      )}
-                      </>
-                    )}
-                  rules={{
-                      required: selectedTag==='Add a new Tag' ? 'Input a Tag' : false,
-                      minLength: {
-                          value: 3,
-                          message: 'Task should be at least 3 characters long',
-                      },
-                      maxLength: {
-                          value: 18,
-                          message: 'Task should be max 18 characters long',
-                      },
-                      validate: existingtag || 'This tag already exists'
-                  }}
-                  />
-                </View>
-              </View>
               <Pressable onPress={handleSubmit(addTask)} style={styles.submit}><Text>CREATE</Text></Pressable> 
             <Text style={{color: 'lightgray', fontSize: 12, marginBottom:10}}>Must be up to 32 characters</Text>
           </View> 

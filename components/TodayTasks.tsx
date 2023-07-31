@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text, View, Dimensions, Pressable } from 'react-native';
+import { TouchableOpacity, Button, Text, View, Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import NewTask from '../modal/NewTask';
 import { Feather } from '@expo/vector-icons';
@@ -254,8 +254,8 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
     }
   };
 
-  const dailyData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==0));
-  const recurringData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==1));
+  const dailyData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==0 && c.monthly==false));
+  const recurringData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==1 && c.monthly==false));
 
   const DeleteItem = ({ id }) => (
     <View style={{flex: 1,justifyContent: 'center', alignItems: 'flex-end', paddingRight: 25, backgroundColor:'darkred'}}>
@@ -290,7 +290,8 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
           data={dailyData} 
           scrollEnabled={true} 
           renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
-          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} tag={item.tag} time={item.time} section={undefined} />} 
+          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} tag={item.tag} 
+          time={item.time} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} 
           bounces={false} 
           rightOpenValue={-80}
@@ -305,16 +306,18 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
         <SwipeListView 
           data={recurringData} 
           scrollEnabled={true} 
-          renderItem={({ item }) => <Task item={item} />} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
+          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} tag={item.tag} 
+          time={item.time} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-80}
           disableRightSwipe={true}
           closeOnRowBeginSwipe={true}
         />
-        {/*<Button title='Add yesterdayLog' onPress={addLog} />
+       {/* <Button title='Add yesterdayLog' onPress={addLog} />
         <Button title='remove Todays log' onPress={removeTodayLog} />
         <Button title='remove Tasks' onPress={removeDb} />
-  <Button title='remove Logs' onPress={removelogDb} />*/}
+        <Button title='remove Logs' onPress={removelogDb} /> */}
       </View>
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
@@ -328,7 +331,7 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
         tags={tags}
         track={undefined}
         section={undefined}
-        selectedDate={date}
+        pageDate={date}
         tracksScreen={false}
       />
     </>

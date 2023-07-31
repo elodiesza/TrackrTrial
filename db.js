@@ -43,7 +43,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, tag INTEGER, time TEXT, section TEXT, UNIQUE(task,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, monthly BOOLEAN, tag INTEGER, time TEXT, section TEXT, UNIQUE(task,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tasks', null,
