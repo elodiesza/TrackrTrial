@@ -9,7 +9,7 @@ import Mood from './Mood';
 
 const width = Dimensions.get('window').width;
 
-const StatsHome = ({ habits, month, year, tags, moods, daysInMonth }) => {
+const StatsHome = ({ habits, month, year, tracks, moods, daysInMonth }) => {
 
 
 

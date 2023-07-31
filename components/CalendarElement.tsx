@@ -8,7 +8,7 @@ import { container } from '../styles';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tags, setTags, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) {
+export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -120,23 +120,23 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
     )
   }
 
-  const CalendarTaskItem = ({task, tag}) => (
+  const CalendarTaskItem = ({task, track}) => (
     <>
-      <TouchableOpacity style={[styles.task,{backgroundColor: tags.filter(c=>c.id==tag).map(c=>c.color)[0]}]}>
+      <TouchableOpacity style={[styles.task,{backgroundColor: tracks.filter(c=>c.id==track).map(c=>c.color)[0]}]}>
         <Text style={{fontSize:10}}>{task}</Text>
       </TouchableOpacity>
     </>
   );
   const RenderTaskItem = ({item}) => (
-    <CalendarTaskItem task={item.task} tag={item.tag} />
+    <CalendarTaskItem task={item.task} track={item.track} />
   );
 
   return (
     <View style={container.body}>
         <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
-          <Statistics year={year} month={month} habits={habits} tags={tags} setHabits={setHabits} setTags={setTags} sleep={sleep} load={load} loadx={loadx} moods={moods}/>
+          <Statistics year={year} month={month} habits={habits} tracks={tracks} setHabits={setHabits} setTracks={setTracks} sleep={sleep} load={load} loadx={loadx} moods={moods}/>
           <TrackersElement db={db} load={load} loadx={loadx} 
-          tags={tags} setTags={setTags} 
+          tracks={tracks} setTracks={setTracks} 
           year={year} month={month} 
           habits={habits} setHabits={setHabits} 
           moods={moods} setMoods={setMoods} 
@@ -153,7 +153,7 @@ export default function CalendarElement({year, month, day, tasks, tags, setTags,
             keyExtractor={item => item.id}
           />
           </View>
-          <MonthlyTasks db={db} load={load} loadx={loadx} tags={tags} setTags={setTags} year={year} month={month} tasks={tasks} setTasks={setTasks}/>
+          <MonthlyTasks db={db} load={load} loadx={loadx} tracks={tracks} setTracks={setTracks} year={year} month={month} tasks={tasks} setTasks={setTasks}/>
         </Swiper>
     </View>
   );

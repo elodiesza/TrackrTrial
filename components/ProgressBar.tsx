@@ -1,10 +1,5 @@
 import { StyleSheet, Button, TouchableOpacity, Text, View, Dimensions, Pressable, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
-import NewTask from '../modal/NewTask';
-import { Feather } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import moment from 'moment';
-import Color from './Color';
 import { container, colors} from '../styles';
 import Slider from '@react-native-community/slider';
 

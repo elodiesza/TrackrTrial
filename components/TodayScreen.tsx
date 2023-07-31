@@ -11,7 +11,7 @@ import UpdateState from '../modal/UpdateState';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, setStates}) => {
+const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, setStates}) => {
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +63,7 @@ const TodayScreen = ({ db, tasks, setTasks, tags, setTags, habits, setHabits, mo
       return (
         <View>
           <Pressable onPress={()=>updateState(habits.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0])} style={{ height: 75, width:25*1.25, transform: [{ skewX: '-45deg' },{scale: 1.25}], left: 60 }}>
-            <IndicatorTableTitleToday name={ind.item} state={habits.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.state)[0]} tags={tags} habits={habits} year={year} month={month}/>
+            <IndicatorTableTitleToday name={ind.item} state={habits.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.state)[0]} tracks={tracks} habits={habits} year={year} month={month}/>
           </Pressable>
         </View>
       );

@@ -2,13 +2,12 @@ import { StyleSheet, Button, TouchableOpacity, Text, View, Dimensions, Pressable
 import { useState, useEffect } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
-import Color from './Color';
 import { container} from '../styles';
 
 
 const width = Dimensions.get('window').width;
 
-function Task({db, tasks, setTasks, tags, setTags, sections, date,task, taskState, id ,tag, time, section, trackScreen}) {
+function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, taskState, id ,track, time, section, trackScreen}) {
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +19,7 @@ function Task({db, tasks, setTasks, tags, setTags, sections, date,task, taskStat
     let nextDayYear = nextDay.getFullYear();
     let nextDayMonth = nextDay.getMonth();
     let nextDayDay = nextDay.getDate();
-    let copyTag=existingTasks[indexToUpdate].tag;
+    let copytrack=existingTasks[indexToUpdate].track;
     let copyTime=existingTasks[indexToUpdate].time;
     if (existingTasks[indexToUpdate].taskState==0){
       db.transaction(tx=> {
@@ -62,9 +61,9 @@ function Task({db, tasks, setTasks, tags, setTags, sections, date,task, taskStat
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copyTag,copyTime],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime],
             (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, tag:copyTag, time:copyTime});
+              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime});
             },
           );
         });

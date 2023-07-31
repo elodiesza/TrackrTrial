@@ -8,7 +8,7 @@ const ColorPicker = ( {colorPickerVisible, setColorPickerVisible, picked, setPic
   const colorChoice=[colors.primary.red,colors.primary.orange,colors.primary.yellow,colors.primary.yellowgreen,colors.primary.green,
     colors.primary.blue,colors.primary.turquoise,colors.primary.purple,colors.primary.magenta,colors.primary.pink,colors.primary.beige,colors.primary.brown,colors.primary.default,colors.primary.gray,colors.primary.black];
 
-  const TagColor = ({ item }) => {
+  const TrackColor = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => (setPicked(item), setColorPickerVisible(!setColorPickerVisible))}>
         <Color color={item} />
@@ -28,9 +28,9 @@ const ColorPicker = ( {colorPickerVisible, setColorPickerVisible, picked, setPic
               <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setColorPickerVisible(!colorPickerVisible)}} activeOpacity={1}>
                 <TouchableWithoutFeedback>
                   <View style={styles.colorPicker}>
-                    <FlatList data={colorChoice.slice(0,5)} renderItem={TagColor} horizontal={true}/>
-                    <FlatList data={colorChoice.slice(5,10)} renderItem={TagColor} horizontal={true}/>
-                    <FlatList data={colorChoice.slice(10,15)} renderItem={TagColor} horizontal={true}/>
+                    <FlatList data={colorChoice.slice(0,5)} renderItem={TrackColor} horizontal={true}/>
+                    <FlatList data={colorChoice.slice(5,10)} renderItem={TrackColor} horizontal={true}/>
+                    <FlatList data={colorChoice.slice(10,15)} renderItem={TrackColor} horizontal={true}/>
                   </View>
                 </TouchableWithoutFeedback>
               </TouchableOpacity>

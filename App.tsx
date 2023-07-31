@@ -20,7 +20,7 @@ export default function App() {
   const {
     isLoading,
     habits,
-    tags,
+    tracks,
     tasks,
     moods,
     sleep,
@@ -34,7 +34,7 @@ export default function App() {
     sections,
     progress,
     loadx,
-    setTags,
+    setTracks,
     setHabits,
     setTasks,
     setMoods,
@@ -62,7 +62,7 @@ export default function App() {
             </View>)}}
         />
         <Tab.Screen name="Tracks" children={()=><Tracks 
-        tags={tags} setTags={setTags} db={db}
+        tracks={tracks} setTracks={setTracks} db={db}
         sections={sections} setSections={setSections}
         tasks={tasks} setTasks={setTasks}
         progress={progress} setProgress={setProgress}/>} 
@@ -74,7 +74,7 @@ export default function App() {
         />
         <Tab.Screen name="Today" children={()=><Today db={db} 
         tasks={tasks} setTasks={setTasks} 
-        tags={tags} setTags={setTags} 
+        tracks={tracks} setTracks={setTracks} 
         habits={habits} setHabits={setHabits} 
         moods={moods} setMoods={setMoods} 
         sleep={sleep} setSleep={setSleep} 
@@ -92,9 +92,9 @@ export default function App() {
              <Feather name="sun" size={28} />  
           </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tags={tags} 
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tracks={tracks} 
         tasks={tasks} setTasks={setTasks} 
-        setHabits={setHabits} setTags={setTags} 
+        setHabits={setHabits} setTracks={setTracks} 
         load={load} loadx={loadx} 
         moods={moods} setMoods={setMoods} 
         sleep={sleep} setSleep={setSleep} 

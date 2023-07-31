@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
+
 import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View, FlatList } from 'react-native';
-import { useForm, Controller, set } from 'react-hook-form';
 import { container,colors } from '../styles';
-import { MaterialIcons, Feather } from '@expo/vector-icons';
 import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
 

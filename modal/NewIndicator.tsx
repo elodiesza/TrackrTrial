@@ -7,7 +7,7 @@ import { container } from '../styles';
 
 
 
-function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tags, setTags, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
+function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tracks, setTracks, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
 
   const [isLoading, setIsLoading] = useState(true);
 

@@ -5,9 +5,8 @@ import CalendarElement from '../components/CalendarElement';
 import { container } from '../styles';
 import { Feather } from '@expo/vector-icons';
 
-const height = Dimensions.get('window').height;
-const Calendar = ({db, habits, tags, setHabits, setTags, tasks, setTasks, load, loadx, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) => {
-  const [addTodoVisible, setAddTodoVisible] = useState(false);
+
+const Calendar = ({db, habits, tracks, setHabits, setTracks, tasks, setTasks, load, loadx, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   var today = new Date();
@@ -89,7 +88,7 @@ const Calendar = ({db, habits, tags, setHabits, setTags, tasks, setTasks, load, 
         </Pressable>
       </View>
       <CalendarElement year={year} month={month} day={day} 
-      tasks={tasks} tags={tags} setTags={setTags} 
+      tasks={tasks} tracks={tracks} setTracks={setTracks} 
       load={load} loadx={loadx} db={db} setTasks={setTasks} 
       habits={habits} setHabits={setHabits} 
       moods={moods} setMoods={setMoods} 

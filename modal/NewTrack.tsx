@@ -7,7 +7,7 @@ import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
 
 
-function NewTrack({newTrackVisible, setNewTrackVisible, db, tags, setTags, setSelectedTab}) {
+function NewTrack({newTrackVisible, setNewTrackVisible, db, tracks, setTracks, setSelectedTab}) {
 
 
   const {control, handleSubmit, reset} = useForm();
@@ -22,20 +22,20 @@ function NewTrack({newTrackVisible, setNewTrackVisible, db, tags, setTags, setSe
 
 
   const addTrack = async (data) => {
-    let existingtags = [...tags]; 
+    let existingtracks = [...tracks]; 
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO tags (tag, color) VALUES (?, ?)',
+              'INSERT INTO tracks (track, color) VALUES (?, ?)',
               [data.name, picked],
-              (txtObj, tagResultSet) => {
-                const newStateId = tagResultSet.insertId;
-                const newTag = {
-                  id: newStateId,
-                  tag: data.name,
+              (txtObj, trackResultSet) => {
+                const newTrackId = trackResultSet.insertId;
+                const newTrack = {
+                  id: newTrackId,
+                  track: data.name,
                   color: picked==undefined? colors.primary.default : picked,
                 };
-                existingtags.push(newTag);
-                setTags(existingtags); 
+                existingtracks.push(newTrack);
+                setTracks(existingtracks); 
               }
             );
         });

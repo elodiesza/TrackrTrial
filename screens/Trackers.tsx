@@ -7,7 +7,7 @@ import { container } from '../styles';
 
 const width = Dimensions.get('window').width;
 
-const Trackers = ({db, habits, tags, setHabits, setTags, load, loadx, moods, setMoods, sleep, setSleep}) => {
+const Trackers = ({db, habits, tracks, setHabits, setTracks, load, loadx, moods, setMoods, sleep, setSleep}) => {
 
   var today = new Date();
   var thisMonth = today.getMonth();

@@ -14,7 +14,7 @@ import NewTrack from '../modal/NewTrack';
 
 const width = Dimensions.get('window').width;
 
-function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, progress, setProgress}) {
+function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, progress, setProgress}) {
 
     const today= new Date();
     const thisYear = today.getFullYear();
@@ -22,10 +22,10 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
     const day = today.getDate();
 
 
-    const tabstitles =[... new Set(tags.map(c => c.tag))];
+    const tabstitles =[... new Set(tracks.map(c => c.track))];
     const tabstitleslength = tabstitles.length;
     const [selectedTab, setSelectedTab] = useState(tabstitles[tabstitleslength-1]);
-    const [selectedTabColor, setSelectedTabColor] = useState(tags.filter(c=>c.tag==selectedTab).map(c=>c.color)[0]);
+    const [selectedTabColor, setSelectedTabColor] = useState(tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
     const [lighterColor, setLighterColor] = useState(paleColor(selectedTabColor));
     const [newSectionVisible, setNewSectionVisible] = useState(false);
     const [newTrackVisible, setNewTrackVisible] = useState(false);
@@ -34,17 +34,17 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
     const [selectedSection, setSelectedSection] = useState('');
 
     useEffect(()=>{
-        setSelectedTabColor(tags.filter(c=>c.tag==selectedTab).map(c=>c.color)[0]);
+        setSelectedTabColor(tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
         setLighterColor(paleColor(selectedTabColor));
-    },[selectedTab, tags])
+    },[selectedTab, tracks])
 
     const TransferDaily = (id) => {
         let existingTasks = [...tasks];
         let toTransfer = tasks.filter(c=>(c.id==id))[0];
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,toTransfer.tag,null],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,toTransfer.track,null],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, tag:toTransfer.tag, time:null});
+            existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, track:toTransfer.track, time:null});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)
@@ -63,11 +63,11 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
         })
     }
 
-    const deleteTags = () => {
+    const deletetracks = () => {
         db.transaction(tx => {
-          tx.executeSql('DROP TABLE IF EXISTS tags', null,
-            (txObj, resultSet) => setTags([]),
-            (txObj, error) => console.log('error deleting tags')
+          tx.executeSql('DROP TABLE IF EXISTS tracks', null,
+            (txObj, resultSet) => setTracks([]),
+            (txObj, error) => console.log('error deleting tracks')
           );
         });
       }
@@ -101,8 +101,8 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
 
     const TabItem = ({item,index, selected}) => {
         return (
-            <Pressable onPress={()=>setSelectedTab(item.tag)} style={{position:'relative', marginLeft:-50, bottom:selected, zIndex:selected==-1?1:0}}>
-                <Tab color={paleColor(item.color)} title={item.tag} onPress={()=>setSelectedTab(item.tag)}/>
+            <Pressable onPress={()=>setSelectedTab(item.track)} style={{position:'relative', marginLeft:-50, bottom:selected, zIndex:selected==-1?1:0}}>
+                <Tab color={paleColor(item.color)} title={item.track} onPress={()=>setSelectedTab(item.track)}/>
             </Pressable>
         );
     };
@@ -115,8 +115,8 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
             </View>
             <View style={{height:41, zIndex:1, bottom:-1, flexDirection:'row'}}>
                 <FlatList
-                    data={tags}
-                    renderItem={({item,index}) =>  <TabItem item={item} index={index} selected={selectedTab==item.tag?-1:0} />}
+                    data={tracks}
+                    renderItem={({item,index}) =>  <TabItem item={item} index={index} selected={selectedTab==item.track?-1:0} />}
                     horizontal={true}
                     keyExtractor= {(item,index) => index.toString()}
                     contentContainerStyle={{flexDirection:'row-reverse',left:30}}
@@ -140,9 +140,9 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
                         <SwipeListView
                             data={tasks.filter(c=>c.section==item.section)}
                             renderItem={({item,index}) =>
-                            <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
+                            <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
                             sections={sections} date={undefined} section={item.section} task={item.task} 
-                            taskState={item.taskState} time={undefined} tag={item.tag} id={index} trackScreen={true}/>
+                            taskState={item.taskState} time={undefined} track={item.track} id={index} trackScreen={true}/>
                             }
                             renderHiddenItem={({ item }) => <TaskSwipeItem id={item.id} />} 
                             bounces={false} 
@@ -174,7 +174,7 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
                                 <Feather name='check-square' size={30} color={colors.primary.blue} />
                             </TouchableOpacity> 
                         </View>
-                        <NewTask addModalVisible={newTaskVisible} setAddModalVisible={setNewTaskVisible} db={db} tasks={tasks} setTasks={setTasks} tags={tags} track={selectedTab} section={selectedSection} pageDate={undefined} tracksScreen={true}/>
+                        <NewTask addModalVisible={newTaskVisible} setAddModalVisible={setNewTaskVisible} db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} track={selectedTab} section={selectedSection} pageDate={undefined} tracksScreen={true}/>
                         <NewProgress addModalVisible={newProgressVisible} setAddModalVisible={setNewProgressVisible} db={db} progress={progress} setProgress={setProgress} track={selectedTab} section={selectedSection}/>
                     </View>
                     }
@@ -188,8 +188,8 @@ function Tracks({tags, setTags, db, sections, setSections, tasks, setTasks, prog
                     </TouchableOpacity> 
                 </View>
                 <NewSection db={db} sections={sections} setSections={setSections} track={selectedTab} newSectionVisible={newSectionVisible} setNewSectionVisible={setNewSectionVisible}/>
-                <Button title="delete tags" onPress={deleteTags}/>
-                <NewTrack db={db} tags={tags} setTags={setTags} newTrackVisible={newTrackVisible} setNewTrackVisible={setNewTrackVisible} setSelectedTab={setSelectedTab}/>
+                <Button title="delete tracks" onPress={deletetracks}/>
+                <NewTrack db={db} tracks={tracks} setTracks={setTracks} newTrackVisible={newTrackVisible} setNewTrackVisible={setNewTrackVisible} setSelectedTab={setSelectedTab}/>
             </View>
         </SafeAreaView>
     );

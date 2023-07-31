@@ -4,7 +4,7 @@ import { colors } from '../../styles';
 
 const width = Dimensions.get('window').width;
 
-const Habits = ({ habits, month, year, tags }) => {
+const Habits = ({ habits, month, year, tracks }) => {
 
     const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
@@ -26,8 +26,8 @@ const Habits = ({ habits, month, year, tags }) => {
         let progress=(gauge-lastMonthGauge)*100;
         return(
           <View style={{width:width}}>
-            <View style={{flex:1, width: width, height:40, justifyContent:'center', backgroundColor: tags.filter(c=>c.id==item.tag).length>0?tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]:colors.default, opacity:0.2}}/>
-            <View style={{flex:1, width: gauge=="NaN"? 0:width*gauge, height:40, justifyContent:'center',position:'absolute', backgroundColor: tags.filter(c=>c.id==item.tag).length>0?tags.filter(c=>c.id==item.tag).map(c=>c.color)[0]:colors.default, opacity:0.7}}/>
+            <View style={{flex:1, width: width, height:40, justifyContent:'center', backgroundColor: tracks.filter(c=>c.id==item.track).length>0?tracks.filter(c=>c.id==item.track).map(c=>c.color)[0]:colors.default, opacity:0.2}}/>
+            <View style={{flex:1, width: gauge=="NaN"? 0:width*gauge, height:40, justifyContent:'center',position:'absolute', backgroundColor: tracks.filter(c=>c.id==item.track).length>0?tracks.filter(c=>c.id==item.track).map(c=>c.color)[0]:colors.default, opacity:0.7}}/>
             <View style={{flex:1, flexDirection:'row', width: width, height:40, justifyContent:'center',position:'absolute'}}>
               <View style={{flex:9, justifyContent:'center'}}>
                 <Text style={{textAlignVertical:'center', left:20}}>

@@ -9,7 +9,7 @@ import Task from './Task';
 
 const width = Dimensions.get('window').width;
 
-function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setDate, sections}) {
+function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, setDate, sections}) {
   const today = new Date();
   const month = today.getMonth();
   const year = today.getFullYear();
@@ -67,12 +67,12 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
                 console.warn('enters');  
                 let newTask=existingRecurringTasks[i].task;
                 console.warn(existingRecurringTasks[i].task);
-                let copyTag=existingRecurringTasks[i].tag;
+                let copytrack=existingRecurringTasks[i].track;
                 let copyTime=existingRecurringTasks[i].time;
                 db.transaction(tx => {
-                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copyTag,copyTime],
+                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copytrack,copyTime],
                     (txtObj,resultSet)=> {   
-                      existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, tag:copyTag, time:copyTime});
+                      existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, track:copytrack, time:copyTime});
                       setTasks(existingTasks);
                     },
                   );
@@ -164,7 +164,7 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
     let nextDayYear = nextDay.getFullYear();
     let nextDayMonth = nextDay.getMonth();
     let nextDayDay = nextDay.getDate();
-    let copyTag=existingTasks[indexToUpdate].tag;
+    let copytrack=existingTasks[indexToUpdate].track;
     let copyTime=existingTasks[indexToUpdate].time;
     if (existingTasks[indexToUpdate].taskState==0){
       db.transaction(tx=> {
@@ -206,9 +206,9 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,tag,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copyTag,copyTime],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime],
             (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, tag:copyTag, time:copyTime});
+              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime});
             },
           );
         });
@@ -289,8 +289,8 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
         <SwipeListView 
           data={dailyData} 
           scrollEnabled={true} 
-          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
-          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} tag={item.tag} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
+          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} track={item.track} 
           time={item.time} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} 
           bounces={false} 
@@ -306,8 +306,8 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
         <SwipeListView 
           data={recurringData} 
           scrollEnabled={true} 
-          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
-          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} tag={item.tag} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
+          sections={sections} date={date} task={item.task} taskState={item.taskState} id={item.id} track={item.track} 
           time={item.time} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-80}
@@ -328,7 +328,7 @@ function TodayTasks({db, tasks, setTasks, tags, setTags, load, loadx, date, setD
         db={db}
         tasks={tasks}
         setTasks={setTasks}
-        tags={tags}
+        tracks={tracks}
         track={undefined}
         section={undefined}
         pageDate={date}

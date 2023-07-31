@@ -8,7 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 
 
-const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scales, setScales, scalerecords, setScalerecords, diary, setDiary, setStaterecords, staterecords, states, setStates, sections}) => {
+const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scales, setScales, scalerecords, setScalerecords, diary, setDiary, setStaterecords, staterecords, states, setStates, sections}) => {
 
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,7 @@ const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, se
       </View>
       <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
         <TodayScreen db={db} tasks={tasks} setTasks={setTasks} 
-        tags={tags} setTags={setTags} 
+        tracks={tracks} setTracks={setTracks} 
         habits={habits} setHabits={setHabits} 
         moods={moods} setMoods={setMoods} 
         sleep={sleep} setSleep={setSleep} 
@@ -58,7 +58,7 @@ const Today = ({db, tasks, setTasks, tags, setTags, habits, setHabits, moods, se
         />
         <TodayTasks db={db} 
         tasks={tasks} setTasks={setTasks} 
-        tags={tags} setTags={setTags} load={load} 
+        tracks={tracks} setTracks={setTracks} load={load} 
         loadx={loadx} date={date} setDate={setDate}
         sections={sections}
         />

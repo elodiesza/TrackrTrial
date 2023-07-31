@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
 
-const db = SQLite.openDatabase('example.db');
 
 const useDatabase = () => {
   const [db,setDb] = useState(SQLite.openDatabase('example.db'));
@@ -9,7 +8,7 @@ const useDatabase = () => {
   const [load, loadx] = useState(false);
   const [habits, setHabits] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [tags, setTags] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [moods, setMoods] = useState([]);
   const [sleep, setSleep] = useState([]);
   const [states, setStates] = useState([]);
@@ -25,7 +24,7 @@ const useDatabase = () => {
   useEffect(() => {
     setIsLoading(true);
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS habits (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, tag INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS habits (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, track INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM habits ORDER BY place,day;', null,
@@ -34,16 +33,16 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, tag TEXT, color TEXT, UNIQUE(tag))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tracks (id INTEGER PRIMARY KEY AUTOINCREMENT, track TEXT, color TEXT, UNIQUE(track))')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM tags', null,
-      (txObj, resultSet) => setTags(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting tags')
+      tx.executeSql('SELECT * FROM tracks', null,
+      (txObj, resultSet) => setTracks(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting tracks')
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, monthly BOOLEAN, tag INTEGER, time TEXT, section TEXT, UNIQUE(task,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, monthly BOOLEAN, track INTEGER, time TEXT, section TEXT, UNIQUE(task,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tasks', null,
@@ -155,7 +154,7 @@ const useDatabase = () => {
     isLoading,
     habits,
     tasks,
-    tags,
+    tracks,
     moods,
     sleep,
     states,
@@ -171,7 +170,7 @@ const useDatabase = () => {
     loadx,
     setHabits,
     setTasks,
-    setTags,
+    setTracks,
     setMoods,
     setSleep,
     setStates,

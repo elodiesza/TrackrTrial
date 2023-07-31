@@ -2,8 +2,6 @@ import { FlatList, TouchableOpacity, Pressable, StyleSheet, Text, View, Dimensio
 import { useState,useEffect } from 'react';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Feather } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Color from './Color';
 import NewMTask from '../modal/NewMTask';
 import { container } from '../styles';
 import Task from './Task';
@@ -11,7 +9,7 @@ import Task from './Task';
 
 const width = Dimensions.get('window').width;
 
-export default function MonthlyTasks({db, load, loadx, tags, setTags, year, month, tasks, setTasks}) {
+export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, month, tasks, setTasks}) {
   
   const today = new Date();
   const thisYear = today.getFullYear();
@@ -63,12 +61,12 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
             var newDate=new Date(lastLog.year,lastLog.month+j,1);
             for (var i=0; i<existingRecurringTasks.length;i++){    
               let newTask=existingRecurringTasks[i].task;
-              let copyTag=existingRecurringTasks[i].tag;
+              let copytrack=existingRecurringTasks[i].track;
               let copyTime=existingRecurringTasks[i].time;
               db.transaction(tx => {
-                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,tag,time) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copyTag,copyTime],
+                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copytrack,copyTime],
                   (txtObj,resultSet)=> {   
-                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, tag:copyTag, time:copyTime});
+                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, track:copytrack, time:copyTime});
                     setTasks(existingTasks);
                   },
                 );
@@ -99,9 +97,9 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     let existingTasks = [...tasks.filter(c=>c.monthly==true)];
     let toTransfer = tasks.filter(c=>c.monthly==true).filter(c=>(c.id==id))[0];
     db.transaction((tx) => {
-      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,tag,time) values (?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,false,toTransfer.tag,null],
+      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time) values (?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,false,toTransfer.track,null],
       (txtObj,resultSet)=> {    
-        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth, day:day, taskState:toTransfer.taskState, recurring:0, monthly: false, tag:toTransfer.tag, time:null});
+        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth, day:day, taskState:toTransfer.taskState, recurring:0, monthly: false, track:toTransfer.track, time:null});
         setTasks(existingTasks);
       },
       (txtObj, error) => console.warn('Error inserting data:', error)
@@ -165,7 +163,7 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
     let nextDayYear = nextDay.getFullYear();
     let nextDayMonth = nextDay.getMonth();
     let nextDayDay = nextDay.getDate();
-    let copyTag=existingTasks[indexToUpdate].tag;
+    let copytrack=existingTasks[indexToUpdate].track;
     let copyTime=existingTasks[indexToUpdate].time;
     if (existingTasks[indexToUpdate].taskState==0){
       db.transaction(tx=> {
@@ -207,9 +205,9 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly,tag,time) values (?,?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,true,copyTag,copyTime],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly,track,time) values (?,?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,true,copytrack,copyTime],
             (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, tag:copyTag, time:copyTime});
+              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime});
             },
           );
         });
@@ -270,8 +268,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
           style={styles.dailyTasks} 
           data={dailyData} 
           scrollEnabled={true} 
-          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
-          sections={undefined} date={new Date(year,month,1)} task={item.task} taskState={item.taskState} id={item.id} tag={undefined} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
+          sections={undefined} date={new Date(year,month,1)} task={item.task} taskState={item.taskState} id={item.id} track={undefined} 
           time={undefined} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-100}
@@ -287,8 +285,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
           style={styles.recurringTasks} 
           data={recurringData} 
           scrollEnabled={true} 
-          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} 
-          sections={undefined} date={new Date(year,month,1)} task={item.task} taskState={item.taskState} id={item.id} tag={undefined} 
+          renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
+          sections={undefined} date={new Date(year,month,1)} task={item.task} taskState={item.taskState} id={item.id} track={undefined} 
           time={undefined} section={undefined} trackScreen={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-100}
@@ -305,8 +303,8 @@ export default function MonthlyTasks({db, load, loadx, tags, setTags, year, mont
         db={db}
         tasks={tasks}
         setTasks={setTasks}
-        tags={tags}
-        setTags={setTags}
+        tracks={tracks}
+        setTracks={setTracks}
         year={year}
         month={month}
       />

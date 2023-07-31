@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller, set } from 'react-hook-form';
 
-function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tags, setTags, year, month}) {
+function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tracks, setTracks, year, month}) {
 
   const {control, handleSubmit, reset} = useForm();
   const [load, loadx] = useState(false);
   const [recurring, setRecurring] = useState(false);
   const toggleSwitch = () => setRecurring(previousState => !previousState);
 
-console.warn(tasks);
 
   useEffect(() => {
     if (!addModalVisible) {
@@ -22,9 +21,9 @@ console.warn(tasks);
     console.warn(data);
     let existingTasks = [...tasks]; 
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly, tag, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,year,month,undefined,0,recurring?1:0,true,undefined,undefined, undefined],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,year,month,undefined,0,recurring?1:0,true,undefined,undefined, undefined],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:undefined, taskState:0, recurring:recurring?1:0, monthly:true, tag:undefined, time:undefined, section:undefined});
+            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:undefined, taskState:0, recurring:recurring?1:0, monthly:true, track:undefined, time:undefined, section:undefined});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)

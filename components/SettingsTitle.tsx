@@ -7,7 +7,7 @@ const SettingsTitle = ({title, returnpress}) => {
     return (
         <View style={styles.header}>
             <Pressable onPress={returnpress}>
-                <MaterialIcons name="keyboard-arrow-left" size={25} style={{left:10}} color={colors.blue}/>
+                <MaterialIcons name="keyboard-arrow-left" size={25} style={{left:10}} color={colors.primary.blue}/>
             </Pressable>
             <Text style={{marginLeft:30}}>{title}</Text>
         </View>

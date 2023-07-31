@@ -11,11 +11,10 @@ import SleepTypeColors from '../constants/SleepTypeColors';
 import { container,colors } from '../styles';
 import Color from './Color';
 import AddScale from './AddScale';
-import UpdateState from '../modal/UpdateState';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tags, setTags, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
+export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -56,7 +55,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
       let existinghabits = [...habits];
       let lastMonthhabits = lastMonthData.filter(c => c.day === 1).map(c => c.name);
       let lastMonthTypes = lastMonthData.filter(c => c.day === 1).map(c => c.type);
-      let lastMonthTags = lastMonthData.filter(c => c.day === 1).map(c => c.tag);
+      let lastMonthtracks = lastMonthData.filter(c => c.day === 1).map(c => c.track);
 
       const inserthabits = async () => {
         const promises = [];
@@ -68,8 +67,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
           new Promise((resolve, reject) => {
             db.transaction(tx => {
               tx.executeSql(
-                'INSERT INTO habits (name, year, month, day, state, type, tag, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthTags[j], j],
+                'INSERT INTO habits (name, year, month, day, state, type, track, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthtracks[j], j],
                 (txtObj, stateResultSet) => {
                   const newState = {
                     id: stateResultSet.insertId,
@@ -79,7 +78,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
                     day: i,
                     state: 0,
                     type: lastMonthTypes[j],
-                    tag: lastMonthTags[j],
+                    track: lastMonthtracks[j],
                     place: j,
                   };
                   existinghabits.push(newState);
@@ -211,11 +210,11 @@ function colorMixer(rgbA, rgbB, amountToMix){
       });
       loadx(!load);
     }
-    const removeTagsDb = () => {
+    const removetracksDb = () => {
       db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS tags', null,
-          (txObj, resultSet) => setTags([]),
-          (txObj, error) => console.log('error deleting tags')
+        tx.executeSql('DROP TABLE IF EXISTS tracks', null,
+          (txObj, resultSet) => settracks([]),
+          (txObj, error) => console.log('error deleting tracks')
         );
       });
       loadx(!load);
@@ -769,7 +768,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
       )}
             {/*<Button title='remove thismonth indicators' onPress={removeDbMonth} />
       <Button title='remove Indicators' onPress={removeDb} />
-      <Button title='remove Tags' onPress={removeTagsDb} /> */}
+      <Button title='remove tracks' onPress={removetracksDb} /> */}
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
       </ TouchableOpacity> 
@@ -781,8 +780,8 @@ function colorMixer(rgbA, rgbB, amountToMix){
         db={db}
         habits={habits}
         setHabits={setHabits}
-        tags={tags}
-        setTags={setTags}
+        tracks={tracks}
+        settracks={setTracks}
         states={states}
         setStates={setStates}
         staterecords={staterecords}

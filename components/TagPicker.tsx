@@ -1,9 +1,8 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-const TagPicker = ({load, loadx, tags, selectedTag, setSelectedTag}) => {
+const TrackPicker = ({load, loadx, tracks, selectedTrack, setSelectedTrack}) => {
 
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
@@ -11,19 +10,19 @@ const TagPicker = ({load, loadx, tags, selectedTag, setSelectedTag}) => {
 
     useEffect(() => {
 
-        const merged = [...new Set([{tag: 'Add a new Tag', color: 'white'},...tags])];
-        const TagList = [...new Set(merged.map(c=>c.tag))];
+        const merged = [...new Set([{track: 'Add a new track', color: 'white'},...tracks])];
+        const trackList = [...new Set(merged.map(c=>c.track))];
         const merged2 = () => {
-            const tags= []
-            for(var i=0; i< TagList.length; i++){
-                tags.push({tag: TagList[i]})
+            const tracks= []
+            for(var i=0; i< trackList.length; i++){
+                tracks.push({track: trackList[i]})
             }
-            return tags
+            return tracks
         }
         let newArray=merged2().map((item) => {
-            return {label: item.tag, value: item.tag}})
+            return {label: item.track, value: item.track}})
         setItems(newArray)
-        setSelectedTag(value)
+        setSelectedTrack(value)
     }, [load]);
     
 
@@ -42,8 +41,4 @@ const TagPicker = ({load, loadx, tags, selectedTag, setSelectedTag}) => {
     );
 };
 
-const styles = StyleSheet.create({
-
-});
-
-export default TagPicker;
+export default TrackPicker;

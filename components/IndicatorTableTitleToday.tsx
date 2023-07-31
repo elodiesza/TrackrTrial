@@ -1,14 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import {colors} from '../styles';
 
-const IndicatorTableTitleToday = ({name, state, tags, habits, year, month}) => {
+const IndicatorTableTitleToday = ({name, state, tracks, habits, year, month}) => {
 
-    const IndicatorTag = habits.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==1)).map(c=>c.tag)[0];
-    const IndicatorColor = IndicatorTag==0 ? 'white' : tags.filter(c=>c.id==IndicatorTag).map(c=>c.color)[0];
 
     return (
             <View style={{width:1, height:1}}>
-                <View style={[styles.polygon, {backgroundColor: IndicatorColor, opacity:state==1?1:0.1}]} /><Text numberOfLines={1} style={[styles.indText,{opacity: state==1?1:0.3}]}>{name}</Text>
+                <View style={[styles.polygon, {backgroundColor: colors.primary.white, opacity:state==1?1:0.1}]} /><Text numberOfLines={1} style={[styles.indText,{opacity: state==1?1:0.3}]}>{name}</Text>
             </View>
        );     
 };
