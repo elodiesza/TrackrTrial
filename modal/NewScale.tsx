@@ -33,8 +33,6 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
     });
     loadx(!load);
   }
-
-  console.warn(scales);
   
 
   useEffect(() => {

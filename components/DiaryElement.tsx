@@ -8,11 +8,12 @@ import { useForm, Controller } from 'react-hook-form';
 const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => {
     const {control, handleSubmit, reset} = useForm();
     const [updatenotesDisplay, setUpdatenotesDisplay] = useState(false);
-    const [displayedDiary, setDisplayedDiary] = useState('');
+    const [displayedDiary, setDisplayedDiary] = useState([{'year':'' , 'month':'', 'day':'', 'notes':''}]);
+    const [savedNotes, setSavedNotes] = useState([{'year':'' , 'month':'', 'day':'', 'notes':''}]);
 
     useEffect(() => {
         setUpdatenotesDisplay(false);
-        setDisplayedDiary(diary.filter(c=>(c.year==year && c.month==month && c.day==day)).length>0?diary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes)[0]:'');
+        setDisplayedDiary(diary.filter(c=>(c.year==year && c.month==month && c.day==day)).length>0?[{'year':year , 'month':month, 'day':day, 'notes':diary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes)[0]}]:[{'year':year , 'month':month, 'day':day, 'notes':''}]);
     }, [,diary,day]);
 
     const UpdateDiary = async (data) => {
@@ -61,13 +62,14 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
     
 
     return (
-        <View style={[container.body,{justifyContent:'center', backgroundColor:colors.primary.white}]}>
-            <View style={[styles.textBox,{borderColor:  updatenotesDisplay ? colors.primary.defaultdark : colors.primary.blue}]}>
+        <View style={[container.body,{justifyContent:'center'}]}>
+            <View style={[styles.textBox,{borderColor:  updatenotesDisplay ? colors.primary.defaultdark : colors.primary.blue, backgroundColor:colors.primary.white}]}>
                 <View style={{flex:1, margin:10, flexDirection:'row'}}>
                     <ScrollView style={{flex:1}}>
                         <View style={{flex:1, display: updatenotesDisplay? "none" : "flex"}}>
                             <Text style={{color: colors.primary.defaultdark}}>
-                                {displayedDiary}
+                                {displayedDiary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes).length==0?'':
+                                displayedDiary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes)[0]}
                             </Text>
                         </View>
                         <View style={{flex:1, display: updatenotesDisplay ? "flex" : "none"}}>
@@ -77,9 +79,9 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
                                     render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
                                         <>
                                     <TextInput
-                                        value={displayedDiary}
+                                        value={savedNotes.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes)[0]}
                                         defaultValue={diary.filter(c=>(c.year==year && c.month==month && c.day==day)).length>0 ? diary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes)[0] : ''}
-                                        onChangeText={onChange}
+                                        onChangeText={(value)=>setSavedNotes([{'year':year , 'month':month, 'day':day, 'notes':value}])}
                                         onBlur={onBlur}
                                         multiline={true}
                                         placeholder={"What did you do today ?"}

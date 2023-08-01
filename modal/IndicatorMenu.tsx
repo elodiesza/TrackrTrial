@@ -6,7 +6,7 @@ import ChangeHabitName from './ChangeHabitName';
 
 
 
-const HabitMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setHabits, habits, loadx, load }) => {
+const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setHabits, habits, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [changeModalVisible, setChangeModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -283,7 +283,7 @@ const HabitMenu = ({ month, year, modalVisible, setModalVisible, data, index, db
       },
   });
   
-  export default HabitMenu;
+  export default IndicatorMenu;
   
   
   

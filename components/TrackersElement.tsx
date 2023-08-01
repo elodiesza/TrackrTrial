@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import IndicatorTableTitle from '../components/IndicatorTableTitle';
 import Feather from '@expo/vector-icons/Feather';
 import NewIndicator from '../modal/NewIndicator';
-import HabitMenu from '../modal/HabitMenu';
+import IndicatorMenu from '../modal/IndicatorMenu';
 import AddSleepLog from './AddSleepLog';
 import AddMood from './AddMood';
 import moment from 'moment';
@@ -69,9 +69,9 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
               tx.executeSql(
                 'INSERT INTO habits (name, year, month, day, state, type, track, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthtracks[j], j],
-                (txtObj, stateResultSet) => {
-                  const newState = {
-                    id: stateResultSet.insertId,
+                (txtObj, habitResultSet) => {
+                  const newHabit = {
+                    id: habitResultSet.insertId,
                     name: name,
                     year: thisYear,
                     month: thisMonth,
@@ -81,8 +81,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
                     track: lastMonthtracks[j],
                     place: j,
                   };
-                  existinghabits.push(newState);
-                  resolve(newState);
+                  existinghabits.push(newHabit);
+                  resolve(newHabit);
                 },
                 (_, error) => {
                   console.log(error);
@@ -183,6 +183,69 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
 
   }, [updatedstates]);
 
+  useEffect(() => {
+    if (scalerecords.filter(c => c.year === thisYear && c.month === thisMonth).length === 0) {
+      let existingrecords = [...scalerecords];
+      let lastMonthrecords = lastMonthScales.filter(c => c.day === 1).map(c => c.name);
+      const insertscales = async () => {
+        const promises = [];
+      for (let j = 0; j < lastMonthrecords.length; j++) {
+        const name = lastMonthrecords[j];
+
+        for (let i = 1; i <= DaysInMonth(thisYear, thisMonth); i++) {
+          promises.push(
+          new Promise((resolve, reject) => {
+            db.transaction(tx => {
+              tx.executeSql(
+                'INSERT INTO scalerecords (name, year, month, day, value) VALUES (?, ?, ?, ?, ?)',
+                [name, thisYear, thisMonth, i, undefined],
+                (txtObj, scaleResultSet) => {
+                  const newScale = {
+                    id: scaleResultSet.insertId,
+                    name: name,
+                    year: thisYear,
+                    month: thisMonth,
+                    day: i,
+                    value: undefined,
+                  };
+                  existingrecords.push(newScale);
+                  resolve(newScale);
+                },
+                (_, error) => {
+                  console.log(error);
+                  reject(error);
+                }
+              );
+            });
+          })
+          );
+        }
+      }
+      return Promise.all(promises);
+      };
+      insertscales()
+        .then(newscales => {
+          setUpdatedscales([...updatedscales, ...newscales]);
+          setIsLoading(false); 
+        })
+        .catch(error => {
+          console.log(error);
+          setIsLoading(false); 
+        });
+    } 
+    else {
+      setIsLoading(false); // Set loading scale to false if the data is already present
+    }
+
+  }, []);
+
+  useEffect(() => {
+
+      setScalerecords(updatedscales); // Update the habits scale variable
+      loadx(!load);
+
+  }, [updatedscales]);
+
   function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
@@ -271,7 +334,6 @@ function colorMixer(rgbA, rgbB, amountToMix){
 
     const updateState = (id,item) => {
       let existingstates=[...staterecords];
-      console.warn(id, item);
       const indexToUpdate = existingstates.findIndex(state => state.id === id);
         db.transaction(tx=> {
           tx.executeSql('UPDATE staterecords SET item = ? WHERE id = ?', [item, id],
@@ -341,7 +403,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
           <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:25 }}>
             <IndicatorTableTitle name={ind.item} habits={habits} year={year} month={month} setModalVisible={setModalVisible}/>
           </Pressable>
-          <HabitMenu
+          <IndicatorMenu
             data={ind.item}
             modalVisible={modalVisible === ind.item}
             setModalVisible={setModalVisible}
@@ -364,7 +426,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=>{setSelectedStateItem(item.item);setSelectedStateId(item.id);setSelectedStateIndex(index);setSelectedStateName(name);setStateModalVisible(true)}}>
-              <View style={[styles.cell, { backgroundColor : item.item==""?  colors.white : states.filter(c=>(c.name==item.name && c.item==item.item)).map(c=>c.color)[0]}]}/>
+              <View style={[styles.cell, { backgroundColor : item.item==""?  colors.primary.white : states.filter(c=>(c.name==item.name && c.item==item.item)).map(c=>c.color)[0]}]}/>
             </TouchableOpacity>
             <Modal
             animationType="none"
@@ -767,7 +829,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
       </ScrollView >
       )}
             {/*<Button title='remove thismonth indicators' onPress={removeDbMonth} />
-      <Button title='remove Indicators' onPress={removeDb} />
+            <Button title='remove Indicators' onPress={removeDb} />
       <Button title='remove tracks' onPress={removetracksDb} /> */}
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
@@ -781,7 +843,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
         habits={habits}
         setHabits={setHabits}
         tracks={tracks}
-        settracks={setTracks}
+        setTracks={setTracks}
         states={states}
         setStates={setStates}
         staterecords={staterecords}
