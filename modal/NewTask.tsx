@@ -3,6 +3,7 @@ import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity
 import { useForm, Controller, set } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import uuid from 'react-native-uuid';
 
 function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tracks, track, section, pageDate, tracksScreen}) {
 
@@ -47,7 +48,7 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, trac
     db.transaction((tx) => {
       tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'),tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'),0,recurring?1:0,false,track,addTime=='Add Time'?null:time.toString(),section==undefined?undefined:section],
       (txtObj,resultSet)=> {    
-        existingTasks.push({ id: resultSet.insertId, task: data.task, year:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'), month:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1, day:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'), taskState:0, recurring:recurring?1:0, monthly:false, track:track, time:addTime=='Add Time'?null:time.toString(), section});
+        existingTasks.push({ id: uuid.v4(), task: data.task, year:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'), month:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1, day:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'), taskState:0, recurring:recurring?1:0, monthly:false, track:track, time:addTime=='Add Time'?null:time.toString(), section});
         setTasks(existingTasks);
       },
       (txtObj, error) => console.warn('Error inserting data:', error)

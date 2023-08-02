@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View, FlatList } from 'react-native';
 import { useForm, Controller, set } from 'react-hook-form';
 import { container,colors } from '../styles';
+import uuid from 'react-native-uuid';
 
 
 function NewSection({db, sections, setSections, track, newSectionVisible, setNewSectionVisible}) {
@@ -15,9 +16,8 @@ function NewSection({db, sections, setSections, track, newSectionVisible, setNew
                   'INSERT INTO sections (section, track) VALUES (?, ?)',
                   [data.name, track],
                   (txtObj, stateResultSet) => {
-                    const newStateId = stateResultSet.insertId;
                     const newState = {
-                      id: newStateId,
+                      id: uuid.v4(),
                       section: data.name,
                       track: track,
                     };

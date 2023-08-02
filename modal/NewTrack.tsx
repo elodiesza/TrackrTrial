@@ -5,6 +5,7 @@ import { container,colors } from '../styles';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
+import uuid from 'react-native-uuid';
 
 
 function NewTrack({newTrackVisible, setNewTrackVisible, db, tracks, setTracks, setSelectedTab, setSelectedTabColor}) {
@@ -28,9 +29,8 @@ function NewTrack({newTrackVisible, setNewTrackVisible, db, tracks, setTracks, s
               'INSERT INTO tracks (track, color) VALUES (?, ?)',
               [data.name, picked],
               (txtObj, trackResultSet) => {
-                const newTrackId = trackResultSet.insertId;
                 const newTrack = {
-                  id: newTrackId,
+                  id: uuid.v4(),
                   track: data.name,
                   color: picked==undefined? colors.primary.default : picked,
                 };

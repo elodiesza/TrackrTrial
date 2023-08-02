@@ -4,7 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import SleepColorPicker from './SleepColorPicker';
 import { container } from '../styles';
-
+import uuid from 'react-native-uuid';
 
 
 const width = Dimensions.get('window').width;
@@ -49,7 +49,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
             db.transaction((tx) => {
                 tx.executeSql('INSERT INTO sleep (sleep,wakeup,year,month,day,type) values (?,?,?,?,?,?)',[parseInt(moment(sleepTime).format("HH")),null,year,month,day,0],
                 (txtObj,resultSet)=> {    
-                existingSleep.push({ id: resultSet.insertId, sleep: parseInt(moment(sleepTime).format("HH")), wakeup:null, year:year, month:month, day:day, type:0 });
+                existingSleep.push({ id: uuid.v4(), sleep: parseInt(moment(sleepTime).format("HH")), wakeup:null, year:year, month:month, day:day, type:0 });
                 setSleep(existingSleep);
                 },
                 (txtObj, error) => console.warn('Error inserting data:', error)
@@ -75,7 +75,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
             db.transaction((tx) => {
                 tx.executeSql('INSERT INTO sleep (sleep,wakeup,year,month,day,type) values (?,?,?,?,?,?)',[null,parseInt(moment(wakeupTime).format("HH")),year,month,day,0],
                 (txtObj,resultSet)=> {    
-                existingSleep.push({ id: resultSet.insertId, sleep: null, wakeup:parseInt(moment(wakeupTime).format("HH")), year:year, month:month, day:day, type:0 });
+                existingSleep.push({ id: uuid.v4(), sleep: null, wakeup:parseInt(moment(wakeupTime).format("HH")), year:year, month:month, day:day, type:0 });
                 setSleep(existingSleep);
                 },
                 (txtObj, error) => console.warn('Error inserting data:', error)

@@ -11,6 +11,7 @@ import SleepTypeColors from '../constants/SleepTypeColors';
 import { container,colors } from '../styles';
 import Color from './Color';
 import AddScale from './AddScale';
+import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
@@ -71,7 +72,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
                 [name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthtracks[j], j],
                 (txtObj, habitResultSet) => {
                   const newHabit = {
-                    id: habitResultSet.insertId,
+                    id: uuid.v4(),
                     name: name,
                     year: thisYear,
                     month: thisMonth,
@@ -138,7 +139,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
                 [name, thisYear, thisMonth, i, ''],
                 (txtObj, stateResultSet) => {
                   const newState = {
-                    id: stateResultSet.insertId,
+                    id: uuid.v4(),
                     name: name,
                     year: thisYear,
                     month: thisMonth,
@@ -201,7 +202,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
                 [name, thisYear, thisMonth, i, undefined],
                 (txtObj, scaleResultSet) => {
                   const newScale = {
-                    id: scaleResultSet.insertId,
+                    id: uuid.v4(),
                     name: name,
                     year: thisYear,
                     month: thisMonth,
@@ -274,72 +275,6 @@ const statesType = Array.from({ length:[...new Set(staterecords.filter(c => (c.d
 const scalesType = Array.from({ length:[...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "scale");
 const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])];
 
-    const removeDb = () => {
-      db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS habits', null,
-          (txObj, resultSet) => setHabits([]),
-          (txObj, error) => console.log('error deleting habits')
-        );
-      });
-      loadx(!load);
-    }
-    const removeScalesDb = () => {
-      db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS scales', null,
-          (txObj, resultSet) => setScales([]),
-          (txObj, error) => console.log('error deleting scales')
-        );
-      });
-      db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS scalerecords', null,
-          (txObj, resultSet) => setScalerecords([]),
-          (txObj, error) => console.log('error deleting scalerecords')
-        );
-      });
-      loadx(!load);
-    }
-    const removeStatesDb = () => {
-      db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS states', null,
-          (txObj, resultSet) => setStates([]),
-          (txObj, error) => console.log('error deleting states')
-        );
-      });
-      db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
-          (txObj, resultSet) => setStaterecords([]),
-          (txObj, error) => console.log('error deleting state records')
-        );
-      });
-      loadx(!load);
-    }
-    const removetracksDb = () => {
-      db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS tracks', null,
-          (txObj, resultSet) => settracks([]),
-          (txObj, error) => console.log('error deleting tracks')
-        );
-      });
-      loadx(!load);
-    }
-
-    const removeDbMonth = () => {
-      let existinghabits = [...habits];
-      db.transaction(tx => {
-        tx.executeSql(
-          'DELETE FROM habits WHERE month = ?',
-          [6],
-          (txObj, resultSet) => {
-            setHabits(existinghabits.filter(c=>c.month!=6)),
-            console.log('habits deleted successfully');
-          },
-          (txObj, error) => {
-            // Handle error
-            console.log('Error deleting habits:', error);
-          }
-        );
-      });
-    };
 
     const updateHabit = (id) => {
       let existinghabits=[...habits];

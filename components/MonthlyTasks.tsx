@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import NewMTask from '../modal/NewMTask';
 import { container } from '../styles';
 import Task from './Task';
+import uuid from 'react-native-uuid';
 
 
 const width = Dimensions.get('window').width;
@@ -42,7 +43,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
         db.transaction(tx => {
           tx.executeSql('INSERT INTO mlogs (year,month) values (?,?)',[year,month],
             (txtObj,resultSet)=> {    
-              existingLogs.push({ id: resultSet.insertId, year:year, month:month});
+              existingLogs.push({ id: uuid.v4(), year:year, month:month});
               setMLogs(existingLogs);                      
             },
           );
@@ -66,7 +67,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
               db.transaction(tx => {
                 tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copytrack,copyTime],
                   (txtObj,resultSet)=> {   
-                    existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, track:copytrack, time:copyTime});
+                    existingTasks.push({ id: uuid.v4(), task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, track:copytrack, time:copyTime});
                     setTasks(existingTasks);
                   },
                 );
@@ -83,7 +84,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
           db.transaction(tx => {
             tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,thisDay],
               (txtObj,resultSet)=> {    
-                existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:thisDay});
+                existingLogs.push({ id: uuid.v4(), year:year, month:month, day:thisDay});
                 setMLogs(existingLogs);
               },
             );
@@ -99,7 +100,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
     db.transaction((tx) => {
       tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,thisDay,toTransfer.taskState,0,false,toTransfer.track,undefined, undefined],
       (txtObj,resultSet)=> {    
-        existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth, day:thisDay, taskState:toTransfer.taskState, recurring:0, monthly: false, track:toTransfer.track, time:undefined, section:undefined});
+        existingTasks.push({ id: uuid.v4(), task: toTransfer.task, year:thisYear, month:thisMonth, day:thisDay, taskState:toTransfer.taskState, recurring:0, monthly: false, track:toTransfer.track, time:undefined, section:undefined});
         setTasks(existingTasks);
       },
       (txtObj, error) => console.warn('Error inserting data:', error)

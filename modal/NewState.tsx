@@ -5,6 +5,7 @@ import { container,colors } from '../styles';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
+import uuid from 'react-native-uuid';
 
 
 function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddModalVisible, load, loadx, db, states, setStates, staterecords, setStaterecords}) {
@@ -41,9 +42,8 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
               'INSERT INTO states (name, item, color, place) VALUES (?, ?, ?, ?)',
               [data.name, itemlist[i].value, itemlist[i].picked, newPlace],
               (txtObj, stateResultSet) => {
-                const newStateId = stateResultSet.insertId;
                 const newState = {
-                  id: newStateId,
+                  id: uuid.v4(),
                   name: data.name,
                   item: itemlist[i].value,
                   color: itemlist[i].picked,
@@ -63,9 +63,8 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
               'INSERT INTO staterecords (name, year, month, day, item) VALUES (?, ?, ?, ?, ?)',
               [data.name, year, month, i, ''],
               (txtObj, stateResultSet) => {
-                const newStateId = stateResultSet.insertId;
                 const newState = {
-                  id: newStateId,
+                  id: uuid.v4(),
                   name: data.name,
                   year: year,
                   month: month,

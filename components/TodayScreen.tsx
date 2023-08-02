@@ -138,7 +138,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           loadx={loadx}
           />
       </View>
-      {/*<Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
+      {/* <Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
         (txObj, resultSet) => setStaterecords([]),
         (txObj, error) => console.log('error selecting tasks')
       );
@@ -157,7 +157,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setScales([]),
         (txObj, error) => console.log('error selecting tasks')
       );
-    })}/>
+    })}/> */}
       <Button title={'delete times'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
         (txObj, resultSet) => setTimes([]),
         (txObj, error) => console.log('error selecting tasks')
@@ -167,8 +167,32 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setTimerecords([]),
         (txObj, error) => console.log('error selecting tasks')
       );
-    })}/> */}
-
+    })}/> 
+    <Button title={'delete sleep'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sleep', null,
+        (txObj, resultSet) => setSleep([]),
+        (txObj, error) => console.log('error selecting sleep')
+      );
+    })}/>
+    <Button title={'delete habits'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS habits', null,
+        (txObj, resultSet) => setHabits([]),
+        (txObj, error) => console.log('error selecting habits')
+      );
+    })}/>
+    <Button title={'delete tasks'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS tasks', null,
+        (txObj, resultSet) => setTasks([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/>
+        <Button title={'delete tracks'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS tracks', null,
+        (txObj, resultSet) => setTracks([]),
+        (txObj, error) => console.log('error selecting tracks')
+      );
+    })}/>
+      <Button title={'delete moods'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS moods', null,
+        (txObj, resultSet) => setMoods([]),
+        (txObj, error) => console.log('error selecting moods')
+      );
+    })}/>
     </SafeAreaView>
   );
 }

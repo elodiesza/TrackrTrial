@@ -63,9 +63,8 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
               'INSERT INTO scalerecords (name, year, month, day, value) VALUES (?, ?, ?, ?, ?)',
               [data.name, year, month, i, undefined],
               (txtObj, scaleResultSet) => {
-                const newScaleId = scaleResultSet.insertId;
                 const newScale = {
-                  id: newScaleId,
+                  id: uuid.v4(),
                   name: data.name,
                   year: year,
                   month: month,

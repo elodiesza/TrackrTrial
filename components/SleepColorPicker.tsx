@@ -2,6 +2,7 @@ import React from 'react';
 import Color from './Color';
 import { View, StyleSheet, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback, FlatList } from 'react-native';
 import SleepTypes from '../constants/SleepTypeColors';
+import uuid from 'react-native-uuid';
 
 const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPickerVisible,picked,setPicked,sleep,setSleep,year,month,day,setSleepModalVisible,sleepModalVisible}) => {
  
@@ -22,7 +23,7 @@ const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPicker
           [null, null, year, month, day, pickedType],
           (txtObj, resultSet) => {
             existingSleep.push({
-              id: resultSet.insertId,
+              id: uuid.v4(),
               sleep: null,
               wakeup: null,
               year: year,

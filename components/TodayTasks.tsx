@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { container} from '../styles';
 import Task from './Task';
+import uuid from 'react-native-uuid';
 
 
 const width = Dimensions.get('window').width;
@@ -44,7 +45,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
           db.transaction(tx => {
             tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
               (txtObj,resultSet)=> {    
-                existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+                existingLogs.push({ id: uuid.v4(), year:year, month:month, day:day});
                 setLogs(existingLogs);                      
               },
             );
@@ -69,7 +70,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
                 db.transaction(tx => {
                   tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copytrack,copyTime,undefined],
                     (txtObj,resultSet)=> {   
-                      existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, track:copytrack, time:copyTime, section: undefined});
+                      existingTasks.push({ id: uuid.v4(), task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, track:copytrack, time:copyTime, section: undefined});
                       setTasks(existingTasks);
                     },
                   );
@@ -86,7 +87,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
             db.transaction(tx => {
               tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
                 (txtObj,resultSet)=> {    
-                  existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day});
+                  existingLogs.push({ id: uuid.v4(), year:year, month:month, day:day});
                   setLogs(existingLogs);
                 },
               );
@@ -109,7 +110,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
       db.transaction(tx => {
         tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day-1],
           (txtObj,resultSet)=> {    
-            existingLogs.push({ id: resultSet.insertId, year:year, month:month, day:day-1});
+            existingLogs.push({ id: uuid.v4(), year:year, month:month, day:day-1});
             setLogs(existingLogs);
           },
         );
@@ -150,104 +151,6 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
         }
       );
     });
-  };
-
-  const updateTaskState = (id) => {
-    let existingTasks=[...tasks];
-    const indexToUpdate = existingTasks.findIndex(task => task.id === id);
-    let postponedTask = existingTasks[indexToUpdate].task;
-    let nextDay= new Date(Math.floor(today.getTime()+(1000*60*60*24)));
-    let nextDayYear = nextDay.getFullYear();
-    let nextDayMonth = nextDay.getMonth();
-    let nextDayDay = nextDay.getDate();
-    let copytrack=existingTasks[indexToUpdate].track;
-    let copyTime=existingTasks[indexToUpdate].time;
-    if (existingTasks[indexToUpdate].taskState==0){
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [1, id],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              existingTasks[indexToUpdate].taskState = 1;
-              setTasks(existingTasks);
-            }
-          },
-          (txObj, error) => console.log('Error updating data', error)
-        );
-      });
-    }
-    else if(existingTasks[indexToUpdate].taskState==1){
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [2, id],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              existingTasks[indexToUpdate].taskState = 2;
-              setTasks(existingTasks);
-            }
-          },
-          (txObj, error) => console.log('Error updating data', error)
-        );
-      });
-    }
-    else if(existingTasks[indexToUpdate].taskState==2){
-      if (existingTasks[indexToUpdate].recurring==0){
-        db.transaction(tx=> {
-          tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [3, id],
-            (txObj, resultSet) => {
-              if (resultSet.rowsAffected > 0) {
-                existingTasks[indexToUpdate].taskState = 3;
-                setTasks(existingTasks);
-              }
-            },
-            (txObj, error) => console.log('Error updating data', error)
-          );
-        });
-        db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime],
-            (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime});
-            },
-          );
-        });
-      }
-      else {
-        db.transaction(tx=> {
-          tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [0, id],
-            (txObj, resultSet) => {
-              if (resultSet.rowsAffected > 0) {
-                existingTasks[indexToUpdate].taskState = 0;
-                setTasks(existingTasks);
-              }
-            },
-            (txObj, error) => console.log('Error updating data', error)
-          );
-        });
-      }
-    }
-    else {
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE tasks SET taskState = ? WHERE id = ?', [0, id],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              existingTasks[indexToUpdate].taskState = 0;
-              setTasks(existingTasks);
-            }
-          },
-          (txObj, error) => console.log('Error updating data', error)
-        );
-      });
-      let postponedTaskId = existingTasks.filter(c=>(c.year==nextDayYear && c.month==nextDayMonth && c.day==nextDayDay && c.task==postponedTask)).map(c=>c.id)[0];
-      db.transaction(tx=> {
-        tx.executeSql('DELETE FROM tasks WHERE id = ?', [postponedTaskId],
-          (txObj, resultSet) => {
-            if (resultSet.rowsAffected > 0) {
-              let existingTasks = [...tasks].filter(task => task.id !==postponedTaskId);
-              setTasks(existingTasks);
-            }
-          },
-          (txObj, error) => console.log(error)
-        );       
-      }) 
-    }
   };
 
   const dailyData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==0 && c.monthly==false));

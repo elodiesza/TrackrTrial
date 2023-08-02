@@ -10,7 +10,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import ProgressBar from '../components/ProgressBar';
 import NewProgress from '../modal/NewProgress';
 import NewTrack from '../modal/NewTrack';
-
+import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
@@ -41,7 +41,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         db.transaction((tx) => {
           tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,false,toTransfer.track,undefined,toTransferSelection],
           (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, monthly:false, track:toTransfer.track, time:undefined, section:toTransferSelection});
+            existingTasks.push({ id: uuid.v4(), task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, monthly:false, track:toTransfer.track, time:undefined, section:toTransferSelection});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)

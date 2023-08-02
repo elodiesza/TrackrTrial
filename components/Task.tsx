@@ -5,7 +5,7 @@ import moment from 'moment';
 import { container} from '../styles';
 import Color from './Color';
 import { colors } from '../styles';
-
+import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
@@ -64,7 +64,7 @@ function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, task
         db.transaction(tx => {
           tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime, section],
             (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime, section:section});
+              existingTasks.push({ id: uuid.v4(), task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime, section:section});
             },
           );
         });

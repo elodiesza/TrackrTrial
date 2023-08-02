@@ -1,7 +1,7 @@
 import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {colors} from '../styles.js';
-import { useState } from 'react';
+import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
@@ -17,7 +17,7 @@ const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalV
             tx.executeSql('INSERT INTO moods (year, month, day, mood) VALUES (?, ?, ?, ?)', [year, month, day, mood],
               (txObj, resultSet) => {
                 if (resultSet.rowsAffected > 0) {
-                  existingMoods.push({id: resultSet.insertId, year: year, month: month, day: day, mood: mood});
+                  existingMoods.push({id: uuid.v4(), year: year, month: month, day: day, mood: mood});
                   setMoods(existingMoods);
                 }
               },

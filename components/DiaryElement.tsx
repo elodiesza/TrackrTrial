@@ -3,6 +3,7 @@ import { View, StyleSheet, TextInput, Text, ScrollView, Pressable } from 'react-
 import {container, colors} from '../styles';
 import { MaterialCommunityIcons, Feather, MaterialIcons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
+import uuid from 'react-native-uuid';
 
 
 const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => {
@@ -26,7 +27,7 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
                   [year, month, day, data.notes],
                   (txtObj, stateResultSet) => {
                     const newState = {
-                      id: stateResultSet.insertId,
+                        id: uuid.v4(),
                         year: year,
                         month: month,
                         day: day,
