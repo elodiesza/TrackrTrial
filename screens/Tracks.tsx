@@ -16,8 +16,6 @@ const width = Dimensions.get('window').width;
 
 function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, progress, setProgress}) {
 
-    console.warn(tasks);
-
     const today= new Date();
     const thisYear = today.getFullYear();
     const thisMonth = today.getMonth();

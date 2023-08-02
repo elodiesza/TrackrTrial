@@ -167,7 +167,15 @@ export const container = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'black',
         marginLeft: 30,
-    }
+    },
+    cell: {
+        width: 25,
+        height: 25,
+        borderColor: 'black',
+        borderWidth: 0.5,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
 
 

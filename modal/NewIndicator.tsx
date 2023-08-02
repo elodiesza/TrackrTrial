@@ -6,8 +6,8 @@ import NewScale from './NewScale';
 import { container } from '../styles';
 
 
-
 function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tracks, setTracks, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
+
 
   const [isLoading, setIsLoading] = useState(true);
 

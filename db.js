@@ -15,6 +15,7 @@ const useDatabase = () => {
   const [staterecords, setStaterecords] = useState([]);
   const [scales, setScales] = useState([]);
   const [scalerecords, setScalerecords] = useState([]);
+  const [timerecords, setTimerecords] = useState([]);
   const [times, setTimes] = useState([]);
   const [diary, setDiary] = useState([]);
   const [sections, setSections] = useState([]);
@@ -24,7 +25,7 @@ const useDatabase = () => {
   useEffect(() => {
     setIsLoading(true);
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS habits (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, track INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS habits (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, state INTEGER, type INTEGER, track INTEGER, place INTEGER, UNIQUE(name,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM habits ORDER BY place,day;', null,
@@ -33,7 +34,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tracks (id INTEGER PRIMARY KEY AUTOINCREMENT, track TEXT, color TEXT, UNIQUE(track))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tracks (id TEXT PRIMARY KEY, track TEXT, color TEXT, UNIQUE(track))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tracks', null,
@@ -42,7 +43,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, monthly BOOLEAN, track INTEGER, time TEXT, section TEXT, UNIQUE(task,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, task TEXT, year INTEGER, month INTEGER, day INTEGER, taskState INTEGER, recurring INTEGER, monthly BOOLEAN, track INTEGER, time TEXT, section TEXT, UNIQUE(task,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tasks', null,
@@ -51,7 +52,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS moods (id INTEGER PRIMARY KEY AUTOINCREMENT, mood TEXT, year INTEGER, month INTEGER, day INTEGER,UNIQUE(year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS moods (id TEXT PRIMARY KEY, mood TEXT, year INTEGER, month INTEGER, day INTEGER,UNIQUE(year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM moods', null,
@@ -60,7 +61,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS sleep (id INTEGER PRIMARY KEY AUTOINCREMENT, sleep INTEGER, wakeup INTEGER, year INTEGER, month INTEGER, day INTEGER, type INT, UNIQUE(sleep,year,month,day),UNIQUE(wakeup,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS sleep (id TEXT PRIMARY KEY, sleep INTEGER, wakeup INTEGER, year INTEGER, month INTEGER, day INTEGER, type INT, UNIQUE(sleep,year,month,day),UNIQUE(wakeup,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM sleep', null,
@@ -69,54 +70,63 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS states (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, item TEXT, color TEXT)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS states (id TEXT PRIMARY KEY, name TEXT, item TEXT, color TEXT,place INTEGER)')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM states', null,
+      tx.executeSql('SELECT * FROM states ORDER BY place;', null,
       (txObj, resultSet) => setStates(resultSet.rows._array),
       (txObj, error) => console.log('error selecting states')
       );
     });
     db.transaction((tx) => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS staterecords (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, item TEXT, UNIQUE(name,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS staterecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, item TEXT, UNIQUE(name,year,month,day))')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM staterecords', null,
+      tx.executeSql('SELECT * FROM staterecords ORDER BY day;', null,
       (txObj, resultSet) => setStaterecords(resultSet.rows._array),
       (txObj, error) => console.log('error selecting state records')
       );
     });
   
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS scales (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, min INTEGER, max INTEGER, mincolor TAXT, maxcolor TEXT, unit TEXT)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS scales (id TEXT PRIMARY KEY, name TEXT, min INTEGER, max INTEGER, mincolor TEXT, maxcolor TEXT, unit TEXT, place INTEGER)')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM scales', null,
+      tx.executeSql('SELECT * FROM scales ORDER BY place;', null,
       (txObj, resultSet) => setScales(resultSet.rows._array),
       (txObj, error) => console.log('error selecting scales')
       );
     });
     db.transaction((tx) => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS scalerecords (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, year INTEGER, month INTEGER, day INTEGER, value INTEGER, UNIQUE(name,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS scalerecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, value INTEGER, UNIQUE(name,year,month,day))')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM scalerecords', null,
+      tx.executeSql('SELECT * FROM scalerecords ORDER BY day;', null,
       (txObj, resultSet) => setScalerecords(resultSet.rows._array),
       (txObj, error) => console.log('error selecting stale records')
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS times (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, min INTEGER, max INTEGER, mincolor TAXT, maxcolor TEXT)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS times (id TEXT PRIMARY KEY, name TEXT, type TEXT, min INTEGER, max INTEGER, mincolor TEXT, maxcolor TEXT, place INTEGER)')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM times', null,
+      tx.executeSql('SELECT * FROM times ORDER BY place', null,
       (txObj, resultSet) => setTimes(resultSet.rows._array),
       (txObj, error) => console.log('error selecting times')
       );
     });
+    db.transaction((tx) => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS timerecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, value INTEGER, UNIQUE(name,year,month,day))')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM timerecords ORDER BY day;', null,
+      (txObj, resultSet) => setTimerecords(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting time records')
+      );
+    });
   
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS diary (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, notes TEXT, img1 TEXT, img2 TEXT, img3 TEXT, img4 TEXT)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS diary (id TEXT PRIMARY KEY, year INTEGER, month INTEGER, day INTEGER, notes TEXT, img1 TEXT, img2 TEXT, img3 TEXT, img4 TEXT)')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM diary', null,
@@ -126,7 +136,7 @@ const useDatabase = () => {
     });
 
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS sections (id INTEGER PRIMARY KEY AUTOINCREMENT, section TEXT, track TEXT)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS sections (id TEXT PRIMARY KEY, section TEXT, track TEXT)')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM sections', null,
@@ -136,7 +146,7 @@ const useDatabase = () => {
     });
  
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS progress (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, track TEXT, list TEXT, progress INTEGER, rate INTEGER)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS progress (id TEXT PRIMARY KEY, name TEXT, track TEXT, list TEXT, progress INTEGER, rate INTEGER)')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM progress', null,
@@ -162,6 +172,7 @@ const useDatabase = () => {
     scales,
     scalerecords,
     times,
+    timerecords,
     diary,
     load,
     db,
@@ -178,6 +189,7 @@ const useDatabase = () => {
     setScales,
     setScalerecords,
     setTimes,
+    setTimerecords,
     setDiary,
     setDb,
     setIsLoading,

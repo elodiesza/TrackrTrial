@@ -44,8 +44,10 @@
     "react-native-svg": "13.4.0",
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-swiper": "^1.6.0",
+    "react-native-uuid": "^2.0.1",
     "react-native-vector-icons": "^9.2.0",
-    "toggle-switch-react-native": "^3.3.0"
+    "toggle-switch-react-native": "^3.3.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable,TouchableOpacity, Dimensions } from 'react-native';
 
-const IndicatorTableTitle = ({name, habits, year, month, setModalVisible}) => {
+const IndicatorTableTitle = ({name, year, month, setModalVisible}) => {
 
     return (
             <TouchableOpacity onPress={()=>setModalVisible(name)} style={{width:1, height:1}}>

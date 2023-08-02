@@ -15,17 +15,6 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
 
   const {control, handleSubmit, reset} = useForm();
   const [itemlist, setItemlist] = useState([{ colorPickerVisible: false, picked: '', value: undefined }]);
-
-  const removeDb = () => {
-    db.transaction(tx => {
-      tx.executeSql('DROP TABLE IF EXISTS states', null,
-        (txObj, resultSet) => setStates([]),
-        (txObj, error) => console.log('error deleting states')
-      );
-    });
-    loadx(!load);
-  }
-
   
   const AddItemtolist = () => {
     setItemlist((prevList) => [...prevList, { colorPickerVisible: false, picked: '' }]);
@@ -45,18 +34,20 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
 
   const addState = async (data) => {
     let existingstates = [...states]; 
+    var newPlace = [... new Set(existingstates.map(c => c.name))].length; 
       for (let i = 0; i < itemlist.length; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO states (name, item, color) VALUES (?, ?, ?)',
-              [data.name, itemlist[i].value, itemlist[i].picked],
+              'INSERT INTO states (name, item, color, place) VALUES (?, ?, ?, ?)',
+              [data.name, itemlist[i].value, itemlist[i].picked, newPlace],
               (txtObj, stateResultSet) => {
                 const newStateId = stateResultSet.insertId;
                 const newState = {
                   id: newStateId,
                   name: data.name,
                   item: itemlist[i].value,
-                  color: itemlist[i].picked
+                  color: itemlist[i].picked,
+                  place: newPlace,
                 };
                 existingstates.push(newState);
                 setStates(existingstates); 
@@ -65,14 +56,14 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
         });
       }
 
-    let existingrecords = [...staterecords]; 
+    let existingrecords = [...staterecords];
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
               'INSERT INTO staterecords (name, year, month, day, item) VALUES (?, ?, ?, ?, ?)',
               [data.name, year, month, i, ''],
-              (txtObj, stateResultSet2) => {
-                const newStateId = stateResultSet2.insertId;
+              (txtObj, stateResultSet) => {
+                const newStateId = stateResultSet.insertId;
                 const newState = {
                   id: newStateId,
                   name: data.name,
@@ -165,7 +156,7 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
         />
       </View>  
       <Pressable onPress={AddItemtolist} style={{display:index+1==itemlist.length?'flex':'none'}}>
-        <Feather name='plus-circle' size={30} color={colors.blue} style={{marginRight:5, bottom:10, marginTop: 10}}/>
+        <Feather name='plus-circle' size={30} color={colors.primary.blue} style={{marginRight:5, bottom:10, marginTop: 10}}/>
       </Pressable>
     </View> 
     );
@@ -234,8 +225,6 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
                 contentContainerStyle={{width:"100%", alignItems:'center', justifyContent:'center'}}
             />
               <Pressable onPress={handleSubmit(addState)} style={container.button}><Text>CREATE</Text></Pressable>
-              <Pressable onPress={removeDb} style={container.button}><Text>detete STATES</Text></Pressable>
-
             <Text style={{color: 'gray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
           </View> 
         </TouchableWithoutFeedback>

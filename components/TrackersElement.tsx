@@ -264,11 +264,51 @@ function colorMixer(rgbA, rgbB, amountToMix){
   return "rgb("+r+","+g+","+b+")";
 }
 
+const habitsNames = [...new Set(habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))];
+const uniqueStatesNames = [...new Set(staterecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
+const uniqueScalesNames = [...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
+const uniqueNames = [...new Set([ ...uniqueScalesNames, ...uniqueStatesNames, ...habitsNames])];
+
+const habitsType = Array.from({ length:[...new Set(habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "habit");
+const statesType = Array.from({ length:[...new Set(staterecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "state");
+const scalesType = Array.from({ length:[...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "scale");
+const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])];
+
     const removeDb = () => {
       db.transaction(tx => {
         tx.executeSql('DROP TABLE IF EXISTS habits', null,
           (txObj, resultSet) => setHabits([]),
           (txObj, error) => console.log('error deleting habits')
+        );
+      });
+      loadx(!load);
+    }
+    const removeScalesDb = () => {
+      db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS scales', null,
+          (txObj, resultSet) => setScales([]),
+          (txObj, error) => console.log('error deleting scales')
+        );
+      });
+      db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS scalerecords', null,
+          (txObj, resultSet) => setScalerecords([]),
+          (txObj, error) => console.log('error deleting scalerecords')
+        );
+      });
+      loadx(!load);
+    }
+    const removeStatesDb = () => {
+      db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS states', null,
+          (txObj, resultSet) => setStates([]),
+          (txObj, error) => console.log('error deleting states')
+        );
+      });
+      db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
+          (txObj, resultSet) => setStaterecords([]),
+          (txObj, error) => console.log('error deleting state records')
         );
       });
       loadx(!load);
@@ -382,7 +422,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=> updateHabit(state.id)}>
-              <View style={[styles.cell, { backgroundColor : filteredhabits[index].state==1 ? '#242424' : 'white' }]} />
+              <View style={[container.cell, { backgroundColor : filteredhabits[index].state==1 ? '#242424' : 'white' }]} />
             </TouchableOpacity>
           </View>
         )
@@ -397,22 +437,21 @@ function colorMixer(rgbA, rgbB, amountToMix){
       );
     };   
 
-    const showTitle = (ind) => {
+    const showTitle = ({item,index}) => {
       return (
         <View>
           <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:25 }}>
-            <IndicatorTableTitle name={ind.item} habits={habits} year={year} month={month} setModalVisible={setModalVisible}/>
+            <IndicatorTableTitle name={item} year={year} month={month} setModalVisible={setModalVisible}/>
           </Pressable>
           <IndicatorMenu
-            data={ind.item}
-            modalVisible={modalVisible === ind.item}
+            data={item}
+            modalVisible={modalVisible === item}
             setModalVisible={setModalVisible}
-            index={ind.id}
             month={month}
             year={year}
             db={db}
-            setHabits={setHabits}
-            habits={habits}
+            setUpdate={uniqueTypes[index]=='habit'? setHabits : uniqueTypes[index]=='state'? setStaterecords : setScalerecords}
+            update={uniqueTypes[index]=='habit'? habits : uniqueTypes[index]=='state'? staterecords : scalerecords}
             loadx={loadx}
             load={load}
           />
@@ -426,7 +465,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=>{setSelectedStateItem(item.item);setSelectedStateId(item.id);setSelectedStateIndex(index);setSelectedStateName(name);setStateModalVisible(true)}}>
-              <View style={[styles.cell, { backgroundColor : item.item==""?  colors.primary.white : states.filter(c=>(c.name==item.name && c.item==item.item)).map(c=>c.color)[0]}]}/>
+              <View style={[container.cell, { backgroundColor : item.item==""?  colors.primary.white : states.filter(c=>(c.name==item.name && c.item==item.item)).map(c=>c.color)[0]}]}/>
             </TouchableOpacity>
             <Modal
             animationType="none"
@@ -443,7 +482,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
             >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedStateItem('');setSelectedStateId('');setStateModalVisible(!stateModalVisible);setSelectedStateIndex(-1);setSelectedStateName('');}} activeOpacity={1}>
               <TouchableWithoutFeedback>
-                <View style={styles.dialogBox}>
+                <View style={container.modal}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} state</Text>
                   <FlatList
                     horizontal
@@ -472,11 +511,11 @@ function colorMixer(rgbA, rgbB, amountToMix){
       const maxvalue = scales.filter(c=>c.name==name).map(c=>c.max)[0];
       return scaleslist.map((item,index) => {
         const amountomix = (maxvalue-item.value)/(maxvalue-minvalue);
-        const colormix = colorMixer(mincolor,maxcolor,amountomix);
+        const colormix = mincolor!==null && maxcolor!==null?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=>{setSelectedScaleItem(item.value);setSelectedScaleId(item.id);setSelectedScaleIndex(index);setSelectedScaleName(name);setScaleModalVisible(true)}}>
-              <View style={[styles.cell, { backgroundColor : item.value==undefined? colors.white : colormix}]}>
+              <View style={[container.cell, { backgroundColor : item.value==undefined? colors.primary.white : colormix}]}>
                 <Text>{item.value}</Text>
               </View>
             </TouchableOpacity>
@@ -497,7 +536,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{height:130, width: 200}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} scale</Text>
-                  <AddScale name={name} scales={scales} setScales={setScales} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setScaleModalVisible={setScaleModalVisible}/> 
+                  <AddScale name={selectedScaleName} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setScaleModalVisible={setScaleModalVisible}/> 
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -554,10 +593,10 @@ function colorMixer(rgbA, rgbB, amountToMix){
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setMoodModalVisible(!moodModalVisible);setSelectedMoodIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
-                <View style={styles.dialogBox}>
+                <View style={container.modal}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} mood</Text>
                   <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setMoodModalVisible={setMoodModalVisible}/>
-                  <TouchableOpacity onPress={() => deleteMood(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
+                  <TouchableOpacity onPress={() => deleteMood(index)} style={[container.button,{backgroundColor: 'lightgray'}]}>
                     <Text>Delete</Text>
                   </TouchableOpacity>
                 </View>
@@ -606,7 +645,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
       let sleepColor= sleepColorCode!==null? sleepColorCode>0.5? colorMixer([130,200,50], [255,255,0], 2*sleepColorCode) : colorMixer([255,255,50], [255,0,0], 2*sleepColorCode) : 'white';
       return  (
         <View>
-          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: sleep.filter(c=>(c.year==year && c.month==month)).length==0? 'white': sleepColor}}>
+          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: (sleep.filter(c=>(c.year==year && c.month==month)).map(c=>c.sleep)[0]==undefined || sleep.filter(c=>(c.year==year && c.month==month)).map(c=>c.wakeup)[0]==undefined)? colors.primary.white: sleepColor}}>
             <Text style={{textAlign:'center', textAlignVertical:'center'}}>{item}</Text>
           </Pressable>
           <Modal
@@ -621,17 +660,9 @@ function colorMixer(rgbA, rgbB, amountToMix){
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
-                <View style={styles.dialogBox}>
+                <View style={[container.modal,{height:200}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
                   <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
-                  <View style={{flexDirection:'row', flex:1}}>
-                    <TouchableOpacity onPress={() => setSleepModalVisible(!sleepModalVisible)} style={[styles.button,{backgroundColor: 'lightgray', marginLeft : 29}]}>
-                      <Text>Update</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray', marginLeft : 20}]}>
-                      <Text>Delete</Text>
-                    </TouchableOpacity>
-                  </View>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -657,10 +688,10 @@ function colorMixer(rgbA, rgbB, amountToMix){
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
-                <View style={styles.dialogBox}>
+                <View style={container.modal}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
                   <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
-                  <TouchableOpacity onPress={() => deleteSleep(index)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
+                  <TouchableOpacity onPress={() => deleteSleep(index)} style={[container.button,{backgroundColor: 'lightgray'}]}>
                     <Text>Delete</Text>
                   </TouchableOpacity>
                 </View>
@@ -690,12 +721,6 @@ function colorMixer(rgbA, rgbB, amountToMix){
       });
       setSleepModalVisible(false);
     };
-
-
-    const habitsNames = [...new Set (habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))];
-    const uniqueStatesNames = [...new Set (states.map(c=>c.name))];
-    const uniqueScalesNames = [...new Set (scales.map(c=>c.name))];
-    const uniqueNames = [...new Set([ ...uniqueScalesNames, ...uniqueStatesNames, ...habitsNames])];
 
     const thismonthMoods = (year,month) =>{
       var arr= [];
@@ -754,7 +779,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
             />
           </View>
           <ScrollView horizontal={true} style={{flex:1,flexDirection:'row'}}>
-            <View>
+            <View style={{display: moods.filter(c=>(c.year==year && c.month==month)).length==0?"none":"flex"}}>
               <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>MOOD</Text>
               <FlatList
                 data={thismonthMoods(year,month)}
@@ -764,7 +789,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
                 scrollEnabled={false}
               />
             </View>
-            <View>
+            <View style={{display: sleep.filter(c=>(c.year==year && c.month==month)).length==0?"none":"flex"}}>
               <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>SLEEP TIME</Text>
                 <FlatList
                   data={thismonthSleep(year,month)}
@@ -774,7 +799,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
                   scrollEnabled={false}
                 />
             </View>
-            <View>
+            <View style={{display: sleep.filter(c=>(c.year==year && c.month==month)).length==0?"none":"flex"}}>
               <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>SLEEP QUALITY</Text>
                 <FlatList
                   data={thismonthSleepQuality(year,month)}
@@ -788,8 +813,8 @@ function colorMixer(rgbA, rgbB, amountToMix){
               <FlatList
                 horizontal
                 data={uniqueNames}
-                renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
-                keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
+                renderItem={uniqueNames!==null?({item,index})=>showTitle({item,index}):undefined}
+                keyExtractor={(item) => (item==null && item!==undefined) ? item.toString():''} 
                 contentContainerStyle={{paddingRight:75}}
               />
               <View style={{flexDirection:'row',alignItems:'flex-start'}}> 
@@ -828,11 +853,13 @@ function colorMixer(rgbA, rgbB, amountToMix){
         <View pointerEvents="none" style={{display: year==thisYear?(month==thisMonth?'flex':'none'):'none',position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >
       )}
-            {/*<Button title='remove thismonth indicators' onPress={removeDbMonth} />
-            <Button title='remove Indicators' onPress={removeDb} />
+      {/*<Button title='remove Scales' onPress={removeScalesDb} />
+      <Button title='remove States' onPress={removeStatesDb} />
+      <Button title='remove thismonth indicators' onPress={removeDbMonth} />
+      <Button title='remove Indicators' onPress={removeDb} />
       <Button title='remove tracks' onPress={removetracksDb} /> */}
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
-        <Feather name='plus-circle' size={50} />
+        <Feather name='plus-circle' size={50} color={colors.primary.blue} />
       </ TouchableOpacity> 
       <NewIndicator
         addModalVisible={addModalVisible===true}
@@ -857,50 +884,7 @@ function colorMixer(rgbA, rgbB, amountToMix){
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex:16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    flex: 1,
-    width: width,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  cell: {
-    width: 25,
-    height: 25,
-    borderColor: 'black',
-    borderWidth: 0.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dialogBox: {
-    flex: 1, 
-    top: 200,
-    position: 'absolute',
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    borderWidth: 2,
-    borderColor: 'lightgray',
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    padding: 15,
-  },
-  button: {
-    width: 100,
-    height: 40,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
+
   polygon: {
     width: 25,
     height: 75,

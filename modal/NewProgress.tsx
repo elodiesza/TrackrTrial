@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
-import moment from 'moment';
 import { useForm, Controller, set } from 'react-hook-form';
 import { container, colors} from '../styles';
+import uuid from 'react-native-uuid';
 
 function NewProgress({addModalVisible, setAddModalVisible, db, progress, setProgress, section, track}) {
   
@@ -13,7 +13,7 @@ function NewProgress({addModalVisible, setAddModalVisible, db, progress, setProg
         db.transaction((tx) => {
           tx.executeSql('INSERT INTO progress ( name, track, list, progress, rate) values (?,?,?,?,?)',[data.name, track, section, 0,0],
           (txtObj,resultSet)=> {    
-            existingProgress.push({ id: resultSet.insertId, name: data.name, track: track, list: section, progress: 0, rate: 0});
+            existingProgress.push({ id: uuid.v4(), name: data.name, track: track, list: section, progress: 0, rate: 0});
             setProgress(existingProgress);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)

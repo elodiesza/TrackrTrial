@@ -9,7 +9,7 @@ import Task from './Task';
 
 const width = Dimensions.get('window').width;
 
-function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, setDate, sections}) {
+function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, sections}) {
   const today = new Date();
   const month = today.getMonth();
   const year = today.getFullYear();
@@ -57,24 +57,19 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
           existingLogs=[];
 
           if (lastLog!==undefined) {
-            console.warn('enters');
             var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
             console.warn(daysBetweenLastAndToday);
             for(var j=1;j<daysBetweenLastAndToday+1;j++){
-              console.warn('enters');
               var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
-              console.warn(newDate);
-              console.warn(existingRecurringTasks.length);
               for (var i=0; i<existingRecurringTasks.length;i++){    
-                console.warn('enters');  
                 let newTask=existingRecurringTasks[i].task;
                 console.warn(existingRecurringTasks[i].task);
                 let copytrack=existingRecurringTasks[i].track;
                 let copyTime=existingRecurringTasks[i].time;
                 db.transaction(tx => {
-                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copytrack,copyTime],
+                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copytrack,copyTime,undefined],
                     (txtObj,resultSet)=> {   
-                      existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, track:copytrack, time:copyTime});
+                      existingTasks.push({ id: resultSet.insertId, task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, track:copytrack, time:copyTime, section: undefined});
                       setTasks(existingTasks);
                     },
                   );
@@ -111,7 +106,6 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
 
   const addLog = () => {
     let existingLogs = [...logs];  
-      console.warn('creates new log');
       db.transaction(tx => {
         tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day-1],
           (txtObj,resultSet)=> {    

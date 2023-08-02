@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller, set } from 'react-hook-form';
+import uuid from 'react-native-uuid';
 
 function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, tracks, setTracks, year, month}) {
 
@@ -22,8 +23,8 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, trac
     let existingTasks = [...tasks]; 
         db.transaction((tx) => {
           tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,year,month,undefined,0,recurring?1:0,true,undefined,undefined, undefined],
-          (txtObj,resultSet)=> {    
-            existingTasks.push({ id: resultSet.insertId, task: data.task, year:year, month:month, day:undefined, taskState:0, recurring:recurring?1:0, monthly:true, track:undefined, time:undefined, section:undefined});
+          (txtObj,)=> {    
+            existingTasks.push({ id: uuid.v4(), task: data.task, year:year, month:month, day:undefined, taskState:0, recurring:recurring?1:0, monthly:true, track:undefined, time:undefined, section:undefined});
             setTasks(existingTasks);
           },
           (txtObj, error) => console.warn('Error inserting data:', error)

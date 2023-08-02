@@ -9,8 +9,6 @@ import Analytics from './screens/Analytics';
 import Tracks from './screens/Tracks';
 import Feather from '@expo/vector-icons/Feather';
 import { SimpleLineIcons } from '@expo/vector-icons';
-import { useEffect,useState } from 'react';
-import * as SQLite from 'expo-sqlite';
 import useDatabase from './db'; // Import the useDatabase function
 
 const Tab = createBottomTabNavigator();
@@ -28,6 +26,8 @@ export default function App() {
     staterecords,
     scales,
     scalerecords,
+    times,
+    timerecords,
     diary,
     load,
     db,
@@ -43,6 +43,8 @@ export default function App() {
     setStaterecords,
     setScales,
     setScalerecords,
+    setTimes,
+    setTimerecords,
     setDiary,
     setDb,
     setIsLoading,
@@ -85,6 +87,8 @@ export default function App() {
         staterecords={staterecords} setStaterecords={setStaterecords}
         states={states} setStates={setStates}
         sections={sections}
+        times={times} setTimes={setTimes}
+        timerecords={timerecords} setTimerecords={setTimerecords}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (

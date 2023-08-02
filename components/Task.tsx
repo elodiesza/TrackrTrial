@@ -12,7 +12,7 @@ const width = Dimensions.get('window').width;
 function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, taskState, id ,track, time, section, trackScreen}) {
 
 
-  const updateTaskState = (id) => {
+  const updateTaskState = () => {
     let existingTasks=[...tasks];
     const indexToUpdate = existingTasks.findIndex(c => c.id === id);
     let postponedTask = existingTasks[indexToUpdate].task;
@@ -62,9 +62,9 @@ function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, task
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time) values (?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime],
+          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime, section],
             (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime});
+              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime, section:section});
             },
           );
         });
@@ -114,7 +114,7 @@ function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, task
 
   return (
     <View style={container.taskcontainer}>
-    <Pressable onPress={()=> updateTaskState(id)}>
+    <Pressable onPress={()=> updateTaskState()}>
       <MaterialCommunityIcons name={taskState===0 ? 'checkbox-blank-outline' : (
         taskState===1 ? 'checkbox-intermediate' : (
         taskState===2 ? 'checkbox-blank' :

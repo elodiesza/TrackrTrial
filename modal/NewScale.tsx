@@ -5,6 +5,7 @@ import { container,colors } from '../styles';
 import { MaterialIcons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
+import uuid from 'react-native-uuid';
 
 
 function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddModalVisible, load, loadx, db, scales, setScales, scalerecords, setScalerecords}) {
@@ -18,22 +19,10 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
     const [colorPickerVisibleMax, setColorPickerVisibleMax] = useState(false);
     const [pickedMin, setPickedMin] = useState(colors.primary.white);
     const [pickedMax, setPickedMax] = useState(colors.primary.white);
-    const [valueMin, setValueMin] = useState(0);
-    const [valueMax, setValueMax] = useState(0);
     const [addColor, setAddColor] = useState(false);
     const [addUnit, setAddUnit] = useState(false);
     const [addValue, setAddValue] = useState(false);
 
-  const removeDb = () => {
-    db.transaction(tx => {
-      tx.executeSql('DROP TABLE IF EXISTS scales', null,
-        (txObj, resultSet) => setScales([]),
-        (txObj, error) => console.log('error deleting scales')
-      );
-    });
-    loadx(!load);
-  }
-  
 
   useEffect(() => {
     if (!newScaleVisible) {
@@ -44,21 +33,22 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
 
   const addScale = async (data) => {
     let existingscales = [...scales]; 
+    var newPlace = existingscales.length;
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO scales (name, min, max, mincolor, maxcolor, unit) VALUES (?, ?, ?, ?, ?, ?)',
+              'INSERT INTO scales (name, min, max, mincolor, maxcolor, unit, place) VALUES (?, ?, ?, ?, ?, ?, ?)',
               [data.name, addValue? data.valueMin : undefined, addValue? data.valueMax : undefined, 
-                addColor? pickedMin : undefined, addColor? pickedMax : undefined ,addUnit? data.unit : undefined],
+                addColor? pickedMin : undefined, addColor? pickedMax : undefined ,addUnit? data.unit : undefined, newPlace],
               (txtObj, scaleResultSet) => {
-                const newScaleId = scaleResultSet.insertId;
                 const newScale = {
-                    id: newScaleId,
+                    id: uuid.v4(),
                     name: data.name,
                     min: addValue? data.valueMin : undefined,
                     max: addValue? data.valueMax : undefined,
                     mincolor: addColor? pickedMin : undefined,
                     maxcolor: addColor? pickedMax : undefined,
                     unit: addUnit? data.unit : undefined,
+                    place: newPlace,
                 };
                 existingscales.push(newScale);
                 setScales(existingscales); 
@@ -72,8 +62,8 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
             tx.executeSql(
               'INSERT INTO scalerecords (name, year, month, day, value) VALUES (?, ?, ?, ?, ?)',
               [data.name, year, month, i, undefined],
-              (txtObj, scaleResultSet2) => {
-                const newScaleId = scaleResultSet2.insertId;
+              (txtObj, scaleResultSet) => {
+                const newScaleId = scaleResultSet.insertId;
                 const newScale = {
                   id: newScaleId,
                   name: data.name,
@@ -89,6 +79,7 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
             );
         });
       }
+
     setNewScaleVisible(false);
     setAddModalVisible(false);
     loadx(!load);
@@ -281,8 +272,6 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                 </View>
                 
                 <Pressable onPress={handleSubmit(addScale)} style={container.button}><Text>CREATE</Text></Pressable>
-                <Pressable onPress={removeDb} style={container.button}><Text>detete Scales</Text></Pressable>
-
             <Text style={{color: 'gray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
           </View> 
         </TouchableWithoutFeedback>

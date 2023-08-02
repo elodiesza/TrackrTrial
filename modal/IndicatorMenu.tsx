@@ -3,26 +3,23 @@ import { StyleSheet, Modal, Alert, TouchableWithoutFeedback, Pressable, Touchabl
 import Feather from '@expo/vector-icons/Feather';
 import IsLoading from './IsLoading';
 import ChangeHabitName from './ChangeHabitName';
+import { container, colors } from '../styles';
 
-
-
-const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index, db, setHabits, habits, loadx, load }) => {
+const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, db, setUpdate, update, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [changeModalVisible, setChangeModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [displayLeft, setDisplayLeft] = useState<"none" | "flex" | undefined>('flex');
     const [displayRight, setDisplayRight] = useState<"none" | "flex" | undefined>('flex');
 
-
-
     useEffect(() => {
-      if(habits.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
+      if(update.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==0){
         setDisplayLeft('none');
       }
     },[load]);
     useEffect(() => {
-      const lastPlace = habits.filter(c=>c.day==1).map(c=>c.place).length-1;
-      if(habits.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==lastPlace){
+      const lastPlace = update.filter(c=>c.day==1).map(c=>c.place).length-1;
+      if(update.filter(c=>(c.name==data && c.day==1)).map(c=>c.place)[0]==lastPlace){
         setDisplayRight('none');
       }
     },[load]);
@@ -30,101 +27,256 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
 
     const deleteState = async (name) => {
       setIsLoading(true);
-      let existinghabits = [...habits];
-      const currentPlace = existinghabits.filter((state) => state.name === name && state.day === 1).map((state) => state.place)[0];
-      let remaininghabits = existinghabits.filter((state) => state.name !== name);
-    
-      await new Promise((resolve) => {
-        db.transaction((tx) => {
-          tx.executeSql(
-            'DELETE FROM habits WHERE name = ?',
-            [name],
-            (txObj, deleteResultSet) => {
-              if (deleteResultSet.rowsAffected > 0) {
-                setHabits(remaininghabits);
-                let updatedhabitsCount = 0;
-                let remaininghabitsLength = remaininghabits.length;
-                for (var i = 0; i < remaininghabitsLength; i++) {
-                  if (remaininghabits[i].place > currentPlace) {
-                    let newPlace = remaininghabits[i].place - 1;
-                    let iDtoUpdate = remaininghabits[i].id;
-                    db.transaction((tx) => {
-                      tx.executeSql(
-                        'UPDATE habits SET place = ? WHERE id = ?',
-                        [newPlace, iDtoUpdate],
-                        (txObj, placeResultSet) => {
-                          if (placeResultSet.rowsAffected > 0 && remaininghabits[i]) {
-                            remaininghabits[i].place = newPlace;
-                          }
-                          updatedhabitsCount++;
-                          if (updatedhabitsCount === remaininghabitsLength) {
-                            resolve();
-                          }
-                        },
-                        (txObj, error) => console.log('Error updating data', error)
-                      );
-                    });
-                  } else {
-                    updatedhabitsCount++;
-                    if (updatedhabitsCount === remaininghabitsLength) {
-                      resolve();
+      let existingupdate = [...update];
+      const currentPlace = existingupdate.filter((state) => state.name === name && state.day === 1).map((state) => state.place)[0];
+      let remainingupdate = existingupdate.filter((state) => state.name !== name);
+      if (update==='habits'){
+        await new Promise((resolve) => {
+          db.transaction((tx) => {
+            tx.executeSql(
+              'DELETE FROM habits WHERE name = ?',
+              [name],
+              (txObj, deleteResultSet) => {
+                if (deleteResultSet.rowsAffected > 0) {
+                  setUpdate(remainingupdate);
+                  let updatedupdateCount = 0;
+                  let remainingupdateLength = remainingupdate.length;
+                  for (var i = 0; i < remainingupdateLength; i++) {
+                    if (remainingupdate[i].place > currentPlace) {
+                      let newPlace = remainingupdate[i].place - 1;
+                      let iDtoUpdate = remainingupdate[i].id;
+                      db.transaction((tx) => {
+                        tx.executeSql(
+                          'UPDATE habits SET place = ? WHERE id = ?',
+                          [newPlace, iDtoUpdate],
+                          (txObj, placeResultSet) => {
+                            if (placeResultSet.rowsAffected > 0 && remainingupdate[i]) {
+                              remainingupdate[i].place = newPlace;
+                            }
+                            updatedupdateCount++;
+                            if (updatedupdateCount === remainingupdateLength) {
+                              resolve();
+                            }
+                          },
+                          (txObj, error) => console.log('Error updating data', error)
+                        );
+                      });
+                    } else {
+                      updatedupdateCount++;
+                      if (updatedupdateCount === remainingupdateLength) {
+                        resolve();
+                      }
                     }
                   }
+                } else {
+                  resolve();
                 }
-              } else {
-                resolve();
-              }
-            },
-            (txObj, error) => console.log(error)
-          );
+              },
+              (txObj, error) => console.log(error)
+            );
+          });
         });
-      });
-    
-      setHabits([...remaininghabits]);
+      }
+      else if (update==='states'){
+        await new Promise((resolve) => {
+          db.transaction((tx) => {
+            tx.executeSql(
+              'DELETE FROM states WHERE name = ?',
+              [name],
+              (txObj, deleteResultSet) => {
+                if (deleteResultSet.rowsAffected > 0) {
+                  setUpdate(remainingupdate);
+                  let updatedupdateCount = 0;
+                  let remainingupdateLength = remainingupdate.length;
+                  for (var i = 0; i < remainingupdateLength; i++) {
+                    if (remainingupdate[i].place > currentPlace) {
+                      let newPlace = remainingupdate[i].place - 1;
+                      let iDtoUpdate = remainingupdate[i].id;
+                      db.transaction((tx) => {
+                        tx.executeSql(
+                          'UPDATE states SET place = ? WHERE id = ?',
+                          [newPlace, iDtoUpdate],
+                          (txObj, placeResultSet) => {
+                            if (placeResultSet.rowsAffected > 0 && remainingupdate[i]) {
+                              remainingupdate[i].place = newPlace;
+                            }
+                            updatedupdateCount++;
+                            if (updatedupdateCount === remainingupdateLength) {
+                              resolve();
+                            }
+                          },
+                          (txObj, error) => console.log('Error updating data', error)
+                        );
+                      });
+                    } else {
+                      updatedupdateCount++;
+                      if (updatedupdateCount === remainingupdateLength) {
+                        resolve();
+                      }
+                    }
+                  }
+                } else {
+                  resolve();
+                }
+              },
+              (txObj, error) => console.log(error)
+            );
+          });
+        });
+      }
+      else if (update==='scales'){
+        await new Promise((resolve) => {
+          db.transaction((tx) => {
+            tx.executeSql(
+              'DELETE FROM scales WHERE name = ?',
+              [name],
+              (txObj, deleteResultSet) => {
+                if (deleteResultSet.rowsAffected > 0) {
+                  setUpdate(remainingupdate);
+                  let updatedupdateCount = 0;
+                  let remainingupdateLength = remainingupdate.length;
+                  for (var i = 0; i < remainingupdateLength; i++) {
+                    if (remainingupdate[i].place > currentPlace) {
+                      let newPlace = remainingupdate[i].place - 1;
+                      let iDtoUpdate = remainingupdate[i].id;
+                      db.transaction((tx) => {
+                        tx.executeSql(
+                          'UPDATE scales SET place = ? WHERE id = ?',
+                          [newPlace, iDtoUpdate],
+                          (txObj, placeResultSet) => {
+                            if (placeResultSet.rowsAffected > 0 && remainingupdate[i]) {
+                              remainingupdate[i].place = newPlace;
+                            }
+                            updatedupdateCount++;
+                            if (updatedupdateCount === remainingupdateLength) {
+                              resolve();
+                            }
+                          },
+                          (txObj, error) => console.log('Error updating data', error)
+                        );
+                      });
+                    } else {
+                      updatedupdateCount++;
+                      if (updatedupdateCount === remainingupdateLength) {
+                        resolve();
+                      }
+                    }
+                  }
+                } else {
+                  resolve();
+                }
+              },
+              (txObj, error) => console.log(error)
+            );
+          });
+        });
+      }
+      setUpdate([...remainingupdate]);
       setModalVisible(false);
       loadx(!load);
       setIsLoading(false);
     };
 
+
     const moveLeft = (name) => {
       setIsLoading(true);
-      let existinghabits = [...habits];
-      let sortedhabits = [...habits];
-      let nameList = existinghabits.filter(c=>c.day==1).map(c=>c.name);
+      let existingupdate = [...update];
+      let sortedupdate = [...update];
+      let nameList = existingupdate.filter(c=>c.day==1).map(c=>c.name);
       let nameIndex = nameList.indexOf(name);
       let previousName = nameList[nameIndex-1];
-      let newPlace2 = existinghabits.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
-      let newPlace = existinghabits.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
-      let toMoveLeftIndex = existinghabits.indexOf(name);
-      let toMoveRightIndex = existinghabits.indexOf(previousName);
-      let impactedDays = existinghabits.filter(c=>c.name==name).map(c=>c.day).length;
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace, name],
-          (txObj, resultSet) => {
-            for (var i=1; i<impactedDays+1;i++){
-            if (resultSet.rowsAffected > 0) {
-                sortedhabits[toMoveRightIndex-1+i] = existinghabits[toMoveLeftIndex-1+i];
-                setHabits(sortedhabits);
-                
+      let newPlace2 = existingupdate.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
+      let newPlace = existingupdate.filter(c=>(c.name==previousName && c.day==1)).map(c=>c.place)[0];
+      let toMoveLeftIndex = existingupdate.indexOf(name);
+      let toMoveRightIndex = existingupdate.indexOf(previousName);
+      let impactedDays = existingupdate.filter(c=>c.name==name).map(c=>c.day).length;
+      if(update='habits'){
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace, name],
+            (txObj, resultSet) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet.rowsAffected > 0) {
+                  sortedupdate[toMoveRightIndex-1+i] = existingupdate[toMoveLeftIndex-1+i];
+                  setUpdate(sortedupdate);
+                  
+                }
               }
-            }
-          },
-          (txObj, error) => console.log('Error updating data', error)
-        );
-      });
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace2, previousName],
-          (txObj, resultSet2) => {
-            for (var i=1; i<impactedDays+1;i++){
-            if (resultSet2.rowsAffected > 0) {
-                [...sortedhabits][toMoveLeftIndex-1+i] = existinghabits[toMoveRightIndex-1+i];
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace2, previousName],
+            (txObj, resultSet2) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet2.rowsAffected > 0) {
+                  [...sortedupdate][toMoveLeftIndex-1+i] = existingupdate[toMoveRightIndex-1+i];
+                }
               }
-            }
-            setHabits([...sortedhabits]);
-          },
-          (txObj, error) => console.log('Error updating data', error)
-        );
-      });
+              setUpdate([...sortedupdate]);
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+      }
+      else if(update='states'){
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace, name],
+            (txObj, resultSet) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet.rowsAffected > 0) {
+                  sortedupdate[toMoveRightIndex-1+i] = existingupdate[toMoveLeftIndex-1+i];
+                  setUpdate(sortedupdate);
+                  
+                }
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE states SET place = ? WHERE name = ?', [newPlace2, previousName],
+            (txObj, resultSet2) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet2.rowsAffected > 0) {
+                  [...sortedupdate][toMoveLeftIndex-1+i] = existingupdate[toMoveRightIndex-1+i];
+                }
+              }
+              setUpdate([...sortedupdate]);
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+      }
+      else if(update='scales'){
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE scales SET place = ? WHERE name = ?', [newPlace, name],
+            (txObj, resultSet) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet.rowsAffected > 0) {
+                  sortedupdate[toMoveRightIndex-1+i] = existingupdate[toMoveLeftIndex-1+i];
+                  setUpdate(sortedupdate);
+                  
+                }
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE scales SET place = ? WHERE name = ?', [newPlace2, previousName],
+            (txObj, resultSet2) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet2.rowsAffected > 0) {
+                  [...sortedupdate][toMoveLeftIndex-1+i] = existingupdate[toMoveRightIndex-1+i];
+                }
+              }
+              setUpdate([...sortedupdate]);
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+      }
       setModalVisible(!modalVisible);
       loadx(!loadx);
       setIsLoading(false);
@@ -132,43 +284,103 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
 
     const moveRight = (name) => {
       setIsLoading(true);
-      let existinghabits = [...habits];
-      let sortedhabits = [...habits];
-      let nameList = existinghabits.filter(c=>c.day==1).map(c=>c.name);
+      let existingupdate = [...update];
+      let sortedupdate = [...update];
+      let nameList = existingupdate.filter(c=>c.day==1).map(c=>c.name);
       let nameIndex = nameList.indexOf(name);
       let nextName = nameList[nameIndex+1];
-      let newPlace2 = existinghabits.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
-      let newPlace = existinghabits.filter(c=>(c.name==nextName && c.day==1)).map(c=>c.place)[0];
-      let toMoveRightIndex = existinghabits.indexOf(name);
-      let toMoveLeftIndex = existinghabits.indexOf(nextName);
-      let impactedDays = existinghabits.filter(c=>c.name==name).map(c=>c.day).length;
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace, name],
-          (txObj, resultSet) => {
-            for (var i=1; i<impactedDays+1;i++){
-            if (resultSet.rowsAffected > 0) {
-                sortedhabits[toMoveLeftIndex-1+i] = existinghabits[toMoveRightIndex-1+i];
-                setHabits(sortedhabits);
-                
+      let newPlace2 = existingupdate.filter(c=>(c.name==name && c.day==1)).map(c=>c.place)[0];
+      let newPlace = existingupdate.filter(c=>(c.name==nextName && c.day==1)).map(c=>c.place)[0];
+      let toMoveRightIndex = existingupdate.indexOf(name);
+      let toMoveLeftIndex = existingupdate.indexOf(nextName);
+      let impactedDays = existingupdate.filter(c=>c.name==name).map(c=>c.day).length;
+      if(update==='habits'){
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace, name],
+            (txObj, resultSet) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet.rowsAffected > 0) {
+                  sortedupdate[toMoveLeftIndex-1+i] = existingupdate[toMoveRightIndex-1+i];
+                  setUpdate(sortedupdate);
+                  
+                }
               }
-            }
-          },
-          (txObj, error) => console.log('Error updating data', error)
-        );
-      });
-      db.transaction(tx=> {
-        tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace2, nextName],
-          (txObj, resultSet2) => {
-            for (var i=1; i<impactedDays+1;i++){
-            if (resultSet2.rowsAffected > 0) {
-                [...sortedhabits][toMoveRightIndex-1+i] = existinghabits[toMoveLeftIndex-1+i];
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE habits SET place = ? WHERE name = ?', [newPlace2, nextName],
+            (txObj, resultSet2) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet2.rowsAffected > 0) {
+                  [...sortedupdate][toMoveRightIndex-1+i] = existingupdate[toMoveLeftIndex-1+i];
+                }
               }
-            }
-            setHabits([...sortedhabits]);
-          },
-          (txObj, error) => console.log('Error updating data', error)
-        );
-      });
+              setUpdate([...sortedupdate]);
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+      }
+      else if(update==='states'){
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE staterecords SET place = ? WHERE name = ?', [newPlace, name],
+            (txObj, resultSet) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet.rowsAffected > 0) {
+                  sortedupdate[toMoveLeftIndex-1+i] = existingupdate[toMoveRightIndex-1+i];
+                  setUpdate(sortedupdate);
+                  
+                }
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE staterecords SET place = ? WHERE name = ?', [newPlace2, nextName],
+            (txObj, resultSet2) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet2.rowsAffected > 0) {
+                  [...sortedupdate][toMoveRightIndex-1+i] = existingupdate[toMoveLeftIndex-1+i];
+                }
+              }
+              setUpdate([...sortedupdate]);
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+      }
+      else if(update==='scales'){
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE scalerecords SET place = ? WHERE name = ?', [newPlace, name],
+            (txObj, resultSet) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet.rowsAffected > 0) {
+                  sortedupdate[toMoveLeftIndex-1+i] = existingupdate[toMoveRightIndex-1+i];
+                  setUpdate(sortedupdate);
+                  
+                }
+              }
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+        db.transaction(tx=> {
+          tx.executeSql('UPDATE scalerecords SET place = ? WHERE name = ?', [newPlace2, nextName],
+            (txObj, resultSet2) => {
+              for (var i=1; i<impactedDays+1;i++){
+              if (resultSet2.rowsAffected > 0) {
+                  [...sortedupdate][toMoveRightIndex-1+i] = existingupdate[toMoveLeftIndex-1+i];
+                }
+              }
+              setUpdate([...sortedupdate]);
+            },
+            (txObj, error) => console.log('Error updating data', error)
+          );
+        });
+      }
       setModalVisible(!modalVisible);
       loadx(!loadx);
       setIsLoading(false);
@@ -187,26 +399,25 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
             loadx(!load);
           }}
         >
-          <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setModalVisible(!modalVisible)}} activeOpacity={1}>
+          <TouchableOpacity style={{flex:1, top: 200, justifyContent: 'flex-start', alignItems: 'center'}} onPressOut={() => {setModalVisible(!modalVisible)}} activeOpacity={1}>
             <TouchableWithoutFeedback>
-              <View style={styles.dialogBox}>
-              <Pressable onPress={()=>moveLeft(data)} style={{display: displayLeft}}>
-                <Feather name="chevron-left" size={25} color={'gray'}/>
-              </Pressable>
-              <Pressable onPress={()=>moveRight(data)} style={{display: displayRight}}>
-                <Feather name="chevron-right" size={25} color={'gray'}/>
-              </Pressable>
-              <Pressable onPress={() => setChangeModalVisible(true)}>
-                <Feather name="edit" size={25}/>
-              </Pressable>
-              <Pressable onPress={() => setDeleteModalVisible(true)}>
-                <Feather name="trash-2" size={25} color={'darkred'}/>
-              </Pressable>
+              <View style={[container.modal,{ width: undefined,paddingVertical:10, flexDirection:'row'}]}>
+                <Pressable onPress={()=>moveLeft(data)} style={{display: displayLeft}}>
+                  <Feather name="chevron-left" size={25} color={'gray'}/>
+                </Pressable>
+                <Pressable onPress={()=>moveRight(data)} style={{display: displayRight}}>
+                  <Feather name="chevron-right" size={25} color={'gray'}/>
+                </Pressable>
+                <Pressable onPress={() => setChangeModalVisible(true)}>
+                  <Feather name="edit" size={25}/>
+                </Pressable>
+                <Pressable onPress={() => setDeleteModalVisible(true)}>
+                  <Feather name="trash-2" size={25} color={'darkred'}/>
+                </Pressable>
               </View>
-              
             </TouchableWithoutFeedback>
           </TouchableOpacity>
-          <ChangeHabitName db={db} data={data} changeModalVisible={changeModalVisible} setChangeModalVisible={setChangeModalVisible} habits={habits} setHabits={setHabits} load={load} loadx={loadx} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+          <ChangeHabitName db={db} data={data} changeModalVisible={changeModalVisible} setChangeModalVisible={setChangeModalVisible} update={update} setUpdate={setUpdate} load={load} loadx={loadx} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
           <Modal
             animationType="none"
             transparent={true}
@@ -218,17 +429,17 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
           >
                 <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setDeleteModalVisible(!deleteModalVisible)}} activeOpacity={1}>
                   <TouchableWithoutFeedback>
-                    <View style={styles.deleteBox}>
+                    <View style={container.modal}>
                       <Text>Are you sure you want to delete</Text>
                       <View style={{flexDirection: 'row'}}>
                         <Text style={{color: '#B9CBCF', fontWeight: 'bold'}}> {data} </Text><Text>?</Text>
                       </View>
                       <Text style={{color: 'gray', fontSize: 10}}>You will not be able to recover your data for this month</Text>
                       <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={() => deleteState(data)} style={[styles.button,{backgroundColor: 'lightgray'}]}>
+                        <TouchableOpacity onPress={() => deleteState(data)} style={[container.button,{backgroundColor: 'lightgray', flex:1}]}>
                           <Text>Delete</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => {setDeleteModalVisible(!deleteModalVisible)}} style={[styles.button,{backgroundColor: '#F4F9FA'}]}>
+                        <TouchableOpacity onPress={() => {setDeleteModalVisible(!deleteModalVisible)}} style={[container.button,{backgroundColor: '#F4F9FA', flex:1}]}>
                           <Text>Cancel</Text>
                         </TouchableOpacity>
                       </View>
@@ -240,48 +451,6 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, index
         </Modal>
   );};
 
-  const styles = StyleSheet.create({
-    dialogBox: {
-        position: 'absolute',
-        flex: 1,
-        alignContent: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 50,
-        backgroundColor: 'white',
-        borderWidth: 2,
-        borderColor: 'lightgray',
-        borderRadius: 20,
-        paddingHorizontal: 10,
-        flexDirection: 'row',
-        top: 200,
-      },
-      deleteBox: {
-        flex: 1, 
-        top: 200,
-        position: 'absolute',
-        alignContent: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'white',
-        borderWidth: 2,
-        borderColor: 'lightgray',
-        borderRadius: 20,
-        paddingHorizontal: 10,
-        padding: 15,
-      },
-      button: {
-        width: 100,
-        height: 40,
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: 10,
-        marginTop: 20,
-      },
-  });
   
   export default IndicatorMenu;
   

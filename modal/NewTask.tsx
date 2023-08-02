@@ -40,6 +40,7 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, trac
     };
 
   const addTask = async (data) => {
+    console.warn(data);
     let existingTasks = [...tasks]; 
     setDate(pageDate);  
     console.warn(data);

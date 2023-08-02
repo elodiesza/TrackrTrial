@@ -1,11 +1,30 @@
 
+import React, { useState } from 'react';
 import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View, FlatList } from 'react-native';
 import { container,colors } from '../styles';
 import Color from '../components/Color';
-import ColorPicker from '../components/ColorPicker';
 
 
-function UpdateState({db, staterecords, setStaterecords, states, setStates, name, updateStateVisible, setUpdateStateVisible}) {
+function UpdateState({db, staterecords, setStaterecords, states, setStates, name, updateStateVisible, setUpdateStateVisible, year, month, day}) {
+
+
+  const changeState = (item) => {
+    let existingstates=[...staterecords];
+    const id=staterecords.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0];
+    const indexToUpdate = existingstates.findIndex(state => state.id === id);
+      db.transaction(tx=> {
+        tx.executeSql('UPDATE staterecords SET item = ? WHERE id = ?', [item, id],
+          (txObj, resultSet) => {
+            if (resultSet.rowsAffected > 0) {
+              existingstates[indexToUpdate].item = item;
+              setStaterecords(existingstates);
+            }
+          },
+          (txObj, error) => console.log('Error updating data', error)
+        );
+      });
+      setUpdateStateVisible(!updateStateVisible);
+  };
 
   return (
     <Modal
@@ -22,7 +41,11 @@ function UpdateState({db, staterecords, setStaterecords, states, setStates, name
             <FlatList
                 horizontal={true}
                 data={[... new Set(states.filter(c=>c.name==name).map(c=>c.item))]}
-                renderItem={({item,index})=><Color color={states.filter(c=>c.name==name).map(c=>c.color)[index]}/>}
+                renderItem={({item,index})=>
+                <Pressable onPress={()=>changeState(item)}>
+                  <Color color={states.filter(c=>c.name==name).map(c=>c.color)[index]}/>
+                </Pressable>
+                }
                 keyExtractor={(item, index) => index.toString()}
                 contentContainerStyle={{width:"100%", alignItems:'center', justifyContent:'center'}}
             />

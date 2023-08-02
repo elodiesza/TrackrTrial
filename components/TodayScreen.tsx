@@ -1,4 +1,4 @@
-import { FlatList, Pressable, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
+import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
 import IndicatorTableTitleToday from './IndicatorTableTitleToday';
 import AddSleepLog from './AddSleepLog';
@@ -11,7 +11,7 @@ import UpdateState from '../modal/UpdateState';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, setStates}) => {
+const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales}) => {
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -69,13 +69,15 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
       );
     };
 
+    const scaleNames= [... new Set(scalerecords.map(c=>c.name))];
+
 
   return (
     <SafeAreaView style={container.body}>
-      <View style={{flex:1}}>
+      <View style={{width:width, height :60}}>
         <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} load={load} loadx={loadx} setMoodModalVisible={undefined}/>
       </View>
-      <View style={{flex:1, width:width}}>
+      <View style={{height:90, width:width}}>
         <FlatList
           horizontal
           data={uniqueNames}
@@ -83,12 +85,19 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
         />
       </View>
-      <View style={{flex:1, width:width}}>
+      <View style={{height:110, width:width}}>
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
       </View>
       <View style={{flex:1, width:width, flexDirection:'row'}}>
         <View style={{flex:1}}>
-          <AddScale name={'WEIGHT'} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={day} load={load} loadx={loadx} setScaleModalVisible={undefined}/>
+          <FlatList
+            data={scaleNames}
+            renderItem={scaleNames!==null?({item})=><AddScale name={item} scalerecords={scalerecords} 
+            setScalerecords={setScalerecords} db={db} year={year} month={month} day={day} load={load} 
+            loadx={loadx} setScaleModalVisible={undefined}/>:undefined}
+            keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
+            showsVerticalScrollIndicator={false}
+          />
         </View>
         <View style={{flex:1}}>
           <FlatList
@@ -107,6 +116,9 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
                     name={item.item}
                     updateStateVisible={updateStateVisible}
                     setUpdateStateVisible={setUpdateStateVisible}
+                    year={year}
+                    month={month}
+                    day={day}
                   />
                 </View>
               </View>}
@@ -114,7 +126,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           />
         </View>
       </View>
-      <View style={{flex:1, width:width, marginBottom:10}}>
+      <View style={{height:150, width:width, marginBottom:10}}>
         <DiaryElement 
           db={db}
           diary={diary}
@@ -126,16 +138,39 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           loadx={loadx}
           />
       </View>
+      {/*<Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
+        (txObj, resultSet) => setStaterecords([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/>
+      <Button title={'delete scalerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS scalerecords', null,
+        (txObj, resultSet) => setScalerecords([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/>
+      <Button title={'delete states'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS states', null,
+        (txObj, resultSet) => setStaterecords([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/>
+      <Button title={'delete scales'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS scales', null,
+        (txObj, resultSet) => setScales([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/>
+      <Button title={'delete times'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
+        (txObj, resultSet) => setTimes([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/> 
+      <Button title={'delete timerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
+        (txObj, resultSet) => setTimerecords([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/> */}
+
     </SafeAreaView>
   );
 }
 
 export default TodayScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    alignContent: 'center',
-    justifyContent: 'center',
-  },
-});

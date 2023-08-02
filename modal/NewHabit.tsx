@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Platform, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { container,colors } from '../styles';
+import uuid from 'react-native-uuid';
 
 
 function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits}) {
@@ -31,10 +32,9 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
             tx.executeSql(
               'INSERT INTO habits (name, year, month, day, state, type, track, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
               [data.name, year, month, i, 0, type, 0, newPlace],
-              (txtObj, stateResultSet) => {
-                const newStateId = stateResultSet.insertId;
+              (txtObj,) => {
                 const newState = {
-                  id: newStateId,
+                  id: uuid.v4(),
                   name: data.name,
                   year: year,
                   month: month,
