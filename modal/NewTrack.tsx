@@ -26,8 +26,8 @@ function NewTrack({newTrackVisible, setNewTrackVisible, db, tracks, setTracks, s
     let existingtracks = [...tracks]; 
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO tracks (track, color) VALUES (?, ?)',
-              [data.name, picked],
+              'INSERT INTO tracks (id,track, color) VALUES (?,?, ?)',
+              [ uuid.v4(),data.name, picked],
               (txtObj, trackResultSet) => {
                 const newTrack = {
                   id: uuid.v4(),

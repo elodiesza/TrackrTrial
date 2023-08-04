@@ -33,21 +33,11 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
         setWakeupTime(currentTime);
     };
 
-    const deleteSleepDb = () => {
-        db.transaction(tx => {
-          tx.executeSql('DROP TABLE IF EXISTS sleep', null,
-            (txObj, resultSet) => setSleep([]),
-            (txObj, error) => console.log('error deleting sleep')
-          );
-        });
-        loadx(!load);
-      }
-
     const addSleep = () => {
         let existingSleep = [...sleep]; 
         if (sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0) {
             db.transaction((tx) => {
-                tx.executeSql('INSERT INTO sleep (sleep,wakeup,year,month,day,type) values (?,?,?,?,?,?)',[parseInt(moment(sleepTime).format("HH")),null,year,month,day,0],
+                tx.executeSql('INSERT INTO sleep (id,sleep,wakeup,year,month,day,type) values (?,?,?,?,?,?,?)',[uuid.v4(),parseInt(moment(sleepTime).format("HH")),null,year,month,day,0],
                 (txtObj,resultSet)=> {    
                 existingSleep.push({ id: uuid.v4(), sleep: parseInt(moment(sleepTime).format("HH")), wakeup:null, year:year, month:month, day:day, type:0 });
                 setSleep(existingSleep);
@@ -73,7 +63,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
         let existingSleep = [...sleep]; 
         if (sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0) {
             db.transaction((tx) => {
-                tx.executeSql('INSERT INTO sleep (sleep,wakeup,year,month,day,type) values (?,?,?,?,?,?)',[null,parseInt(moment(wakeupTime).format("HH")),year,month,day,0],
+                tx.executeSql('INSERT INTO sleep (id,sleep,wakeup,year,month,day,type) values (?,?,?,?,?,?,?)',[uuid.v4(),null,parseInt(moment(wakeupTime).format("HH")),year,month,day,0],
                 (txtObj,resultSet)=> {    
                 existingSleep.push({ id: uuid.v4(), sleep: null, wakeup:parseInt(moment(wakeupTime).format("HH")), year:year, month:month, day:day, type:0 });
                 setSleep(existingSleep);

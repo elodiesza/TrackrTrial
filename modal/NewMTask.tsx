@@ -19,10 +19,10 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, trac
 
 
   const addTask = async (data) => {
-    console.warn(data);
     let existingTasks = [...tasks]; 
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,year,month,undefined,0,recurring?1:0,true,undefined,undefined, undefined],
+          tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring,monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?,?)',
+          [ uuid.v4(),data.task,year,month,undefined,0,recurring?1:0,true,undefined,undefined, undefined],
           (txtObj,)=> {    
             existingTasks.push({ id: uuid.v4(), task: data.task, year:year, month:month, day:undefined, taskState:0, recurring:recurring?1:0, monthly:true, track:undefined, time:undefined, section:undefined});
             setTasks(existingTasks);

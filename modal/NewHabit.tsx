@@ -30,8 +30,8 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO habits (name, year, month, day, state, type, track, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-              [data.name, year, month, i, 0, type, 0, newPlace],
+              'INSERT INTO habits (id,name, year, month, day, state, type, track, place) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
+              [ uuid.v4(),data.name, year, month, i, 0, type, 0, newPlace],
               (txtObj,) => {
                 const newState = {
                   id: uuid.v4(),

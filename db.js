@@ -48,7 +48,7 @@ const useDatabase = () => {
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tasks', null,
       (txObj, resultSet) => setTasks(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting habits')
+      (txObj, error) => console.log('error selecting tasks')
       );
     });
     db.transaction(tx => {
@@ -57,7 +57,7 @@ const useDatabase = () => {
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM moods', null,
       (txObj, resultSet) => setMoods(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting habits')
+      (txObj, error) => console.log('error selecting moods')
       );
     });
     db.transaction(tx => {
@@ -66,7 +66,7 @@ const useDatabase = () => {
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM sleep', null,
       (txObj, resultSet) => setSleep(resultSet.rows._array),
-      (txObj, error) => console.log('error selecting habits')
+      (txObj, error) => console.log('error selecting sleep')
       );
     });
     db.transaction(tx => {

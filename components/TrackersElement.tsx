@@ -17,6 +17,8 @@ const width = Dimensions.get('window').width;
 
 export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
 
+console.warn(habits);
+
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -68,8 +70,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
           new Promise((resolve, reject) => {
             db.transaction(tx => {
               tx.executeSql(
-                'INSERT INTO habits (name, year, month, day, state, type, track, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthtracks[j], j],
+                'INSERT INTO habits (id,name, year, month, day, state, type, track, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [ uuid.v4(),name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthtracks[j], j],
                 (txtObj, habitResultSet) => {
                   const newHabit = {
                     id: uuid.v4(),
@@ -135,8 +137,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
           new Promise((resolve, reject) => {
             db.transaction(tx => {
               tx.executeSql(
-                'INSERT INTO staterecords (name, year, month, day, item) VALUES (?, ?, ?, ?, ?)',
-                [name, thisYear, thisMonth, i, ''],
+                'INSERT INTO staterecords (id, name, year, month, day, item) VALUES (?, ?, ?, ?, ?, ?)',
+                [ uuid.v4(),name, thisYear, thisMonth, i, ''],
                 (txtObj, stateResultSet) => {
                   const newState = {
                     id: uuid.v4(),
@@ -198,8 +200,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
           new Promise((resolve, reject) => {
             db.transaction(tx => {
               tx.executeSql(
-                'INSERT INTO scalerecords (name, year, month, day, value) VALUES (?, ?, ?, ?, ?)',
-                [name, thisYear, thisMonth, i, undefined],
+                'INSERT INTO scalerecords (id, name, year, month, day, value) VALUES (?, ?, ?, ?, ?, ?)',
+                [ uuid.v4(),name, thisYear, thisMonth, i, undefined],
                 (txtObj, scaleResultSet) => {
                   const newScale = {
                     id: uuid.v4(),
@@ -497,9 +499,9 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
       );
     };
     
-    const showNumber = ({item}) => {
+    const showNumber = ({item,index}) => {
       return  (
-        <View style={{width:50,height:25, justifyContent:'center',flexDirection:'row'}}>
+        <View key={index} style={{width:50,height:25, justifyContent:'center',flexDirection:'row'}}>
           <View style={{width:25,height:25, justifyContent:'center'}}>
             <Text style={{textAlign:'right', marginRight: 3, textAlignVertical:'center'}}>{item.day}</Text>
           </View>
@@ -514,7 +516,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
     const showMood = (item,index) => {
       const bgColor = item==null?'white': item=='happy'?'yellowgreen': item=='productive'?'green': item=='sick'?'yellow': item=='stressed'?'orange': item=='angry'?'red': item=='bored'?'plum': item=='sad'?'lightblue': 'white';
       return  (
-        <>
+        <View key={index}>
           <Pressable onPress={()=>{setSelectedMoodIndex(index);setMoodModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: item==null?'white': bgColor }}/>
           <Modal
           animationType="none"
@@ -528,7 +530,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setMoodModalVisible(!moodModalVisible);setSelectedMoodIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
-                <View style={container.modal}>
+                <View style={[container.modal,{width:380, height:170}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} mood</Text>
                   <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setMoodModalVisible={setMoodModalVisible}/>
                   <TouchableOpacity onPress={() => deleteMood(index)} style={[container.button,{backgroundColor: 'lightgray'}]}>
@@ -538,7 +540,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
               </TouchableWithoutFeedback>
             </TouchableOpacity>
           </Modal>
-        </>
+        </View>
         
       )   
     }
@@ -707,7 +709,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
           <View>
             <FlatList
               data={listDays()}
-              renderItem={(item)=>(showNumber(item))}
+              renderItem={({item,index})=>(showNumber({item,index}))}
               keyExtractor={(_, index) => index.toString()}
               style={{marginTop:75,width:50,flexDirection:'row'}}
               scrollEnabled={false}

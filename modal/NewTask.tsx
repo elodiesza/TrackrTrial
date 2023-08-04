@@ -41,12 +41,10 @@ function NewTask({addModalVisible, setAddModalVisible, db, tasks, setTasks, trac
     };
 
   const addTask = async (data) => {
-    console.warn(data);
     let existingTasks = [...tasks]; 
     setDate(pageDate);  
-    console.warn(data);
     db.transaction((tx) => {
-      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?)',[data.task,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'),tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'),0,recurring?1:0,false,track,addTime=='Add Time'?null:time.toString(),section==undefined?undefined:section],
+      tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring, monthly, track, time, section) values (?,?,?,?,?,?,?,?,?,?,?)',[uuid.v4(),data.task,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'),tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1,tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'),0,recurring?1:0,false,track,addTime=='Add Time'?null:time.toString(),section==undefined?undefined:section],
       (txtObj,resultSet)=> {    
         existingTasks.push({ id: uuid.v4(), task: data.task, year:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getFullYear():moment(date).format('YYYY'), month:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getMonth():moment(date).format('MM')-1, day:tracksScreen?undefined:addDeadline=='Add deadline'?pageDate.getDate():moment(date).format('DD'), taskState:0, recurring:recurring?1:0, monthly:false, track:track, time:addTime=='Add Time'?null:time.toString(), section});
         setTasks(existingTasks);

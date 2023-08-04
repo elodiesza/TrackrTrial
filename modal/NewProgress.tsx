@@ -11,7 +11,7 @@ function NewProgress({addModalVisible, setAddModalVisible, db, progress, setProg
   const addProgress = async (data) => {
     let existingProgress = [...progress]; 
         db.transaction((tx) => {
-          tx.executeSql('INSERT INTO progress ( name, track, list, progress, rate) values (?,?,?,?,?)',[data.name, track, section, 0,0],
+          tx.executeSql('INSERT INTO progress (id, name, track, list, progress, rate) values (?,?,?,?,?,?)',[ uuid.v4(),data.name, track, section, 0,0],
           (txtObj,resultSet)=> {    
             existingProgress.push({ id: uuid.v4(), name: data.name, track: track, list: section, progress: 0, rate: 0});
             setProgress(existingProgress);

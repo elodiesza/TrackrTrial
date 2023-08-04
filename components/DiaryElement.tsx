@@ -23,8 +23,8 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
             console.warn('enters if');
             db.transaction((tx) => {
                 tx.executeSql(
-                  'INSERT INTO diary (year, month, day, notes) VALUES (?, ?, ?, ?)',
-                  [year, month, day, data.notes],
+                  'INSERT INTO diary (id,year, month, day, notes) VALUES (?, ?, ?, ?, ?)',
+                  [ uuid.v4(),year, month, day, data.notes],
                   (txtObj, stateResultSet) => {
                     const newState = {
                         id: uuid.v4(),

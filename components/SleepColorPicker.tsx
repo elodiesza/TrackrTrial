@@ -19,8 +19,8 @@ const SleepColorPicker = ( {db, selectedType, colorPickerVisible, setColorPicker
     if (sleep.filter((c) => c.year == year && c.month == month && c.day == day).length == 0) {
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO sleep (sleep, wakeup, year, month, day, type) values (?,?,?,?,?,?)',
-          [null, null, year, month, day, pickedType],
+          'INSERT INTO sleep (id,sleep, wakeup, year, month, day, type) values (?,?,?,?,?,?,?)',
+          [ uuid.v4(),null, null, year, month, day, pickedType],
           (txtObj, resultSet) => {
             existingSleep.push({
               id: uuid.v4(),

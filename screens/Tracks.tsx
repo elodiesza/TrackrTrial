@@ -38,26 +38,19 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         let existingTasks = [...tasks];
         let toTransfer = tasks.filter(c=>(c.id==id))[0];
         let toTransferSelection = tasks.filter(c=>(c.id==id)).map(c=>c.section)[0];
-        db.transaction((tx) => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,day,toTransfer.taskState,0,false,toTransfer.track,undefined,toTransferSelection],
-          (txtObj,resultSet)=> {    
-            existingTasks.push({ id: uuid.v4(), task: toTransfer.task, year:thisYear, month:thisMonth,day:day, taskState:toTransfer.taskState, recurring:0, monthly:false, track:toTransfer.track, time:undefined, section:toTransferSelection});
-            setTasks(existingTasks);
-          },
-          (txtObj, error) => console.warn('Error inserting data:', error)
-          );
-        })
-        db.transaction(tx => {
-          tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
-            (txObj, resultSet2) => {
-              if (resultSet2.rowsAffected > 0) {
-                let existingTasks = [...tasks].filter(task => task.id !== id);
-                setTasks(existingTasks);
-              }
-            },
-            (txObj, error) => console.log(error)
-          );
-        })
+        db.transaction(tx=> {
+            tx.executeSql('UPDATE tasks SET year = ? AND month=? AND day=? WHERE id= ?', [thisYear, thisMonth, day, id],
+              (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                  existingTasks[toTransfer].year = thisYear;
+                  existingTasks[toTransfer].month = thisMonth;
+                  existingTasks[toTransfer].day = day;
+                  setTasks(existingTasks);
+                }
+              },
+              (txObj, error) => console.log('Error updating data', error)
+            );
+        });
     }
 
     const deletetracks = () => {
@@ -82,19 +75,37 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                 tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
                     (txObj, resultSet) => {
                     if (resultSet.rowsAffected > 0) {
-                        let existingTasks = [...tasks].filter(task => task.id !== id);
+                        let existingTasks = [...tasks].filter(c => c.id !== id);
                         setTasks(existingTasks);
                     }
                     },
                     (txObj, error) => console.log(error)
                 );
                 })}>
-                <Feather name="trash-2" size={25} color={'white'} />
+                    <Feather name="trash-2" size={25} color={'white'} />
                 </Pressable>
             </View>
         </View>
       );
 
+      const ProgressSwipeItem = ({ id }) => (
+        <View style={{ paddingRight:10, justifyContent: 'center', alignItems: 'flex-end', flex: 1, backgroundColor: 'darkred' }}>
+            <Pressable onPress={() => 
+                db.transaction(tx => {
+                    tx.executeSql('DELETE FROM progress WHERE id = ?', [id],
+                        (txObj, resultSet) => {
+                        if (resultSet.rowsAffected > 0) {
+                            let existingProgress = [...progress].filter(c => c.id !== id);
+                            setProgress(existingProgress);
+                        }
+                        },
+                        (txObj, error) => console.log(error)
+                    );
+                })}>
+                <Feather name="trash-2" size={25} color={'white'} />
+            </Pressable>
+        </View>
+      );
 
     const TabItem = ({item,index, selected}) => {
         return (
@@ -178,7 +189,6 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
     };
 
     return (
-
         <SafeAreaView style={container.container}>
             <View style={[container.header,{borderBottomWidth:0}]}>
                 <Text style={{fontSize:20}}>TRACKS</Text>
@@ -238,9 +248,9 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             renderItem={({item,index}) =>
                             <ProgressBar db={db} name={item.name} progress={progress} setProgress={setProgress} value={item.progress} id={item.id} color={selectedTabColor}/>
                             }
-                            renderHiddenItem={({ item }) => <TaskSwipeItem id={item.id} />} 
+                            renderHiddenItem={({ item }) => <ProgressSwipeItem id={item.id} />} 
                             bounces={false} 
-                            rightOpenValue={-100}
+                            rightOpenValue={-50}
                             disableRightSwipe={true}
                             closeOnRowBeginSwipe={true}
                             keyExtractor= {(item,index) => index.toString()}

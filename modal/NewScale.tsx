@@ -36,8 +36,8 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
     var newPlace = existingscales.length;
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO scales (name, min, max, mincolor, maxcolor, unit, place) VALUES (?, ?, ?, ?, ?, ?, ?)',
-              [data.name, addValue? data.valueMin : undefined, addValue? data.valueMax : undefined, 
+              'INSERT INTO scales (id,name, min, max, mincolor, maxcolor, unit, place) VALUES (?,?, ?, ?, ?, ?, ?, ?)',
+              [ uuid.v4(),data.name, addValue? data.valueMin : undefined, addValue? data.valueMax : undefined, 
                 addColor? pickedMin : undefined, addColor? pickedMax : undefined ,addUnit? data.unit : undefined, newPlace],
               (txtObj, scaleResultSet) => {
                 const newScale = {
@@ -60,8 +60,8 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO scalerecords (name, year, month, day, value) VALUES (?, ?, ?, ?, ?)',
-              [data.name, year, month, i, undefined],
+              'INSERT INTO scalerecords (id,name, year, month, day, value) VALUES (?,?, ?, ?, ?, ?)',
+              [ uuid.v4(),data.name, year, month, i, undefined],
               (txtObj, scaleResultSet) => {
                 const newScale = {
                   id: uuid.v4(),

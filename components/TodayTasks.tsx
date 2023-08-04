@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import NewTask from '../modal/NewTask';
 import { Feather } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { container} from '../styles';
+import { container, colors } from '../styles';
 import Task from './Task';
 import uuid from 'react-native-uuid';
 
@@ -16,6 +16,8 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
   const year = today.getFullYear();
   const day = today.getDate();
 
+  console.warn(tasks);
+
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -23,7 +25,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
   useEffect(() => {
   
       db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+        tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id TEXT PRIMARY KEY, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
       });
   
       db.transaction(tx => {
@@ -43,7 +45,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
         let existingLogs = [...logs];  
         if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
           db.transaction(tx => {
-            tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
+            tx.executeSql('INSERT INTO logs (id,year,month,day) values (?,?,?,?)',[ uuid.v4(),year,month,day],
               (txtObj,resultSet)=> {    
                 existingLogs.push({ id: uuid.v4(), year:year, month:month, day:day});
                 setLogs(existingLogs);                      
@@ -59,16 +61,15 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
 
           if (lastLog!==undefined) {
             var daysBetweenLastAndToday = Math.floor((today.getTime() - new Date(lastLog.year,lastLog.month,lastLog.day).getTime())/(1000*60*60*24));
-            console.warn(daysBetweenLastAndToday);
             for(var j=1;j<daysBetweenLastAndToday+1;j++){
               var newDate= new Date(new Date(lastLog.year,lastLog.month,lastLog.day).getTime()+j*1000*60*60*24);
               for (var i=0; i<existingRecurringTasks.length;i++){    
                 let newTask=existingRecurringTasks[i].task;
-                console.warn(existingRecurringTasks[i].task);
                 let copytrack=existingRecurringTasks[i].track;
                 let copyTime=existingRecurringTasks[i].time;
                 db.transaction(tx => {
-                  tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copytrack,copyTime,undefined],
+                  tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?,?)',
+                  [ uuid.v4(),newTask,newDate.getFullYear(),newDate.getMonth(),newDate.getDate(),0,1,copytrack,copyTime,undefined],
                     (txtObj,resultSet)=> {   
                       existingTasks.push({ id: uuid.v4(), task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:newDate.getDate(), taskState:0, recurring:1, track:copytrack, time:copyTime, section: undefined});
                       setTasks(existingTasks);
@@ -85,7 +86,8 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
           let existingLogs = [...logs];  
           if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==day))[0]==undefined && isLoading==false){
             db.transaction(tx => {
-              tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day],
+              tx.executeSql('INSERT INTO logs (id,year,month,day) values (?,?,?,?)',
+              [ uuid.v4(),year,month,day],
                 (txtObj,resultSet)=> {    
                   existingLogs.push({ id: uuid.v4(), year:year, month:month, day:day});
                   setLogs(existingLogs);
@@ -108,7 +110,7 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
   const addLog = () => {
     let existingLogs = [...logs];  
       db.transaction(tx => {
-        tx.executeSql('INSERT INTO logs (year,month,day) values (?,?,?)',[year,month,day-1],
+        tx.executeSql('INSERT INTO logs (id,year,month,day) values (?,?,?,?)',[ uuid.v4(),year,month,day-1],
           (txtObj,resultSet)=> {    
             existingLogs.push({ id: uuid.v4(), year:year, month:month, day:day-1});
             setLogs(existingLogs);
@@ -126,32 +128,6 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
     });
     loadx(!load);
   }
-  const removelogDb = () => {
-    db.transaction(tx => {
-      tx.executeSql('DROP TABLE IF EXISTS logs', null,
-        (txObj, resultSet) => setLogs([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    });
-    loadx(!load);
-  }
-  const removeTodayLog = () => {
-    let existingLogs = [...logs];
-    db.transaction(tx => {
-      tx.executeSql(
-        'DELETE FROM logs WHERE day = ?',
-        [day],
-        (txObj, resultSet) => {
-          setLogs(existingLogs.filter(c=>c.day!=day)),
-          console.log('Log deleted successfully');
-        },
-        (txObj, error) => {
-          // Handle error
-          console.log('Error deleting logs:', error);
-        }
-      );
-    });
-  };
 
   const dailyData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==0 && c.monthly==false));
   const recurringData = tasks.filter(c=>(c.day==date.getDate() && c.recurring==1 && c.monthly==false));
@@ -220,8 +196,8 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
         <Button title='remove Logs' onPress={removelogDb} /> */}
       </View>
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
-        <Feather name='plus-circle' size={50} />
-      </ TouchableOpacity> 
+        <Feather name='plus-circle' size={50} color={colors.primary.blue} />
+      </TouchableOpacity> 
       <NewTask
         addModalVisible={addModalVisible===true}
         setAddModalVisible={setAddModalVisible}

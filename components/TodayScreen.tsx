@@ -157,7 +157,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setScales([]),
         (txObj, error) => console.log('error selecting tasks')
       );
-    })}/> */}
+    })}/> 
       <Button title={'delete times'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
         (txObj, resultSet) => setTimes([]),
         (txObj, error) => console.log('error selecting tasks')
@@ -192,7 +192,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setMoods([]),
         (txObj, error) => console.log('error selecting moods')
       );
-    })}/>
+    })}/>*/}
     </SafeAreaView>
   );
 }

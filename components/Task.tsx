@@ -11,10 +11,9 @@ const width = Dimensions.get('window').width;
 
 function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, taskState, id ,track, time, section, trackScreen}) {
 
-
   const updateTaskState = () => {
     let existingTasks=[...tasks];
-    const indexToUpdate = existingTasks.findIndex(c => c.id === id);
+    let indexToUpdate = existingTasks.findIndex(c => c.id === id);
     let postponedTask = existingTasks[indexToUpdate].task;
     let nextDay= date==undefined? undefined:new Date(Math.floor(date.getTime()+(1000*60*60*24)));
     let nextDayYear = date==undefined? undefined:nextDay.getFullYear();
@@ -62,7 +61,8 @@ function Task({db, tasks, setTasks, tracks, setTracks, sections, date,task, task
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime, section],
+          tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring,track,time, section) values (?,?,?,?,?,?,?,?,?,?)',
+          [ uuid.v4(),postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,copytrack,copyTime, section],
             (txtObj,resultSet)=> {   
               existingTasks.push({ id: uuid.v4(), task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime, section:section});
             },

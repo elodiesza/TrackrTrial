@@ -14,7 +14,7 @@ const AddMood = ({ moods,setMoods, db,year,month,day, load, loadx, setMoodModalV
         let existingMoods=[...moods];
         if (existingMoods.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0){
           db.transaction(tx=> {
-            tx.executeSql('INSERT INTO moods (year, month, day, mood) VALUES (?, ?, ?, ?)', [year, month, day, mood],
+            tx.executeSql('INSERT INTO moods (id,year, month, day, mood) VALUES (?,?, ?, ?, ?)', [uuid.v4(),year, month, day, mood],
               (txObj, resultSet) => {
                 if (resultSet.rowsAffected > 0) {
                   existingMoods.push({id: uuid.v4(), year: year, month: month, day: day, mood: mood});

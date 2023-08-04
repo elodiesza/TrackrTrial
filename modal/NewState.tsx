@@ -39,8 +39,8 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
       for (let i = 0; i < itemlist.length; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO states (name, item, color, place) VALUES (?, ?, ?, ?)',
-              [data.name, itemlist[i].value, itemlist[i].picked, newPlace],
+              'INSERT INTO states (id,name, item, color, place) VALUES (?,?, ?, ?, ?)',
+              [ uuid.v4(),data.name, itemlist[i].value, itemlist[i].picked, newPlace],
               (txtObj, stateResultSet) => {
                 const newState = {
                   id: uuid.v4(),
@@ -60,8 +60,8 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO staterecords (name, year, month, day, item) VALUES (?, ?, ?, ?, ?)',
-              [data.name, year, month, i, ''],
+              'INSERT INTO staterecords (id,name, year, month, day, item) VALUES (?,?, ?, ?, ?, ?)',
+              [ uuid.v4(),data.name, year, month, i, ''],
               (txtObj, stateResultSet) => {
                 const newState = {
                   id: uuid.v4(),
@@ -85,13 +85,13 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
   };
 
   const ItemList = ({item,index}) => {
-    const itemData = itemlist[index]; // Get the item data for this specific index
+    const itemData = itemlist[index]; 
     const { colorPickerVisible, picked } = itemData;
     return (
       <View style={{width:"100%", justifyContent:'flex-start', alignItems:'flex-end'}}>
         <View style={{flexDirection:'row', width:"100%", justifyContent:'flex-start', alignItems:'flex-end'}}>
           <Pressable onPress={() => RemoveItemfromlist(index)} style={{ display: itemlist.length === 1 ? 'none' : 'flex' }}>
-            <Feather name='minus-circle' size={30} color={colors.blue} style={{ marginRight: 5, bottom: 10 }} />
+            <Feather name='minus-circle' size={30} color={colors.primary.blue} style={{ marginRight: 5, bottom: 10 }} />
           </Pressable>
           <Controller
           control= {control}
@@ -104,7 +104,6 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
                 const updatedItems = [...itemlist];
                 updatedItems[index] = { ...item, value: text };
                 setItemlist(updatedItems);
-                // Now call the onChange function provided by react-hook-form
                 onChange(text);
               }}
               autoCapitalize = {"characters"}
@@ -177,7 +176,7 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
             <View style={container.modal}>
                 <View style={{width:"100%",flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginBottom:10}}>
                     <Pressable onPress={() => setNewStateVisible(!newStateVisible)}>
-                        <MaterialIcons name="keyboard-arrow-left" size={25} color={colors.blue}/>
+                        <MaterialIcons name="keyboard-arrow-left" size={25} color={colors.primary.blue}/>
                     </Pressable>
                     <Text style={{left:20}}>NEW STATE</Text>
                 </View>

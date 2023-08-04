@@ -98,7 +98,8 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
     let existingTasks = [...tasks];
     let toTransfer = tasks.filter(c=>(c.id==id))[0];
     db.transaction((tx) => {
-      tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?)',[toTransfer.task,thisYear,thisMonth,thisDay,toTransfer.taskState,0,false,toTransfer.track,undefined, undefined],
+      tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?,?)',
+      [ uuid.v4(),toTransfer.task,thisYear,thisMonth,thisDay,toTransfer.taskState,0,false,toTransfer.track,undefined, undefined],
       (txtObj,resultSet)=> {    
         existingTasks.push({ id: uuid.v4(), task: toTransfer.task, year:thisYear, month:thisMonth, day:thisDay, taskState:toTransfer.taskState, recurring:0, monthly: false, track:toTransfer.track, time:undefined, section:undefined});
         setTasks(existingTasks);
@@ -206,9 +207,10 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
           );
         });
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring, monthly,track,time) values (?,?,?,?,?,?,?,?,?)',[postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,true,copytrack,copyTime],
+          tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring, monthly,track,time) values (?,?,?,?,?,?,?,?,?,?)',
+          [ uuid.v4(),postponedTask,nextDayYear,nextDayMonth,nextDayDay,0,0,true,copytrack,copyTime],
             (txtObj,resultSet)=> {   
-              existingTasks.push({ id: resultSet.insertId, task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime});
+              existingTasks.push({ id:  uuid.v4(), task: postponedTask, year: nextDayYear, month:nextDayMonth, day:nextDayDay, taskState:0, recurring:0, track:copytrack, time:copyTime});
             },
           );
         });
