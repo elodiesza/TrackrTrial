@@ -1,4 +1,4 @@
-import { FlatList, TouchableOpacity, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { FlatList, Button, TouchableOpacity, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useState,useEffect } from 'react';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Feather } from '@expo/vector-icons';
@@ -22,7 +22,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
   
   useEffect(() => {
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id INTEGER PRIMARY KEY AUTOINCREMENT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id TEXT PRIMARY KEY, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
     });
 
     db.transaction(tx => {
@@ -41,7 +41,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
       let existingLogs = [...mlogs];  
       if(existingLogs.filter(c=>(c.year==year && c.month==month))[0]==undefined && isLoading==false){
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO mlogs (year,month) values (?,?)',[year,month],
+          tx.executeSql('INSERT INTO mlogs (id,year,month) values (?,?,?)',[year,month],
             (txtObj,resultSet)=> {    
               existingLogs.push({ id: uuid.v4(), year:year, month:month});
               setMLogs(existingLogs);                      
@@ -65,7 +65,8 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
               let copytrack=existingRecurringTasks[i].track;
               let copyTime=existingRecurringTasks[i].time;
               db.transaction(tx => {
-                tx.executeSql('INSERT INTO tasks (task,year,month,day,taskState,recurring,monthly,track,time) values (?,?,?,?,?,?,?,?,?)',[newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copytrack,copyTime],
+                tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring,monthly,track,time) values (?,?,?,?,?,?,?,?,?,?)',
+                [uuid.v4(),newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copytrack,copyTime],
                   (txtObj,resultSet)=> {   
                     existingTasks.push({ id: uuid.v4(), task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, track:copytrack, time:copyTime});
                     setTasks(existingTasks);
@@ -82,7 +83,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
         let existingLogs = [...mlogs];  
         if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==thisDay))[0]==undefined && isLoading==false){
           db.transaction(tx => {
-            tx.executeSql('INSERT INTO mlogs (year,month,day) values (?,?,?)',[year,month,thisDay],
+            tx.executeSql('INSERT INTO mlogs (id,year,month,day) values (?,?,?,?)',[uuid.v4(),year,month,thisDay],
               (txtObj,resultSet)=> {    
                 existingLogs.push({ id: uuid.v4(), year:year, month:month, day:thisDay});
                 setMLogs(existingLogs);

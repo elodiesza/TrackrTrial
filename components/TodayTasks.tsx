@@ -16,7 +16,6 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
   const year = today.getFullYear();
   const day = today.getDate();
 
-  console.warn(tasks);
 
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -190,10 +189,6 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
           closeOnRowBeginSwipe={true}
         />
                 <Button title='remove Tasks' onPress={removeDb} />
-       {/* <Button title='Add yesterdayLog' onPress={addLog} />
-        <Button title='remove Todays log' onPress={removeTodayLog} />
-
-        <Button title='remove Logs' onPress={removelogDb} /> */}
       </View>
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} color={colors.primary.blue} />

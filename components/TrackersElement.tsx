@@ -17,7 +17,6 @@ const width = Dimensions.get('window').width;
 
 export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
 
-console.warn(habits);
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -514,7 +513,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
     }
 
     const showMood = (item,index) => {
-      const bgColor = item==null?'white': item=='happy'?'yellowgreen': item=='productive'?'green': item=='sick'?'yellow': item=='stressed'?'orange': item=='angry'?'red': item=='bored'?'plum': item=='sad'?'lightblue': 'white';
+      const bgColor = item==null?'white': item=='happy'?'yellowgreen': item=='productive'?'green': item=='sick'?'yellow': item=='stressed'?'orange': item=='angry'?'red': item=='calm'?'pink' : item=='bored'?'plum': item=='sad'?'lightblue': 'white';
       return  (
         <View key={index}>
           <Pressable onPress={()=>{setSelectedMoodIndex(index);setMoodModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: item==null?'white': bgColor }}/>
@@ -578,11 +577,11 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
       let thisgoSleepTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==index+1)).map(c=>c.sleep)[0];
       let thiswakeupTime= sleep.filter(c=>(c.year==year && c.month==month && c.day==index+1)).map(c=>c.wakeup)[0];
       let thissleepTime= thisgoSleepTime>thiswakeupTime ? thiswakeupTime+24-thisgoSleepTime : thiswakeupTime-thisgoSleepTime;
-      let sleepColorCode = (thissleepTime-sleepMin)/(sleepMax-sleepMin);
+      let sleepColorCode = sleepMax==sleepMin? null:(thissleepTime-sleepMin)/(sleepMax-sleepMin);
       let sleepColor= sleepColorCode!==null? sleepColorCode>0.5? colorMixer([130,200,50], [255,255,0], 2*sleepColorCode) : colorMixer([255,255,50], [255,0,0], 2*sleepColorCode) : 'white';
       return  (
         <View>
-          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: (sleep.filter(c=>(c.year==year && c.month==month)).map(c=>c.sleep)[0]==undefined || sleep.filter(c=>(c.year==year && c.month==month)).map(c=>c.wakeup)[0]==undefined)? colors.primary.white: sleepColor}}>
+          <Pressable onPress={()=>{setSelectedSleepIndex(index);setSleepModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', borderWidth:0.5, backgroundColor: (sleep.filter(c=>(c.year==year && c.month==month && c.day==index+1)).map(c=>c.sleep)[0]==(undefined||null) || sleep.filter(c=>(c.year==year && c.month==month && c.day==index+1)).map(c=>c.wakeup)[0]==(undefined||null))? colors.primary.white: sleepColor}}>
             <Text style={{textAlign:'center', textAlignVertical:'center'}}>{item}</Text>
           </Pressable>
           <Modal
@@ -597,7 +596,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
-                <View style={[container.modal,{height:200}]}>
+                <View style={[container.modal,{height:170}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
                   <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
                 </View>
@@ -625,12 +624,9 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
-                <View style={container.modal}>
+                <View style={[container.modal,{height:170}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
                   <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
-                  <TouchableOpacity onPress={() => deleteSleep(index)} style={[container.button,{backgroundColor: 'lightgray'}]}>
-                    <Text>Delete</Text>
-                  </TouchableOpacity>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>

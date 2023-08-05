@@ -10,7 +10,6 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import ProgressBar from '../components/ProgressBar';
 import NewProgress from '../modal/NewProgress';
 import NewTrack from '../modal/NewTrack';
-import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
@@ -29,6 +28,8 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
     const [newTaskVisible, setNewTaskVisible] = useState(false);
     const [newProgressVisible, setNewProgressVisible] = useState(false);
     const [selectedSection, setSelectedSection] = useState('');
+    const [showSection, setShowSection] = useState({'index':0,'show':true});
+    const [showArchive, setShowArchive] = useState(false);
 
     useEffect(() => {
         setSelectedTabColor(selectedTab==undefined? colors.primary.default:tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
@@ -36,10 +37,9 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
 
     const TransferDaily = (id) => {
         let existingTasks = [...tasks];
-        let toTransfer = tasks.filter(c=>(c.id==id))[0];
-        let toTransferSelection = tasks.filter(c=>(c.id==id)).map(c=>c.section)[0];
+        const toTransfer = existingTasks.map(c=>c.id).findIndex(c=>c==id);
         db.transaction(tx=> {
-            tx.executeSql('UPDATE tasks SET year = ? AND month=? AND day=? WHERE id= ?', [thisYear, thisMonth, day, id],
+            tx.executeSql('UPDATE tasks SET year = ?, month=?, day=? WHERE id= ?', [thisYear,thisMonth,day, id],
               (txObj, resultSet) => {
                 if (resultSet.rowsAffected > 0) {
                   existingTasks[toTransfer].year = thisYear;
@@ -88,7 +88,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         </View>
       );
 
-      const ProgressSwipeItem = ({ id }) => (
+    const ProgressSwipeItem = ({ id }) => (
         <View style={{ paddingRight:10, justifyContent: 'center', alignItems: 'flex-end', flex: 1, backgroundColor: 'darkred' }}>
             <Pressable onPress={() => 
                 db.transaction(tx => {
@@ -105,7 +105,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                 <Feather name="trash-2" size={25} color={'white'} />
             </Pressable>
         </View>
-      );
+    );
 
     const TabItem = ({item,index, selected}) => {
         return (
@@ -117,7 +117,6 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
 
     const DeleteTrack = () => {
         const id = tracks.filter((c) => c.track == selectedTab).map((c) => c.id)[0];
-        console.warn(id)
         db.transaction(
             (tx) => {
             tx.executeSql(
@@ -171,21 +170,41 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
 
     const DeleteSection = () => {
         const id= sections.filter(c=>c.section==selectedSection).map(c=>c.id)[0];
-            db.transaction(tx=> {
-              tx.executeSql('DELETE FROM sections WHERE id = ?', [id],
-                (txObj, resultSet) => {
-                  if (resultSet.rowsAffected > 0) {
+        db.transaction(tx=> {
+            tx.executeSql('DELETE FROM sections WHERE id = ?', [id],
+            (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
                     let existingSections = [...sections].filter(c=>c.id!==id);
-                    let existingTasks = [...tasks].filter(c=>(c.section!==selectedSection));
-                    let existingProgress = [...progress].filter(c=>(c.section!==selectedSection));
                     setSections(existingSections);
-                    setTasks(existingTasks);
-                    setProgress(existingProgress);
                   }
-                },
-                (txObj, error) => console.log(error)
+            },
+            (txObj, error) => console.log(error)
+            );       
+        })  
+        const taskid= tasks.filter(c=>c.section==selectedSection).map(c=>c.id)[0];
+        db.transaction(tx=> {
+            tx.executeSql('DELETE FROM tasks WHERE id = ?', [taskid],
+            (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                    let existingTasks = [...tasks].filter(c=>(c.section!==selectedSection));
+                    setTasks(existingTasks);
+                  }
+            },
+            (txObj, error) => console.log(error)
             );       
         })   
+        const progressid= progress.filter(c=>c.section==selectedSection).map(c=>c.id)[0];
+        db.transaction(tx=> {
+            tx.executeSql('DELETE FROM progress WHERE id = ?', [progressid],
+            (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                    let existingProgress = [...progress].filter(c=>(c.section!==selectedSection));
+                    setProgress(existingProgress);
+                  }
+            },
+            (txObj, error) => console.log(error)
+            );       
+        })    
     };
 
     return (
@@ -225,12 +244,16 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                     <View>
                         <View style={[container.section,{flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: paleColor(selectedTabColor)}]}> 
                             <Text>{item.section}</Text>
-                            <Pressable style={{position:'absolute',right:10}}>
+                            <Pressable onPress={()=>setShowSection({"index":index,"show":true})} style={{display:(showSection.index==index&&showSection.show==false)?"flex":"none",position:'absolute',right:10}}>
                                 <MaterialIcons name="keyboard-arrow-down" size={25}/>
                             </Pressable>
+                            <Pressable onPress={()=>setShowSection({"index":index,"show":false})}  style={{display:(showSection.index==index&&showSection.show==true)?"flex":"none",position:'absolute',right:10}}>
+                                <MaterialIcons name="keyboard-arrow-up" size={25}/>
+                            </Pressable>
                         </View>
+                        <View style={{display:(showSection.index==index&&showSection.show==true)?"flex":"none"}}>
                         <SwipeListView
-                            data={tasks.filter(c=>(c.section==item.section && c.track==selectedTab))}
+                            data={tasks.filter(c=>(c.section==item.section && c.track==selectedTab && c.taskState!==2 ))}
                             renderItem={({item,index}) =>
                             <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
                             sections={sections} date={undefined} section={item.section} task={item.task} 
@@ -266,6 +289,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                                 <Feather name='check-square' size={30} color={colors.primary.blue} />
                             </TouchableOpacity> 
                         </View>
+                        </View>
                         <NewTask addModalVisible={newTaskVisible} setAddModalVisible={setNewTaskVisible} db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} track={selectedTab} section={selectedSection} pageDate={undefined} tracksScreen={true}/>
                         <NewProgress addModalVisible={newProgressVisible} setAddModalVisible={setNewProgressVisible} db={db} progress={progress} setProgress={setProgress} track={selectedTab} section={selectedSection}/>
                     </View>
@@ -275,8 +299,58 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                     showsHorizontalScrollIndicator={false}
                 />
                 <NewSection db={db} sections={sections} setSections={setSections} track={selectedTab} newSectionVisible={newSectionVisible} setNewSectionVisible={setNewSectionVisible}/>
-                <Button title="delete tracks" onPress={deletetracks}/>
+                {/*<Button title="delete tracks" onPress={deletetracks}/>
+                <Button title={'delete progress'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS progress', null,
+                    (txObj, resultSet) => setProgress([]),
+                    (txObj, error) => console.log('error selecting progress')
+                );
+                })}/>
+                <Button title={'delete sections'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sections', null,
+                    (txObj, resultSet) => setSections([]),
+                    (txObj, error) => console.log('error selecting sections')
+                );
+                })}/>*/}
                 <NewTrack db={db} tracks={tracks} setTracks={setTracks} newTrackVisible={newTrackVisible} setNewTrackVisible={setNewTrackVisible} setSelectedTab={setSelectedTab} setSelectedTabColor={setSelectedTabColor}/>
+            </View>
+            <View>
+                <View style={[container.section,{flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: paleColor(selectedTabColor)}]}> 
+                    <Text>ARCHIVES</Text>
+                    <Pressable onPress={()=>setShowArchive(true)} style={{display:showArchive==false?"flex":"none",position:'absolute',right:10}}>
+                        <MaterialIcons name="keyboard-arrow-up" size={25}/>
+                    </Pressable>
+                    <Pressable onPress={()=>setShowArchive(false)}  style={{display:showArchive==true?"flex":"none",position:'absolute',right:10}}>
+                        <MaterialIcons name="keyboard-arrow-down" size={25}/>
+                    </Pressable>
+                </View>
+                <View style={{display: showArchive==true?"flex":"none",height:200}}>
+                    <SwipeListView
+                            data={tasks.filter(c=>(c.track==selectedTab && c.taskState==2 ))}
+                            renderItem={({item,index}) =>
+                            <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
+                            sections={sections} date={undefined} section={item.section} task={item.task} 
+                            taskState={item.taskState} time={undefined} track={selectedTab} id={item.id} trackScreen={false}/>
+                            }
+                            renderHiddenItem={({ item }) => <TaskSwipeItem id={item.id} />} 
+                            bounces={false} 
+                            rightOpenValue={-100}
+                            disableRightSwipe={true}
+                            closeOnRowBeginSwipe={true}
+                            keyExtractor= {(item,index) => index.toString()}
+                    />
+                    <SwipeListView
+                            data={progress.filter(c=>(c.track==selectedTab && c.progress==100))}
+                            renderItem={({item,index}) =>
+                            <ProgressBar db={db} name={item.name} progress={progress} setProgress={setProgress} value={item.progress} id={item.id} color={selectedTabColor}/>
+                            }
+                            renderHiddenItem={({ item }) => <ProgressSwipeItem id={item.id} />} 
+                            bounces={false} 
+                            rightOpenValue={-50}
+                            disableRightSwipe={true}
+                            closeOnRowBeginSwipe={true}
+                            keyExtractor= {(item,index) => index.toString()}
+                    />
+                </View>
+                    
             </View>
         </SafeAreaView>
     );

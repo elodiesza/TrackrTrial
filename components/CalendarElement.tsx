@@ -99,8 +99,12 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
           <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
         </View>
         <View style={{flex:1, justifyContent: 'flex-end'}}>
-          <FlatList data={monthTodo(tasks.filter(c=>c.recurring==false), year, month, date)}
-          horizontal={false} scrollEnabled={true} renderItem={RenderTaskItem} bounces={false} />
+          <FlatList 
+          data={monthTodo(tasks.filter(c=>c.recurring==false), year, month, date)}
+          horizontal={false} 
+          scrollEnabled={true} 
+          renderItem={RenderTaskItem} 
+          bounces={false} />
         </View>
       </View>
     )
@@ -122,7 +126,7 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
 
   const CalendarTaskItem = ({task, track}) => (
     <>
-      <TouchableOpacity style={[styles.task,{backgroundColor: tracks.filter(c=>c.id==track).map(c=>c.color)[0]}]}>
+      <TouchableOpacity style={[styles.task,{backgroundColor: tracks.filter(c=>c.track==track).map(c=>c.color)[0]}]}>
         <Text style={{fontSize:10}}>{task}</Text>
       </TouchableOpacity>
     </>

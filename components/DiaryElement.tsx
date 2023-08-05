@@ -19,19 +19,18 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
 
     const UpdateDiary = async (data) => {
         let existingdiary = [...diary]; 
-        if(diary.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0){
-            console.warn('enters if');
+        if(existingdiary.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0){
             db.transaction((tx) => {
                 tx.executeSql(
                   'INSERT INTO diary (id,year, month, day, notes) VALUES (?, ?, ?, ?, ?)',
-                  [ uuid.v4(),year, month, day, data.notes],
+                  [ uuid.v4(),year, month, day, savedNotes[0].notes],
                   (txtObj, stateResultSet) => {
                     const newState = {
                         id: uuid.v4(),
                         year: year,
                         month: month,
                         day: day,
-                        notes: data.notes
+                        notes: savedNotes[0].notes,
                     };
                     existingdiary.push(newState);
                     setDiary(existingdiary); 
@@ -45,10 +44,10 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
             let diaryIndex = existingdiary.findIndex(c => c.id === diaryId);
             db.transaction(tx=> {
                 tx.executeSql('UPDATE diary SET notes = ? WHERE year= ? AND month=? AND day=?', 
-                [data.notes, year, month, day],
+                [savedNotes[0].notes, year, month, day],
                   (txObj, resultSet2) => {
                     if (resultSet2.rowsAffected > 0) {
-                      existingdiary[diaryIndex].notes = data.notes;
+                      existingdiary[diaryIndex].notes = savedNotes[0].notes;
                       setDiary(existingdiary);
                       loadx(!load);
                     }

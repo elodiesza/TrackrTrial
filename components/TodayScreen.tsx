@@ -138,7 +138,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           loadx={loadx}
           />
       </View>
-      {/* <Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
+     {/*  <Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
         (txObj, resultSet) => setStaterecords([]),
         (txObj, error) => console.log('error selecting tasks')
       );
@@ -163,16 +163,12 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, error) => console.log('error selecting tasks')
       );
     })}/> 
-      <Button title={'delete timerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
+     <Button title={'delete timerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
         (txObj, resultSet) => setTimerecords([]),
         (txObj, error) => console.log('error selecting tasks')
       );
     })}/> 
-    <Button title={'delete sleep'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sleep', null,
-        (txObj, resultSet) => setSleep([]),
-        (txObj, error) => console.log('error selecting sleep')
-      );
-    })}/>
+
     <Button title={'delete habits'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS habits', null,
         (txObj, resultSet) => setHabits([]),
         (txObj, error) => console.log('error selecting habits')
@@ -192,7 +188,22 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setMoods([]),
         (txObj, error) => console.log('error selecting moods')
       );
-    })}/>*/}
+    })}/>
+    <Button title={'delete logs'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS logs', null,
+        (txObj, resultSet) => setLogs([]),
+        (txObj, error) => console.log('error selecting logs')
+      );
+    })}/>
+            <Button title={'delete sleep'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sleep', null,
+        (txObj, resultSet) => setSleep([]),
+        (txObj, error) => console.log('error selecting sleep')
+      );
+    })}/>
+    <Button title={'delete diary'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS diary', null,
+        (txObj, resultSet) => setDiary([]),
+        (txObj, error) => console.log('error selecting diary')
+      );
+    })}/>    */}
     </SafeAreaView>
   );
 }

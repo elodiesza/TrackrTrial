@@ -61,7 +61,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS sleep (id TEXT PRIMARY KEY, sleep INTEGER, wakeup INTEGER, year INTEGER, month INTEGER, day INTEGER, type INT, UNIQUE(sleep,year,month,day),UNIQUE(wakeup,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS sleep (id TEXT PRIMARY KEY, sleep INTEGER, wakeup INTEGER, year INTEGER, month INTEGER, day INTEGER, type INT, UNIQUE(year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM sleep', null,
