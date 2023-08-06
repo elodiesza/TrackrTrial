@@ -45,7 +45,7 @@ const AddScale = ({ name, scalerecords, setScalerecords, db,year,month,day, load
                                 // Set the cleaned integer value back to the input field
                                 onChange(intValue);}}
                             onBlur={onBlur}
-                            placeholder="value"
+                            placeholder={scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0]==null?'':scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0].toString()}
                             style={[container.textinput,{width: 80, borderColor: error ? 'red' : '#e8e8e8'}]}
                         />
                         {error && (

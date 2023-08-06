@@ -129,8 +129,8 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                     message: 'Name should be at least 3 characters long',
                     },
                     maxLength: {
-                    value: 12,
-                    message: 'Name should be max 12 characters long',
+                    value: 14,
+                    message: 'Name should be max 14 characters long',
                     },
                     validate: (name) => {
                     if (name.includes('  ')) {
@@ -198,10 +198,10 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                         </>
                     )}
                     rules={{
-                        required: 'Input a value',
                         validate: (value) => {
                             if (!/^\d*$/.test(value)) {
-                              return 'Please enter a valid integer';
+                              if(value == undefined){return true}
+                              else{return 'Please enter a valid integer';}
                             }
                             return true;
                           },
@@ -231,10 +231,10 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                         </>
                     )}
                     rules={{
-                        required: 'Input a value',
                         validate: (value) => {
                             if (!/^\d*$/.test(value)) {
-                              return 'Please enter a valid integer';
+                              if(value == undefined){return true}
+                              else{return 'Please enter a valid integer';}
                             }
                             return true;
                         },

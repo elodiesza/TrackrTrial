@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable,TouchableOpacity, Dimensions } from 'react-native';
 
-const IndicatorTableTitle = ({name, year, month, setModalVisible}) => {
+const IndicatorTableTitle = ({name, year, month, setModalVisible,scaleInd, scalerecords}) => {
 
     return (
             <TouchableOpacity onPress={()=>setModalVisible(name)} style={{width:1, height:1}}>
-                <View style={[styles.polygon, {backgroundColor: 'white'}]} /><Text numberOfLines={1} style={styles.indText}>{name}</Text>
+                <View style={[styles.polygon, {backgroundColor: 'white', 
+                width: (scaleInd&&scalerecords.filter(c=>(c.year==year && c.month==month && c.name==name && c.value>1000)).length>0)?51:(scaleInd&&scalerecords.filter(c=>(c.year==year && c.month==month && c.name==name && c.value>100)).length>0)?39:26}]} />
+                <Text numberOfLines={1} style={styles.indText}>{name}</Text>
             </TouchableOpacity>
        );     
 };

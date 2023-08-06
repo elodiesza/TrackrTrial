@@ -29,7 +29,7 @@ function ProgressBar({db, name, progress, setProgress, value, id, color}) {
   };
 
   return (
-    <View style={{flexDirection:'row',justifyContent:'center', alignItems:'center',backgroundColor:colors.primary.white,width:width, height:40}}>
+    <View style={{flexDirection:'row',backgroundColor:colors.primary.white,width:width, height:40}}>
         <Pressable onPress={()=>setNameClicked(!nameClicked)} style={{flex:nameClicked?3/4:1/4,justifyContent:'center', marginLeft:10}}>
           <Text style={{textAlign:'left'}}>{name}</Text>
         </Pressable>
@@ -41,7 +41,7 @@ function ProgressBar({db, name, progress, setProgress, value, id, color}) {
             step={1}
             thumbTintColor={color}
             minimumValue={0}
-            maximumValue={100}
+            maximumValue={101}
             minimumTrackTintColor={color}
             maximumTrackTintColor={colors.primary.defaultlight}
           />

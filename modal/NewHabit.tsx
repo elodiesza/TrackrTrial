@@ -96,8 +96,8 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
                   message: 'Task should be at least 3 characters long',
                 },
                 maxLength: {
-                  value: 12,
-                  message: 'Task should be max 12 characters long',
+                  value: 14,
+                  message: 'Task should be max 14 characters long',
                 },
                 validate: (name) => {
                   if (name.includes('  ')) {

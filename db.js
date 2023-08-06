@@ -20,6 +20,7 @@ const useDatabase = () => {
   const [diary, setDiary] = useState([]);
   const [sections, setSections] = useState([]);
   const [progress, setProgress] = useState([]);
+  const [weather, setWeather] = useState([]);
 
 
   useEffect(() => {
@@ -155,6 +156,16 @@ const useDatabase = () => {
       );
     });
 
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS weather (id TEXT PRIMARY KEY, weather TEXT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM weather', null,
+      (txObj, resultSet) => setWeather(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting weather')
+      );
+    });
+
     setIsLoading(false);
   
   },[load]);
@@ -178,6 +189,7 @@ const useDatabase = () => {
     db,
     sections,
     progress,
+    weather,
     loadx,
     setHabits,
     setTasks,
@@ -195,6 +207,7 @@ const useDatabase = () => {
     setIsLoading,
     setSections,
     setProgress,
+    setWeather,
   };
 };
 

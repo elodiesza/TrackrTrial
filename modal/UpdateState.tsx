@@ -11,7 +11,7 @@ function UpdateState({db, staterecords, setStaterecords, states, setStates, name
   const changeState = (item) => {
     let existingstates=[...staterecords];
     const id=staterecords.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0];
-    const indexToUpdate = existingstates.findIndex(state => state.id === id);
+    const indexToUpdate = existingstates.findIndex(c => c.id == id);
       db.transaction(tx=> {
         tx.executeSql('UPDATE staterecords SET item = ? WHERE id = ?', [item, id],
           (txObj, resultSet) => {
@@ -47,7 +47,9 @@ function UpdateState({db, staterecords, setStaterecords, states, setStates, name
                 </Pressable>
                 }
                 keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={{width:"100%", alignItems:'center', justifyContent:'center'}}
+                scrollEnabled={true}
+                bounces={false}
+                contentContainerStyle={{ alignItems:'center', justifyContent:'center'}}
             />
               <Pressable style={container.button}><Text>CREATE</Text></Pressable>
             <Text style={{color: 'gray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>

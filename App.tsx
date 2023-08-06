@@ -33,6 +33,7 @@ export default function App() {
     db,
     sections,
     progress,
+    weather,
     loadx,
     setTracks,
     setHabits,
@@ -50,6 +51,7 @@ export default function App() {
     setIsLoading,
     setSections,
     setProgress,
+    setWeather,
   } = useDatabase();
 
 
@@ -89,6 +91,7 @@ export default function App() {
         sections={sections}
         times={times} setTimes={setTimes}
         timerecords={timerecords} setTimerecords={setTimerecords}
+        weather={weather} setWeather={setWeather}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (

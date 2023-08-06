@@ -376,8 +376,8 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
     const showTitle = ({item,index}) => {
       return (
         <View>
-          <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:25 }}>
-            <IndicatorTableTitle name={item} year={year} month={month} setModalVisible={setModalVisible}/>
+          <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:scalerecords.filter(c=>c.year==year&&c.month==month&&c.name==item&&c.value>1000).length>0?50:25 }}>
+            <IndicatorTableTitle name={item} year={year} month={month} setModalVisible={setModalVisible} scaleInd={true} scalerecords={scalerecords}/>
           </Pressable>
           <IndicatorMenu
             data={item}
@@ -441,17 +441,17 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
     
     const showscales = (name) => {
       const scaleslist = scalerecords.filter(c=>(c.name==name && c.year==year && c.month==month));
-      const mincolor = hexToRgb(scales.filter(c=>c.name==name).map(c=>c.mincolor)[0]);
-      const maxcolor = hexToRgb(scales.filter(c=>c.name==name).map(c=>c.maxcolor)[0]);
-      const minvalue = scales.filter(c=>c.name==name).map(c=>c.min)[0];
-      const maxvalue = scales.filter(c=>c.name==name).map(c=>c.max)[0];
+      const mincolor = scales.filter(c=>c.name==name).map(c=>c.mincolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==name).map(c=>c.mincolor)[0]);
+      const maxcolor = scales.filter(c=>c.name==name).map(c=>c.maxcolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==name).map(c=>c.maxcolor)[0]);
+      const minvalue = scales.filter(c=>c.name==name).map(c=>c.min)[0]==null?Math.min(...scalerecords.filter(c=>(c.name==name && c.value!==null)).map(c=>c.value)):scales.filter(c=>c.name==name).map(c=>c.min)[0];
+      const maxvalue = scales.filter(c=>c.name==name).map(c=>c.max)[0]==null?Math.max(...scalerecords.filter(c=>(c.name==name && c.value!==null)).map(c=>c.value)):scales.filter(c=>c.name==name).map(c=>c.max)[0];
       return scaleslist.map((item,index) => {
-        const amountomix = (maxvalue-item.value)/(maxvalue-minvalue);
+        const amountomix = maxvalue==minvalue? 0.5:(maxvalue-item.value)/(maxvalue-minvalue);
         const colormix = mincolor!==null && maxcolor!==null?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=>{setSelectedScaleItem(item.value);setSelectedScaleId(item.id);setSelectedScaleIndex(index);setSelectedScaleName(name);setScaleModalVisible(true)}}>
-              <View style={[container.cell, { backgroundColor : item.value==undefined? colors.primary.white : colormix}]}>
+              <View style={[container.cell, { width:scalerecords.filter(c=>(c.year==year&&c.month==month&&c.name==item.name&&c.value>1000)).length>0?50:scalerecords.filter(c=>(c.year==year&&c.month==month&&c.name==item.name&&c.value>100)).length>0?37:25,backgroundColor : item.value==undefined? colors.primary.white : colormix}]}>
                 <Text>{item.value}</Text>
               </View>
             </TouchableOpacity>

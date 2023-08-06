@@ -35,7 +35,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
 
     const addSleep = () => {
         let existingSleep = [...sleep]; 
-        if (sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.sleep)[0]==null||undefined) {
+        if (sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).length==0) {
             db.transaction((tx) => {
                 tx.executeSql('INSERT INTO sleep (id,sleep,wakeup,year,month,day,type) values (?,?,?,?,?,?,?)',[uuid.v4(),parseInt(moment(sleepTime).format("HH")),null,year,month,day,0],
                 (txtObj,resultSet)=> {    

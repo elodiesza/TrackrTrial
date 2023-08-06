@@ -2,7 +2,7 @@ import { View, Text, Button, TouchableOpacity, Dimensions, StyleSheet, Pressable
 import Tab from '../components/Tab';
 import { colors, container, paleColor } from '../styles';
 import { useEffect, useState } from 'react';
-import { Feather, MaterialIcons, Entypo} from '@expo/vector-icons';
+import { Feather, MaterialIcons, Entypo, Ionicons} from '@expo/vector-icons';
 import NewSection from '../modal/NewSection';
 import NewTask from '../modal/NewTask';
 import Task from '../components/Task';
@@ -239,7 +239,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                     </View>
                 </View>
                 <FlatList
-                    data={sections.filter(c=>c.track==selectedTab)}
+                    data={sections.filter(c=>c.track==selectedTab)} 
                     renderItem={({item,index}) => 
                     <View>
                         <View style={[container.section,{flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: paleColor(selectedTabColor)}]}> 
@@ -267,7 +267,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             keyExtractor= {(item,index) => index.toString()}
                         />
                         <SwipeListView
-                            data={progress.filter(c=>(c.list==item.section && c.track==selectedTab))}
+                            data={progress.filter(c=>(c.list==item.section && c.track==selectedTab && c.progress!==100))}
                             renderItem={({item,index}) =>
                             <ProgressBar db={db} name={item.name} progress={progress} setProgress={setProgress} value={item.progress} id={item.id} color={selectedTabColor}/>
                             }
@@ -322,7 +322,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                         <MaterialIcons name="keyboard-arrow-down" size={25}/>
                     </Pressable>
                 </View>
-                <View style={{display: showArchive==true?"flex":"none",height:200}}>
+                <View style={{display: showArchive==true?"flex":"none",height:200,justifyContent:'flex-start'}}>
                     <SwipeListView
                             data={tasks.filter(c=>(c.track==selectedTab && c.taskState==2 ))}
                             renderItem={({item,index}) =>
@@ -340,7 +340,42 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                     <SwipeListView
                             data={progress.filter(c=>(c.track==selectedTab && c.progress==100))}
                             renderItem={({item,index}) =>
-                            <ProgressBar db={db} name={item.name} progress={progress} setProgress={setProgress} value={item.progress} id={item.id} color={selectedTabColor}/>
+                                <View style={{height:40,width:width,backgroundColor:colors.primary.white,flexDirection:'row'}}>
+                                    <View style={{width:width-140,justifyContent:'center',paddingLeft:10}}>
+                                        <Text>{item.name}</Text>
+                                    </View>
+                                    <FlatList
+                                    horizontal
+                                    data={[{'name':item.name,'rate':1},{'name':item.name,'rate':2},{'name':item.name,'rate':3},{'name':item.name,'rate':4},{'name':item.name,'rate':5}]}
+                                    renderItem={({ item }) => 
+                                        <Pressable onPress={()=>{
+                                            let existingprogress = [...progress]; 
+                                            const id=progress.filter(c=>(c.name==item.name && c.track==selectedTab)).map(c=>c.id)[0];
+                                            const progressIndex = progress.findIndex(c=>(c.name==item.name && c.track==selectedTab));
+                                            db.transaction(tx=> {
+                                                tx.executeSql('UPDATE progress SET rate = ? WHERE id=?', [item.rate,id],
+                                                    (txObj, resultSet) => {
+                                                    if (resultSet.rowsAffected > 0) {
+                                                        existingprogress[progressIndex].rate = item.rate;
+                                                        setProgress(existingprogress);
+                                                    }
+                                                    },
+                                                    (txObj, error) => console.log('Error updating data', error)
+                                                );
+                                            });
+                                        }} style={{justifyContent:'center'}}>
+                                            <View style={{display:item.rate>progress.filter(c=>(c.track==selectedTab&&c.name==item.name&&c.progress==100)).map(c=>c.rate)[0]?"flex":"none"}}>
+                                                <Ionicons name="star-outline" size={25} />
+                                            </View>
+                                            <View style={{display:item.rate<=progress.filter(c=>(c.track==selectedTab&&c.name==item.name&&c.progress==100)).map(c=>c.rate)[0]?"flex":"none"}}>
+                                                <Ionicons name="star" size={25} />
+                                            </View>
+                                        </Pressable>
+                                    }
+                                    contentContainerStyle={{width:130}}
+                                    scrollEnabled={false}
+                                    />
+                                </View>
                             }
                             renderHiddenItem={({ item }) => <ProgressSwipeItem id={item.id} />} 
                             bounces={false} 
