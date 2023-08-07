@@ -6,7 +6,7 @@ import { container } from '../styles';
 import { Feather } from '@expo/vector-icons';
 
 
-const Calendar = ({db, habits, tracks, setHabits, setTracks, tasks, setTasks, load, loadx, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) => {
+const Calendar = ({db, habits, tracks, setHabits, setTracks, tasks, setTasks, load, loadx, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   var today = new Date();
@@ -98,6 +98,7 @@ const Calendar = ({db, habits, tracks, setHabits, setTracks, tasks, setTasks, lo
       scales={scales} setScales={setScales} 
       scalerecords={scalerecords} setScalerecords={setScalerecords}
       diary={diary} setDiary={setDiary}
+      weather={weather} setWeather={setWeather}
       />
     </SafeAreaView>
   );

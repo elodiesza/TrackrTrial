@@ -25,9 +25,12 @@ const Mood = ({  moods, year, month, daysInMonth, pieWidth }) => {
             widthAndHeight={pieWidth}
             series={totalCount==0? [1,0,0,0,0,0,0,0] : moodCounts.map(c=>c.count)}
             sliceColor={totalCount==0? ['lightgray','gray','gray','gray','gray','gray','gray','gray']: moodColors}
-            coverRadius={0.45}
+            coverRadius={0.60}
             coverFill={colors.primary.defaultlight}
           />
+          <View style={{position:'absolute'}}>
+            <Text style={{textAlign:'center', fontSize:10}}>MOOD</Text>
+          </View>
         </View>
   );
 };

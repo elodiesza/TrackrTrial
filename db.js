@@ -21,6 +21,8 @@ const useDatabase = () => {
   const [sections, setSections] = useState([]);
   const [progress, setProgress] = useState([]);
   const [weather, setWeather] = useState([]);
+  const [stickers, setStickers] = useState([]);
+  const [stickerrecords, setStickerrecords] = useState([]);
 
 
   useEffect(() => {
@@ -160,8 +162,27 @@ const useDatabase = () => {
       tx.executeSql('CREATE TABLE IF NOT EXISTS weather (id TEXT PRIMARY KEY, weather TEXT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM weather', null,
+      tx.executeSql('SELECT * FROM weather ORDER BY day;', null,
       (txObj, resultSet) => setWeather(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting weather')
+      );
+    });
+
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS stickers (id TEXT PRIMARY KEY, name TEXT, icon TEXT, color TEXT)')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM stickers', null,
+      (txObj, resultSet) => setStickers(resultSet.rows._array),
+      (txObj, error) => console.log('error selecting weather')
+      );
+    });
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS stickerrecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM stickerrecords ORDER BY day;', null,
+      (txObj, resultSet) => setStickerrecords(resultSet.rows._array),
       (txObj, error) => console.log('error selecting weather')
       );
     });
@@ -190,6 +211,8 @@ const useDatabase = () => {
     sections,
     progress,
     weather,
+    stickers,
+    stickerrecords,
     loadx,
     setHabits,
     setTasks,
@@ -208,6 +231,8 @@ const useDatabase = () => {
     setSections,
     setProgress,
     setWeather,
+    setStickers,
+    setStickerrecords,
   };
 };
 

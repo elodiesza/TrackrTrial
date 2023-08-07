@@ -8,7 +8,7 @@ import MoodStats from './Statistics/MoodStats';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({year, month, habits, states, staterecords, tracks, setHabits, setTracks, sleep, moods}) => {
+const Statistics = ({year, month, habits, states, scales, scalerecords, staterecords, tracks, setHabits, setTracks, sleep, moods}) => {
   var today = new Date();
 
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
@@ -26,7 +26,7 @@ const Statistics = ({year, month, habits, states, staterecords, tracks, setHabit
     <SafeAreaView style={styles.container}>
       <View style={styles.body}>
         <Swiper horizontal={true} showsButtons={false} showsPagination={true} loop={false}>
-          <StatsHome habits={habits} states={states} staterecords={staterecords} month={month} year={year} tracks={tracks} moods={moods} daysInMonth={DaysInMonth(year,month)}/>
+          <StatsHome habits={habits} states={states} scales={scales} scalerecords={scalerecords} sleep={sleep} staterecords={staterecords} month={month} year={year} tracks={tracks} moods={moods} daysInMonth={DaysInMonth(year,month)}/>
           <Habits habits={habits} month={month} year={year} tracks={tracks}/>
           <MoodStats moods={moods} daysInMonth={DaysInMonth(year,month)}/>
           <SleepLog sleep={sleep} year={year} month={month}/>

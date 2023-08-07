@@ -8,7 +8,7 @@ import { container } from '../styles';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary}) {
+export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -138,7 +138,7 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
   return (
     <View style={container.body}>
         <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
-          <Statistics year={year} month={month} habits={habits} states={states} staterecords={staterecords} tracks={tracks} setHabits={setHabits} setTracks={setTracks} sleep={sleep} moods={moods}/>
+          <Statistics year={year} month={month} habits={habits} states={states} scales={scales} scalerecords={scalerecords} staterecords={staterecords} tracks={tracks} setHabits={setHabits} setTracks={setTracks} sleep={sleep} moods={moods}/>
           <TrackersElement db={db} load={load} loadx={loadx} 
           tracks={tracks} setTracks={setTracks} 
           year={year} month={month} 
@@ -149,6 +149,7 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
           staterecords={staterecords} setStaterecords={setStaterecords}
           scales={scales} setScales={setScales} 
           scalerecords={scalerecords} setScalerecords={setScalerecords}
+          weather={weather} setWeather={setWeather}
           />
           <View style={{flex:1}}>
           <FlatList

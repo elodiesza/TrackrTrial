@@ -6,16 +6,17 @@ import WeatherData from '../constants/Weather';
 import uuid from 'react-native-uuid';
 
 function UpdateWeather({db, weather, setWeather, year, month, day}) {
-    const initialWeather= weather.filter(c=>(c.year==year&&c.month==month&&c.day==day)).length==0?'cloud-outline': weather.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.weather)[0];
+
+    const initialWeather= weather.filter(c=>(c.year==year&&c.month==month&&c.day==day)).length==0?'add-circle-outline': weather.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.weather)[0];
     const initialWeatherId=WeatherData.filter(c=>c.weather==initialWeather).map(c=>c.id)[0];
     const [selectedId, setSelectedId] = useState(weather.filter(c=>(c.year==year&&c.month==month&&c.day==day)).length==0?-1:initialWeatherId);
     const [selectedWeather, setSelectedWeather] = useState(initialWeather);
 
     useEffect(() => {
         setSelectedWeather(
-            selectedId==-1?'cloud-outline':
-            WeatherData.filter(c=>c.id==selectedId).map(c=>c.weather)[0]);
-    },[,selectedId]);
+            selectedId==-1?'add-circle-outline':
+            WeatherData.filter(c=>c.id==(selectedId)).map(c=>c.weather)[0]);
+    },[selectedId]);
 
     const changeWeather = () => {
         let existingweather=[...weather];
@@ -48,13 +49,10 @@ function UpdateWeather({db, weather, setWeather, year, month, day}) {
             });
         }
     };
-
+    console.warn(initialWeather,initialWeatherId,weather.map(c=>c.weather));
   return (
-    <TouchableOpacity onPress={()=>{changeWeather();setSelectedId(selectedId==5?0:selectedId+1);}} style={{width:100, justifyContent:'center', alignItems:'center'}}>
-            <View style={{display:selectedId==-1?"flex":"none"}}>
-                <Ionicons name={selectedWeather} size={60} color={colors.primary.gray}/>
-            </View>
-            <View style={{display:selectedId==-1?"none":"flex"}}>
+    <TouchableOpacity onPress={()=>{setSelectedId(selectedId==5?0:selectedId+1);changeWeather();}} style={{width:100, justifyContent:'center', alignItems:'center'}}>
+            <View>
                 <Ionicons name={selectedWeather} size={60} color={colors.primary.blue}/>
             </View>
     </TouchableOpacity>

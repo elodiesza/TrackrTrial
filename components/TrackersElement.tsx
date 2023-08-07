@@ -12,10 +12,13 @@ import { container,colors } from '../styles';
 import Color from './Color';
 import AddScale from './AddScale';
 import uuid from 'react-native-uuid';
+import UpdateWeather from './UpdateWeather';
+import { Ionicons } from '@expo/vector-icons';
+import WeatherData from '../constants/Weather';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords}) {
+export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, weather, setWeather}) {
 
 
   var today = new Date();
@@ -42,6 +45,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
   const [selectedScaleItem, setSelectedScaleItem] = useState('');
   const [scaleValue, setScaleValue] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
+  const [weatherModalVisible, setWeatherModalVisible] = useState(false);
+  const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(-1);
 
   const [updatedhabits, setUpdatedhabits] = useState([]);
   const [updatedstates, setUpdatedstates] = useState([]);
@@ -358,7 +363,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
         return ( 
           <View key={index}>
             <TouchableOpacity onPress={()=> updateHabit(state.id)}>
-              <View style={[container.cell, { backgroundColor : filteredhabits[index].state==1 ? '#242424' : 'white' }]} />
+              <View style={[container.cell, { backgroundColor : filteredhabits[index].state==1 ? colors.primary.tungstene : colors.primary.white }]} />
             </TouchableOpacity>
           </View>
         )
@@ -512,6 +517,36 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
         )   
     }
 
+    const showWeather = (item,index) => {
+      return  (
+        <View key={index}>
+          <Pressable onPress={()=>{setSelectedWeatherIndex(index);setWeatherModalVisible(true);}} style={{flex:1,width:25,height:25, justifyContent:'center', alignItems:'center',borderWidth:0.5, backgroundColor: colors.primary.white }}>
+            <Ionicons name={item} size={20} color={colors.primary.black} />
+          </Pressable>
+          <Modal
+          animationType="none"
+          transparent={true}
+          visible={selectedWeatherIndex === index && weatherModalVisible}
+          onRequestClose={() => {
+            setSelectedWeatherIndex(index);
+            setWeatherModalVisible(!weatherModalVisible);
+            loadx(!load);
+          }}
+          >
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedWeatherIndex(index);setWeatherModalVisible(!weatherModalVisible);}} activeOpacity={1}>
+              <TouchableWithoutFeedback>
+                <View style={[container.modal,{width:200, height:100}]}>
+                  <Text style={{textAlign:'center'}}>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} weather</Text>
+                  <UpdateWeather weather={weather} setWeather={setWeather} db={db} year={year} month={month} day={index+1}/>
+                </View>
+              </TouchableWithoutFeedback>
+            </TouchableOpacity>
+          </Modal>
+        </View>
+        
+      )   
+    }
+
     const showMood = (item,index) => {
       const bgColor = item==null?'white': item=='happy'?'yellowgreen': item=='productive'?'green': item=='sick'?'yellow': item=='stressed'?'orange': item=='angry'?'red': item=='calm'?'pink' : item=='bored'?'plum': item=='sad'?'lightblue': 'white';
       return  (
@@ -532,9 +567,6 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
                 <View style={[container.modal,{width:380, height:170}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} mood</Text>
                   <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setMoodModalVisible={setMoodModalVisible}/>
-                  <TouchableOpacity onPress={() => deleteMood(index)} style={[container.button,{backgroundColor: 'lightgray'}]}>
-                    <Text>Delete</Text>
-                  </TouchableOpacity>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -655,6 +687,14 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
       setSleepModalVisible(false);
     };
 
+    const thismonthWeather = (year,month) =>{
+      var arr= [];
+      for (let i=1; i<=DaysInMonth(year,month);i++) {
+        arr.push(weather.filter(c=>(c.year==year && c.month==month && c.day==i)).length==0? null : weather.filter(c=>(c.year==year && c.month==month && c.day==i)).map(c=>c.weather)[0] );
+      }
+      return (arr);
+    };
+
     const thismonthMoods = (year,month) =>{
       var arr= [];
       for (let i=1; i<=DaysInMonth(year,month);i++) {
@@ -712,6 +752,16 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
             />
           </View>
           <ScrollView horizontal={true} style={{flex:1,flexDirection:'row'}}>
+            <View style={{display: weather.filter(c=>(c.year==year && c.month==month)).length==0?"none":"flex"}}>
+              <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>WEATHER </Text>
+              <FlatList
+                data={thismonthWeather(year,month)}
+                renderItem={({item,index})=>(showWeather(item,index))}
+                keyExtractor={(_, index) => index.toString()}
+                style={{width:25,flexDirection:'row'}}
+                scrollEnabled={false}
+              />
+            </View>
             <View style={{display: moods.filter(c=>(c.year==year && c.month==month)).length==0?"none":"flex"}}>
               <View style={[styles.polygon]} /><Text numberOfLines={1} style={styles.indText}>MOOD</Text>
               <FlatList

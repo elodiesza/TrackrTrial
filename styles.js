@@ -1,4 +1,4 @@
-import { StyleSheet,Dimensions, Platform  } from "react-native";
+import { StyleSheet,Dimensions } from "react-native";
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -26,6 +26,7 @@ export const colors = {
         beige: '#ffebcd',
         gray: '#d3d3d3',  
         black: '#000000',
+        tungstene: '#2c3e50',
         transparent: '#000000',
     },
     pale:{

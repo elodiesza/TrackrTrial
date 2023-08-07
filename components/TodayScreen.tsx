@@ -8,14 +8,18 @@ import DiaryElement from './DiaryElement';
 import AddScale from './AddScale';
 import UpdateState from '../modal/UpdateState';
 import UpdateWeather from './UpdateWeather';
+import StickerList from './StickerList';
+import NewSticker from '../modal/NewSticker';
+import { Ionicons } from '@expo/vector-icons';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather}) => {
+const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords}) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [selectedName, setSelectedName] = useState('');
     const [updateStateVisible, setUpdateStateVisible] = useState(false);
+    const [newStickerVisible, setNewStickerVisible] = useState(false);
 
     const allNames = habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
@@ -127,7 +131,11 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           />
         </View>
       </View>
-      <View style={{height:150, width:width, marginBottom:10}}>
+      <View style={{height:180, width:width, marginBottom:10}}>
+        <View style={{width:width-40, height:30, marginHorizontal:20}}>
+          <StickerList db={db} stickers={stickers} setStickers={setStickers} stickerrecords={stickerrecords} setStickerrecords={setStickerrecords} year={year} month={month} day={day}/>
+          <Ionicons onPress={()=>setNewStickerVisible(true)} name="add-circle-outline" size={30} color={colors.primary.blue}/>
+        </View>
         <DiaryElement 
           db={db}
           diary={diary}
@@ -137,8 +145,9 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           day={day}
           load={load}
           loadx={loadx}
-          />
+        />
       </View>
+      <NewSticker db={db} stickers={stickers} setStickers={setStickers} newStickerVisible={newStickerVisible} setNewStickerVisible={setNewStickerVisible}/>
      {/*  <Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
         (txObj, resultSet) => setStaterecords([]),
         (txObj, error) => console.log('error selecting tasks')

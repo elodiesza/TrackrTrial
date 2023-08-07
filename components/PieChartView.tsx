@@ -34,14 +34,17 @@ const PieChartView = ({ name, year, month, states, staterecords, daysInMonth, pi
 
 
   return (
-        <View style={{flex:1, justifyContent:'center', alignItems: 'center'}}>
+        <View style={{flex:1, justifyContent:'center', alignItems: 'center', margin:10}}>
           <PieChart
             widthAndHeight={pieWidth}
             series={dataCounts.reduce((accumulator, currentValue) => accumulator + currentValue, 0)==0?noDataArray:dataCounts}
             sliceColor={itemColors}
-            coverRadius={0.45}
+            coverRadius={0.60}
             coverFill={colors.primary.defaultlight}
           />
+          <View style={{position:'absolute'}}>
+            <Text style={{textAlign:'center', fontSize:10}}>{name}</Text>
+          </View>
         </View>
   );
 };

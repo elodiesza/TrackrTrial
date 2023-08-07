@@ -34,6 +34,8 @@ export default function App() {
     sections,
     progress,
     weather,
+    stickers,
+    stickerrecords,
     loadx,
     setTracks,
     setHabits,
@@ -52,6 +54,8 @@ export default function App() {
     setSections,
     setProgress,
     setWeather,
+    setStickers,
+    setStickerrecords,
   } = useDatabase();
 
 
@@ -92,6 +96,8 @@ export default function App() {
         times={times} setTimes={setTimes}
         timerecords={timerecords} setTimerecords={setTimerecords}
         weather={weather} setWeather={setWeather}
+        stickers={stickers} setStickers={setStickers}
+        stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (
@@ -110,6 +116,7 @@ export default function App() {
         scales={scales} setScales={setScales} 
         scalerecords={scalerecords} setScalerecords={setScalerecords}
         diary={diary} setDiary={setDiary}
+        weather={weather} setWeather={setWeather}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
