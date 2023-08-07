@@ -1,24 +1,21 @@
 import React, { Component } from 'react'
 import { FlatList, SafeAreaView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { useEffect, useState } from 'react';
-import PieChart from 'react-native-pie-chart'
-import moment from 'moment';
 import SleeplogMonth from '../../components/SleepLogMonth';
 
 const width = Dimensions.get('window').width;
 
-const SleepLog = ({sleep, load, loadx, year, month}) => {
+const SleepLogStats = ({sleep, year, month}) => {
 
 
     return (
         <SafeAreaView style={styles.container}>
-          <SleeplogMonth sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
+          <SleeplogMonth sleep={sleep} year={year} month={month}/>
         </SafeAreaView>
     );
 
 };
 
-export default SleepLog;
+export default SleepLogStats;
 
 const styles = StyleSheet.create({
   container: {

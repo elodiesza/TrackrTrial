@@ -1,75 +1,49 @@
 import React, { Component } from 'react'
 import { FlatList, ScrollView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { useEffect, useState } from 'react';
 import PieChart from 'react-native-pie-chart'
-import moment from 'moment';
+import {colors} from '../styles';
 
-const width = Dimensions.get('window').width;
 
-const PieChartView = ({  intable, daysInMonth }) => {
+const PieChartView = ({ name, year, month, states, staterecords, daysInMonth, pieWidth }) => {
  
-  const itemCounts = [{"item":"productive", "count":0},{"item":"happy", "count":0},{"item":"sick", "count":0},{"item":"stressed", "count":0},{"item":"angry", "count":0},{"item":"calm", "count":0},{"item":"bored", "count":0},{"item":"sad", "count":0}];
-  
-  
-  const table = () => {
-    let temp=intable;
-    for (var i=0; i<intable.length; i++){
-      temp[i][0][0] = "item";
-    }
-    return temp;
-  }
-  console.log(intable);
-
-  if (table.length!==0){
-    for(var i=1; i<daysInMonth+1;i++){
-      table.filter(c=>c.day==i).length==0? undefined: itemCounts.filter(c=>c.item==table.filter(c=>c.day==i).map(c=>c.item)[0])[0].count++;
+  const itemList=states.filter(c=>c.name==name).map(c=>c.item);
+  const NbOfItems=itemList.length;
+  const dataSeries=[];
+  if (staterecords.length!==0){
+    for(var j=0; j<NbOfItems;j++){
+      var itemCount=0;
+      for(var i=1; i<daysInMonth+1;i++){
+        staterecords.filter(c=>(c.year==year && c.month==month && c.day==i && c.name==name)).map(c=>c.item)[0]==itemList[j]? itemCount++: undefined;
+      }
+      dataSeries.push({'item':itemList[j], 'count':itemCount});
     }
   }
+  const itemColors=states.filter(c=>c.name==name).map(c=>c.color);
+  
+  var sumCounts=0;
+  for (var i=0;i<NbOfItems;i++){
+    sumCounts=sumCounts+dataSeries.map(c=>c.count)[i];
+  }
 
-  const itemColors = ['green','yellowgreen','yellow','orange','red','pink','plum','lightblue'];
-  const totalCount = itemCounts.map(c=>c.count).reduce((a,b)=>a+b,0);
+  var noDataArray=[1];
+  for (var i=0;i<NbOfItems;i++){
+    i==0?undefined:noDataArray.push(0);
+  }
+
+  const dataCounts=dataSeries.map(c=>c.count);
 
 
   return (
-    <View style={{ flex: 1, width:width }}>
-      <View style={{height: 300, width:width, justifyContent:'center', alignItems: 'center', flexDirection:'row'}}>
-        <View style={{flex:4, justifyContent:'center', alignItems: 'center'}}>
+        <View style={{flex:1, justifyContent:'center', alignItems: 'center'}}>
           <PieChart
-            widthAndHeight={width/2}
-            series={totalCount==0? [1,0,0,0,0,0,0,0] : itemCounts.map(c=>c.count)}
-            sliceColor={totalCount==0? ['lightgray','gray','gray','gray','gray','gray','gray','gray']: itemColors}
+            widthAndHeight={pieWidth}
+            series={dataCounts.reduce((accumulator, currentValue) => accumulator + currentValue, 0)==0?noDataArray:dataCounts}
+            sliceColor={itemColors}
             coverRadius={0.45}
-            coverFill={'#FFF'}
+            coverFill={colors.primary.defaultlight}
           />
         </View>
-        <View style={{flex:3, justifyContent:'center', alignItems: 'center'}}>
-          <FlatList
-            data={itemCounts}
-            renderItem={({item,index}) => 
-              <View style={{flexDirection:'row'}}>
-                <View style={{height:14,width:14, alignSelf:'center', backgroundColor:itemColors[index],borderRadius:7}}/>
-                <Text style={{fontSize: 14,width:40, margin:3, marginLeft:10, color: 'gray'}}>{totalCount==0? 0: (item.count*100/totalCount).toFixed(0)}% </Text><Text style={{fontSize: 14, margin:3}}>{item.item}</Text>
-              </View>
-            }
-            keyExtractor={item => item.item}
-            scrollEnabled={false}
-            contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
-          />
-        </View>
-      </View>
-    </View>
   );
 };
 export default PieChartView;
 
-const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    margin: 10,
-  },
-});

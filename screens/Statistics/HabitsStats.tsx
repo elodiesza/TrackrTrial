@@ -4,7 +4,7 @@ import { colors } from '../../styles';
 
 const width = Dimensions.get('window').width;
 
-const Habits = ({ habits, month, year, tracks }) => {
+const HabitsStats = ({ habits, month, year, tracks }) => {
 
     const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
@@ -57,7 +57,7 @@ const Habits = ({ habits, month, year, tracks }) => {
     </View>
   );
 };
-export default Habits;
+export default HabitsStats;
 
 const styles = StyleSheet.create({
   container: {

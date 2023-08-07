@@ -1,24 +1,20 @@
 import { FlatList, SafeAreaView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { useEffect, useState } from 'react';
 import React from 'react';
-import { Feather } from '@expo/vector-icons';
-import moment from 'moment';
-import SleepLog from './Statistics/SleepLog';
-import Mood from './Statistics/Mood';
+import SleepLog from './Statistics/SleepLogStats';
 import Swiper from 'react-native-swiper';
-import Habits from './Statistics/Habits';
+import Habits from './Statistics/HabitsStats';
 import StatsHome from './Statistics/StatsHome';
+import MoodStats from './Statistics/MoodStats';
 
 const width = Dimensions.get('window').width;
 
-const Statistics = ({year, month, habits, tracks, setHabits, setTracks, sleep, load, loadx, moods}) => {
+const Statistics = ({year, month, habits, states, staterecords, tracks, setHabits, setTracks, sleep, moods}) => {
   var today = new Date();
 
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
 
   if (!habits || habits.length === 0) {
-    // Render loading state or placeholder component
     return (
       <View style={styles.container}>
         <Text>Loading...</Text>
@@ -30,10 +26,10 @@ const Statistics = ({year, month, habits, tracks, setHabits, setTracks, sleep, l
     <SafeAreaView style={styles.container}>
       <View style={styles.body}>
         <Swiper horizontal={true} showsButtons={false} showsPagination={true} loop={false}>
-          <StatsHome habits={habits} month={month} year={year} tracks={tracks} moods={moods} daysInMonth={DaysInMonth(year,month)}/>
+          <StatsHome habits={habits} states={states} staterecords={staterecords} month={month} year={year} tracks={tracks} moods={moods} daysInMonth={DaysInMonth(year,month)}/>
           <Habits habits={habits} month={month} year={year} tracks={tracks}/>
-          <Mood moods={moods.filter(c=>(c.year==year && c.month==month))} daysInMonth={DaysInMonth(year,month)}/>
-          <SleepLog sleep={sleep} load={load} loadx={loadx} year={year} month={month}/>
+          <MoodStats moods={moods} daysInMonth={DaysInMonth(year,month)}/>
+          <SleepLog sleep={sleep} year={year} month={month}/>
         </Swiper>
       </View>
     </SafeAreaView>

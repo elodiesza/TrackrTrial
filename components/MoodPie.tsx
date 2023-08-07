@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { FlatList, ScrollView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useEffect, useState } from 'react';
 import PieChart from 'react-native-pie-chart'
-import moment from 'moment';
+import {colors} from '../styles';
 
 const width = Dimensions.get('window').width;
 
-const Mood = ({  moods, daysInMonth }) => {
+const Mood = ({  moods, year, month, daysInMonth, pieWidth }) => {
  
   const moodCounts = [{"mood":"productive", "count":0},{"mood":"happy", "count":0},{"mood":"sick", "count":0},{"mood":"stressed", "count":0},{"mood":"angry", "count":0},{"mood":"calm", "count":0},{"mood":"bored", "count":0},{"mood":"sad", "count":0}];
   
@@ -19,47 +19,17 @@ const Mood = ({  moods, daysInMonth }) => {
   const moodColors = ['green','yellowgreen','yellow','orange','red','pink','plum','lightblue'];
   const totalCount = moodCounts.map(c=>c.count).reduce((a,b)=>a+b,0);
 
-
   return (
-    <View style={{ flex: 1, width:width }}>
-      <View style={{height: 300, width:width, justifyContent:'center', alignItems: 'center', flexDirection:'row'}}>
         <View style={{flex:4, justifyContent:'center', alignItems: 'center'}}>
           <PieChart
-            widthAndHeight={width/2}
+            widthAndHeight={pieWidth}
             series={totalCount==0? [1,0,0,0,0,0,0,0] : moodCounts.map(c=>c.count)}
             sliceColor={totalCount==0? ['lightgray','gray','gray','gray','gray','gray','gray','gray']: moodColors}
             coverRadius={0.45}
-            coverFill={'#FFF'}
+            coverFill={colors.primary.defaultlight}
           />
         </View>
-        <View style={{flex:3, justifyContent:'center', alignItems: 'center'}}>
-          <FlatList
-            data={moodCounts}
-            renderItem={({item,index}) => 
-              <View style={{flexDirection:'row'}}>
-                <View style={{height:14,width:14, alignSelf:'center', backgroundColor:moodColors[index],borderRadius:7}}/>
-                <Text style={{fontSize: 14,width:40, margin:3, marginLeft:10, color: 'gray'}}>{totalCount==0? 0: (item.count*100/totalCount).toFixed(0)}% </Text><Text style={{fontSize: 14, margin:3}}>{item.mood}</Text>
-              </View>
-            }
-            keyExtractor={item => item.mood}
-            scrollEnabled={false}
-            contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
-          />
-        </View>
-      </View>
-    </View>
   );
 };
 export default Mood;
 
-const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    margin: 10,
-  },
-});

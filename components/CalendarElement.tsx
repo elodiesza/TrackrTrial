@@ -138,7 +138,7 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
   return (
     <View style={container.body}>
         <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
-          <Statistics year={year} month={month} habits={habits} tracks={tracks} setHabits={setHabits} setTracks={setTracks} sleep={sleep} load={load} loadx={loadx} moods={moods}/>
+          <Statistics year={year} month={month} habits={habits} states={states} staterecords={staterecords} tracks={tracks} setHabits={setHabits} setTracks={setTracks} sleep={sleep} moods={moods}/>
           <TrackersElement db={db} load={load} loadx={loadx} 
           tracks={tracks} setTracks={setTracks} 
           year={year} month={month} 

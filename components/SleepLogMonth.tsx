@@ -5,13 +5,12 @@ import moment from 'moment';
 
 const width = Dimensions.get('window').width;
 
-const SleeplogMonth = ({ sleep, load, loadx, year, month}) => {
+const SleeplogMonth = ({ sleep, year, month}) => {
 
     const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
 
     var today = new Date();
     var day = today.getDate();
-    const [isLoading, setIsLoading] = useState(false);
     const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
 
