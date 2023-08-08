@@ -1,14 +1,15 @@
-import { TouchableOpacity, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, ScrollView, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
 import Swiper from 'react-native-swiper'
 import MonthlyTasks from '../components/MonthlyTasks';
 import TrackersElement from './TrackersElement';
 import Statistics from '../screens/Statistics';
-import { container } from '../styles';
+import { container, colors } from '../styles';
+import { Ionicons } from '@expo/vector-icons';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather}) {
+export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather, stickers, stickerrecords}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -93,9 +94,22 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
   };
 
   const CalendarCell = (date) => {
+    const thisdaySticker=stickerrecords.filter(c=>(c.year==year && c.month==month &&c.state==true && c.day==date)).map(c=>c.name);
     return(
       <View style={[styles.calendarCell,{backgroundColor: date==0? 'lightgray' : 'white', borderColor: (date==thisDay && month==thisMonth && year==thisYear)? 'red':'gray', borderWidth: (date==thisDay && month==thisMonth && year==thisYear)? 2:0.5}]}>
-        <View style={{height:15}}>
+        <View style={{height:15, flexDirection:'row', justifyContent:'flex-end'}}>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
+            {stickers
+              .filter(c => thisdaySticker.includes(c.name))
+              .map((item, index) => (
+                <View key={index}>
+                  <View style={{position:'absolute'}}>
+                    <Ionicons name={item.icon} size={15} color={item.color}/>
+                  </View>
+                  <Ionicons name={item.icon+'-outline'} size={15} color={colors.primary.black}/>
+                </View>
+              ))}
+          </ScrollView>
           <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
         </View>
         <View style={{flex:1, justifyContent: 'flex-end'}}>
@@ -138,7 +152,13 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
   return (
     <View style={container.body}>
         <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
-          <Statistics year={year} month={month} habits={habits} states={states} scales={scales} scalerecords={scalerecords} staterecords={staterecords} tracks={tracks} setHabits={setHabits} setTracks={setTracks} sleep={sleep} moods={moods}/>
+          <Statistics year={year} month={month} 
+          habits={habits} states={states} 
+          scales={scales} scalerecords={scalerecords} 
+          stickers={stickers} stickerrecords={stickerrecords}
+          staterecords={staterecords} tracks={tracks} 
+          setHabits={setHabits} setTracks={setTracks} 
+          sleep={sleep} moods={moods}/>
           <TrackersElement db={db} load={load} loadx={loadx} 
           tracks={tracks} setTracks={setTracks} 
           year={year} month={month} 

@@ -48,9 +48,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
               <Pressable onPress={()=>setNewHabitVisible} style={container.button}>
                 <Text style={container.buttontext}>TIME</Text>
               </Pressable>
-              <Pressable onPress={()=>setNewHabitVisible} style={container.button}>
-                <Text style={container.buttontext}>STICKER</Text>
-              </Pressable>
               <NewHabit newHabitVisible={newHabitVisible} setNewHabitVisible={setNewHabitVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits}/>
               <NewState newStateVisible={newStateVisible} setNewStateVisible={setNewStateVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>
               <NewScale newScaleVisible={newScaleVisible} setNewScaleVisible={setNewScaleVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits} 

@@ -117,6 +117,7 @@ export default function App() {
         scalerecords={scalerecords} setScalerecords={setScalerecords}
         diary={diary} setDiary={setDiary}
         weather={weather} setWeather={setWeather}
+        stickers={stickers} stickerrecords={stickerrecords}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (

@@ -8,7 +8,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 const width = Dimensions.get('window').width;
 
-const StatsHome = ({ habits, states, scales, scalerecords, sleep, staterecords, month, year, tracks, moods, daysInMonth }) => {
+const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerrecords, sleep, staterecords, month, year, tracks, moods, daysInMonth }) => {
+    console.warn(stickerrecords)
 
     const today=new Date();
     const thisDay= today.getDate();
@@ -28,7 +29,7 @@ const StatsHome = ({ habits, states, scales, scalerecords, sleep, staterecords, 
                 <View style={{width:90, justifyContent:'center', marginLeft:10}}>
                     <Text style={{fontSize:10}}>{item}</Text>
                 </View>
-                <View style={{width:100,height:18,borderRadius:5, borderWidth:1, borderColor:colors.primary.black, backgroundColor:colors.primary.white}}>
+                <View style={{width:90,height:18,borderRadius:5, borderWidth:1, borderColor:colors.primary.black, backgroundColor:colors.primary.white}}>
                     <View style={{width:98*habitsPercentage(),height:16,backgroundColor:colors.primary.tungstene,borderRadius:4}} />
                 </View>
             </View>
@@ -47,6 +48,21 @@ const StatsHome = ({ habits, states, scales, scalerecords, sleep, staterecords, 
             </View>
         );
     }
+    const stickerObject = ({item}) => {
+        const stickerCount= stickerrecords.filter(c=>(c.name==item.name&&c.year==year&&c.month==month&&c.state==true)).length;
+        return(
+            <View style={{width:250,flexDirection:'row', alignItems:'center'}}>
+                <View style={{}}>
+                    <View style={{position:'absolute'}}>
+                        <Ionicons name={item.icon} size={30} color={item.color}/>
+                    </View>
+                    <Ionicons name={item.icon+'-outline'} size={30} color={colors.primary.black}/>
+                </View>
+                <Text style={{fontSize:10, marginHorizontal:10}}>{stickerCount}</Text>
+                <Text style={{fontSize:10, marginHorizontal:10}}>{item.name}</Text>
+            </View>
+        );
+    };
 
 
     //Sleep gauges
@@ -73,12 +89,21 @@ const StatsHome = ({ habits, states, scales, scalerecords, sleep, staterecords, 
                 contentContainerStyle={{height:100}}
                 horizontal
             />
-            <FlatList
-                data={[...new Set(habits.map(c=>c.name))]}
-                renderItem={({ item }) =>habitBar({item})}
-                keyExtractor={(_, index) => index.toString()}
-                contentContainerStyle={{height:200,flex:1}}
-            />
+            <View style={{flexDirection:'row', flex:1}}>
+                <FlatList
+                    data={[...new Set(habits.map(c=>c.name))]}
+                    renderItem={({ item }) =>habitBar({item})}
+                    keyExtractor={(_, index) => index.toString()}
+                    contentContainerStyle={{height:200,flex:1}}
+                />
+                <FlatList
+                    data={[...new Set(stickers)]}
+                    renderItem={({ item }) =>stickerObject({item})}
+                    keyExtractor={(_, index) => index.toString()}
+                    contentContainerStyle={{height:200,flex:1}}
+                />
+            </View>
+            
             <FlatList
                 data={[...new Set(scales.map(c=>c.name))]}
                 renderItem={({ item }) =>scaleObject({item})}

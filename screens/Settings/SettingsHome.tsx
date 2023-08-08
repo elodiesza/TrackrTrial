@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     arrow: {
         position: 'absolute',
         right: 0,
-        color: colors.blue,
+        color: colors.primary.blue,
     }
 
 });
