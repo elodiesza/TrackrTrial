@@ -14,7 +14,7 @@ function NewSticker({db, stickers, setStickers, newStickerVisible, setNewSticker
   const {control, handleSubmit, reset} = useForm();
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [picked, setPicked] = useState(colors.primary.white);
-  const [pickedSticker, setPickedSticker] = useState('');
+  const [pickedIcon, setPickedIcon] = useState('');
 
   const data = [Object.values(StickerIcons.outline).slice(0,8),
                 Object.values(StickerIcons.outline).slice(8,16),
@@ -29,6 +29,32 @@ function NewSticker({db, stickers, setStickers, newStickerVisible, setNewSticker
                 Object.values(StickerIcons.fill).slice(32,40)
               ]
 
+  const addSticker = async (data) => {
+    let existingstickers = [...stickers]; 
+      if(pickedIcon !== ''){
+        db.transaction((tx) => {
+            tx.executeSql(
+              'INSERT INTO stickers (id, name, icon, color) VALUES (?, ?, ?, ?)',
+              [ uuid.v4(),data.name, pickedIcon, picked],
+              (txtObj, stateResultSet) => {
+                const newSticker = {
+                  id: uuid.v4(),
+                  name: data.name,
+                  icon: pickedIcon,
+                  color: picked,
+                };
+                existingstickers.push(newSticker);
+                setStickers(existingstickers); 
+              }
+            );
+        });
+        setNewStickerVisible(false);
+      }
+      else {
+        console.warn('Please pick an icon')
+      }
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -36,11 +62,11 @@ function NewSticker({db, stickers, setStickers, newStickerVisible, setNewSticker
       visible={newStickerVisible}
       onRequestClose={() => {
         setNewStickerVisible(!newStickerVisible);
-        setPickedSticker('');
+        setPickedIcon('');
         setPicked(colors.primary.white);
       }}
     > 
-      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setNewStickerVisible(!newStickerVisible);setPickedSticker('');setPicked(colors.primary.white);}} activeOpacity={1}>
+      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setNewStickerVisible(!newStickerVisible);setPickedIcon('');setPicked(colors.primary.white);}} activeOpacity={1}>
         <TouchableWithoutFeedback>
           <View style={container.modal}>
             <FlatList 
@@ -51,8 +77,8 @@ function NewSticker({db, stickers, setStickers, newStickerVisible, setNewSticker
                   <FlatList
                     data={item}
                     renderItem={({item,index}) =>(
-                      <TouchableOpacity onPress={()=>setPickedSticker(dataFill[rowIndex][index])}>
-                        <View style={{position:'absolute',display:pickedSticker==dataFill[rowIndex][index]?"flex":"none"}}>
+                      <TouchableOpacity onPress={()=>setPickedIcon(dataFill[rowIndex][index])}>
+                        <View style={{position:'absolute',display:pickedIcon==dataFill[rowIndex][index]?"flex":"none"}}>
                           <Ionicons name={dataFill[rowIndex][index]} size={30} color={picked}/>
                         </View> 
                         <Ionicons name={item} size={30} color={colors.primary.blue}/>
@@ -91,6 +117,7 @@ function NewSticker({db, stickers, setStickers, newStickerVisible, setNewSticker
               rules={{required: true}}
             />
             </View>
+            <Pressable onPress={handleSubmit(addSticker)} style={container.button}><Text>CREATE</Text></Pressable>
           </View> 
         </TouchableWithoutFeedback>
       </TouchableOpacity>

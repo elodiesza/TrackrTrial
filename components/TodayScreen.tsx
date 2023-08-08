@@ -132,7 +132,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         </View>
       </View>
       <View style={{height:180, width:width, marginBottom:10}}>
-        <View style={{width:width-40, height:30, marginHorizontal:20}}>
+        <View style={{bottom:5,height:30, marginHorizontal:20, flexDirection:'row'}}>
           <StickerList db={db} stickers={stickers} setStickers={setStickers} stickerrecords={stickerrecords} setStickerrecords={setStickerrecords} year={year} month={month} day={day}/>
           <Ionicons onPress={()=>setNewStickerVisible(true)} name="add-circle-outline" size={30} color={colors.primary.blue}/>
         </View>
@@ -213,7 +213,13 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setDiary([]),
         (txObj, error) => console.log('error selecting diary')
       );
-    })}/>    */}
+    })}/>  
+        <Button title={'delete stickerrecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS stickerrecords', null,
+        (txObj, resultSet) => setStickerrecords([]),
+        (txObj, error) => console.log('error selecting stickerrecords')
+      );
+    })}/>   
+    */}
     </SafeAreaView>
   );
 }

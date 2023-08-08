@@ -27,7 +27,6 @@ function UpdateWeather({db, weather, setWeather, year, month, day}) {
                 (txtObj,resultSet)=> {    
                     existingweather.push({id:uuid.v4(),weather:selectedWeather,year:year,month:month,day:day});
                     setWeather(existingweather);
-                    console.warn('Insert completed')
                 },
                 (txtObj, error) => console.warn('Error inserting data:', error)
                 );
@@ -39,17 +38,15 @@ function UpdateWeather({db, weather, setWeather, year, month, day}) {
             db.transaction(tx=> {
                 tx.executeSql('UPDATE weather SET weather = ? WHERE id = ?', [selectedWeather, id],
                 (txObj, resultSet) => {
-                    if (resultSet.rowsAffected > 0) {
                     existingweather[indexToUpdate].weather = selectedWeather;
                     setWeather(existingweather);
-                    }
                 },
                 (txObj, error) => console.log('Error updating data', error)
                 );
             });
         }
     };
-    console.warn(initialWeather,initialWeatherId,weather.map(c=>c.weather));
+
   return (
     <TouchableOpacity onPress={()=>{setSelectedId(selectedId==5?0:selectedId+1);changeWeather();}} style={{width:100, justifyContent:'center', alignItems:'center'}}>
             <View>

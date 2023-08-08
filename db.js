@@ -169,7 +169,7 @@ const useDatabase = () => {
     });
 
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS stickers (id TEXT PRIMARY KEY, name TEXT, icon TEXT, color TEXT)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS stickers (id TEXT PRIMARY KEY, name TEXT, icon TEXT, color TEXT, UNIQUE(icon,color), UNIQUE(name))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM stickers', null,
@@ -178,7 +178,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS stickerrecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS stickerrecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, state BOOLEAN, UNIQUE(name,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM stickerrecords ORDER BY day;', null,
