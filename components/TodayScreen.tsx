@@ -94,7 +94,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
       </View>
       <View style={{flex:1, width:width, flexDirection:'row'}}>
-        <View style={{flex:1}}>
+        <View style={{flex:1,marginLeft:20}}>
           <FlatList
             data={scaleNames}
             renderItem={scaleNames!==null?({item})=><AddScale name={item} scales={scales} scalerecords={scalerecords} 
@@ -104,7 +104,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
             showsVerticalScrollIndicator={false}
           />
         </View>
-        <View style={{flex:1}}>
+        <View style={{flex:2}}>
           <FlatList
             data={[... new Set(states.map(c=>c.name))]}
             renderItem={(item)=>
@@ -219,7 +219,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, error) => console.log('error selecting stickerrecords')
       );
     })}/>   
-    */}
+    */}      
     </SafeAreaView>
   );
 }

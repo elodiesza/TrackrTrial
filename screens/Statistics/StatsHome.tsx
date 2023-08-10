@@ -52,7 +52,7 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
             var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
             return "rgb("+r+","+g+","+b+")";
           }
-        const meanvalue= scalerecords.length==0? 0: (scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).reduce((a, b) => a + b) / scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).length).toFixed(0);
+        const meanvalue= scalerecords.filter(c=>(c.year==year&&c.month==month)).length==0? 0: (scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).reduce((a, b) => a + b) / scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).length).toFixed(0);
         const mincolor = scales.filter(c=>c.name==item).map(c=>c.mincolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==item).map(c=>c.mincolor)[0]);
         const maxcolor = scales.filter(c=>c.name==item).map(c=>c.maxcolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==item).map(c=>c.maxcolor)[0]);
         const minvalue = scales.filter(c=>c.name==item).map(c=>c.min)[0]==null?Math.min(...scalerecords.filter(c=>(c.name==item && c.value!==null)).map(c=>c.value)):scales.filter(c=>c.name==item).map(c=>c.min)[0];
@@ -93,15 +93,15 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
 
     //Sleep gauges
     const sleepwidth = sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null)).length;
-    const greensleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.type==5)).length/sleepwidth;
-    const yellowgreensleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.type==4)).length/sleepwidth;
-    const yellowsleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.type==3)).length/sleepwidth;
-    const orangesleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.type==2)).length/sleepwidth;
-    const redsleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.type==1)).length/sleepwidth;
+    const greensleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==5)).length/sleepwidth;
+    const yellowgreensleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==4)).length/sleepwidth;
+    const yellowsleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==3)).length/sleepwidth;
+    const orangesleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==2)).length/sleepwidth;
+    const redsleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==1)).length/sleepwidth;
     const firstcolor = Math.max(...sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null)).map(c=>c.type));
     const lastcolor = Math.min(...sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null)).map(c=>c.type));
-    const meansleep = (sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).map(c=>c.sleep).reduce((a, b) => a + b) / sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).map(c=>c.sleep).length).toFixed(1);
-    const meanwakeup = (sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).map(c=>c.wakeup).reduce((a, b) => a + b) / sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).map(c=>c.wakeup).length).toFixed(1);
+    const meansleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).length==0? undefined: (sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).map(c=>c.sleep).reduce((a, b) => a + b) / sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).map(c=>c.sleep).length).toFixed(1);
+    const meanwakeup = sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).length==0? undefined:(sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).map(c=>c.wakeup).reduce((a, b) => a + b) / sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).map(c=>c.wakeup).length).toFixed(1);
 
     return (
         <View style={[container.body,{marginHorizontal:10}]}>

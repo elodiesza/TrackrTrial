@@ -51,7 +51,6 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         });
     };
 
-    console.warn('arrow', arrow);
 
     useEffect(() => {
         setArrow(arrowArray());

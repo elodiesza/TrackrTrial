@@ -100,7 +100,7 @@ export const container = StyleSheet.create({
     },
     button: {
         height:40,
-        width: "100%",
+        flex:1,
         borderWidth:1,
         borderColor: colors.primary.blue,
         borderRadius: 10,

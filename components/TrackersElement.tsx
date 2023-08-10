@@ -14,7 +14,6 @@ import AddScale from './AddScale';
 import uuid from 'react-native-uuid';
 import UpdateWeather from './UpdateWeather';
 import { Ionicons } from '@expo/vector-icons';
-import WeatherData from '../constants/Weather';
 
 const width = Dimensions.get('window').width;
 
@@ -279,7 +278,7 @@ const uniqueNames = [...new Set([ ...uniqueScalesNames, ...uniqueStatesNames, ..
 const habitsType = Array.from({ length:[...new Set(habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "habit");
 const statesType = Array.from({ length:[...new Set(staterecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "state");
 const scalesType = Array.from({ length:[...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "scale");
-const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])];
+const uniqueTypes = [ ...scalesType, ...statesType, ...habitsType];
 
 
     const updateHabit = (id) => {
@@ -335,28 +334,6 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
               loadx(!load);
     };
 
-    const updateScale = (id,item) => {
-      let existingscales=[...scalerecords];
-      const indexToUpdate = existingscales.findIndex(c => c.id === id);
-        db.transaction(tx=> {
-          tx.executeSql('UPDATE scalerecords SET value = ? WHERE id = ?', [item, id],
-            (txObj, resultSet) => {
-              if (resultSet.rowsAffected > 0) {
-                existingscales[indexToUpdate].value = item;
-                setScalerecords(existingscales);
-              }
-            },
-            (txObj, error) => console.log('Error updating data', error)
-          );
-        });
-        setSelectedScaleIndex(-1);
-        setSelectedScaleId('');
-        setSelectedScaleName('');
-        setSelectedScaleItem('');
-        setScaleModalVisible(!scaleModalVisible);
-        loadx(!load);
-    };
-
     const showhabits = (ind) => {
       const filteredhabits = habits.filter(c=>(c.name==ind && c.year==year && c.month==month));
       return filteredhabits.map((state,index) => {
@@ -379,6 +356,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
     };   
 
     const showTitle = ({item,index}) => {
+
       return (
         <View>
           <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:scalerecords.filter(c=>c.year==year&&c.month==month&&c.name==item&&c.value>1000).length>0?50:25 }}>
@@ -391,8 +369,11 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
             month={month}
             year={year}
             db={db}
+            type={uniqueTypes[index]}
             setUpdate={uniqueTypes[index]=='habit'? setHabits : uniqueTypes[index]=='state'? setStaterecords : setScalerecords}
             update={uniqueTypes[index]=='habit'? habits : uniqueTypes[index]=='state'? staterecords : scalerecords}
+            update2={uniqueTypes[index]=='state'? states : scales}
+            setUpdate2={uniqueTypes[index]=='state'? setStates : setScales}
             loadx={loadx}
             load={load}
           />
@@ -477,7 +458,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{height:130, width: 200}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} scale</Text>
-                  <AddScale name={selectedScaleName} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setScaleModalVisible={setScaleModalVisible}/> 
+                  <AddScale name={selectedScaleName} scales={scales} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setScaleModalVisible={setScaleModalVisible}/> 
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -510,7 +491,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
             <Text style={{textAlign:'right', marginRight: 3, textAlignVertical:'center'}}>{item.day}</Text>
           </View>
           <View style={{width:25,height:25, justifyContent:'center'}}>
-            <Text style={{color: colors.defaultdark, textAlign:'center', marginRight: 3, textAlignVertical:'center'}}>{item.dayoftheweek}</Text>
+            <Text style={{color: colors.primary.defaultdark, textAlign:'center', marginRight: 3, textAlignVertical:'center'}}>{item.dayoftheweek}</Text>
           </View>
         </View>
 
@@ -575,26 +556,6 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
         
       )   
     }
-
-    const deleteMood = (index) => {
-      let existingMoods = [...moods];
-      let Idtodelete = existingMoods.filter(c=>(c.year==year && c.month==month && c.day==index+1))[0].id;
-      db.transaction(tx => {
-        tx.executeSql(
-          'DELETE FROM moods WHERE id=?',
-          [Idtodelete],
-          (txObj, resultSet) => {
-            setMoods(existingMoods.filter(c=>(c.id!=Idtodelete))),
-            console.log('Mood deleted successfully');
-          },
-          (txObj, error) => {
-            // Handle error
-            console.log('Error deleting mood:', error);
-          }
-        );
-      });
-      setMoodModalVisible(false);
-    };
 
     const showSleep = (item,index) => {
       let sleepArray = [];
@@ -666,26 +627,6 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
         </View>
         )   
     }
-
-    const deleteSleep = (index) => {
-      let existingSleep = [...sleep];
-      let Idtodelete = existingSleep.filter(c=>(c.year==year && c.month==month && c.day==index+1))[0].id;
-      db.transaction(tx => {
-        tx.executeSql(
-          'DELETE FROM sleep WHERE id=?',
-          [Idtodelete],
-          (txObj, resultSet) => {
-            setSleep(existingSleep.filter(c=>(c.id!=Idtodelete))),
-            console.log('Sleep deleted successfully');
-          },
-          (txObj, error) => {
-            // Handle error
-            console.log('Error deleting sleep:', error);
-          }
-        );
-      });
-      setSleepModalVisible(false);
-    };
 
     const thismonthWeather = (year,month) =>{
       var arr= [];
@@ -836,11 +777,7 @@ const uniqueTypes = [...new Set([ ...scalesType, ...statesType, ...habitsType])]
         <View pointerEvents="none" style={{display: year==thisYear?(month==thisMonth?'flex':'none'):'none',position:'absolute',marginTop:50+thisDay*25, borderTopWidth:2, borderBottomWidth:2, borderColor:'blue', width:'100%', height:25}}/>
       </ScrollView >
       )}
-      {/*<Button title='remove Scales' onPress={removeScalesDb} />
-      <Button title='remove States' onPress={removeStatesDb} />
-      <Button title='remove thismonth indicators' onPress={removeDbMonth} />
-      <Button title='remove Indicators' onPress={removeDb} />
-      <Button title='remove tracks' onPress={removetracksDb} /> */}
+
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} color={colors.primary.blue} />
       </ TouchableOpacity> 

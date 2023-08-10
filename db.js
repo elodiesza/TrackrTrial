@@ -41,7 +41,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tracks', null,
-      (txObj, resultSet) => setTracks(resultSet.rows._array),
+      (txObj, resultSet2) => setTracks(resultSet2.rows._array),
       (txObj, error) => console.log('error selecting tracks')
       );
     });
@@ -50,7 +50,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM tasks', null,
-      (txObj, resultSet) => setTasks(resultSet.rows._array),
+      (txObj, resultSet3) => setTasks(resultSet3.rows._array),
       (txObj, error) => console.log('error selecting tasks')
       );
     });
@@ -59,7 +59,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM moods', null,
-      (txObj, resultSet) => setMoods(resultSet.rows._array),
+      (txObj, resultSet4) => setMoods(resultSet4.rows._array),
       (txObj, error) => console.log('error selecting moods')
       );
     });
@@ -68,7 +68,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM sleep', null,
-      (txObj, resultSet) => setSleep(resultSet.rows._array),
+      (txObj, resultSet5) => setSleep(resultSet5.rows._array),
       (txObj, error) => console.log('error selecting sleep')
       );
     });
@@ -77,7 +77,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM states ORDER BY place;', null,
-      (txObj, resultSet) => setStates(resultSet.rows._array),
+      (txObj, resultSet6) => setStates(resultSet6.rows._array),
       (txObj, error) => console.log('error selecting states')
       );
     });
@@ -86,7 +86,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM staterecords ORDER BY day;', null,
-      (txObj, resultSet) => setStaterecords(resultSet.rows._array),
+      (txObj, resultSet7) => setStaterecords(resultSet7.rows._array),
       (txObj, error) => console.log('error selecting state records')
       );
     });
@@ -96,7 +96,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM scales ORDER BY place;', null,
-      (txObj, resultSet) => setScales(resultSet.rows._array),
+      (txObj, resultSet8) => setScales(resultSet8.rows._array),
       (txObj, error) => console.log('error selecting scales')
       );
     });
@@ -105,7 +105,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM scalerecords ORDER BY day;', null,
-      (txObj, resultSet) => setScalerecords(resultSet.rows._array),
+      (txObj, resultSet9) => setScalerecords(resultSet9.rows._array),
       (txObj, error) => console.log('error selecting stale records')
       );
     });
@@ -114,7 +114,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM times ORDER BY place', null,
-      (txObj, resultSet) => setTimes(resultSet.rows._array),
+      (txObj, resultSet10) => setTimes(resultSet10.rows._array),
       (txObj, error) => console.log('error selecting times')
       );
     });
@@ -123,7 +123,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM timerecords ORDER BY day;', null,
-      (txObj, resultSet) => setTimerecords(resultSet.rows._array),
+      (txObj, resultSet11) => setTimerecords(resultSet11.rows._array),
       (txObj, error) => console.log('error selecting time records')
       );
     });
@@ -133,7 +133,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM diary', null,
-      (txObj, resultSet) => setDiary(resultSet.rows._array),
+      (txObj, resultSet12) => setDiary(resultSet12.rows._array),
       (txObj, error) => console.log('error selecting diary')
       );
     });
@@ -143,7 +143,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM sections', null,
-      (txObj, resultSet) => setSections(resultSet.rows._array),
+      (txObj, resultSet13) => setSections(resultSet13.rows._array),
       (txObj, error) => console.log('error selecting section')
       );
     });
@@ -153,7 +153,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM progress', null,
-      (txObj, resultSet) => setProgress(resultSet.rows._array),
+      (txObj, resultSet14) => setProgress(resultSet14.rows._array),
       (txObj, error) => console.log('error selecting progress')
       );
     });
@@ -173,7 +173,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM stickers', null,
-      (txObj, resultSet) => setStickers(resultSet.rows._array),
+      (txObj, resultSet15) => setStickers(resultSet15.rows._array),
       (txObj, error) => console.log('error selecting weather')
       );
     });
@@ -182,7 +182,7 @@ const useDatabase = () => {
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM stickerrecords ORDER BY day;', null,
-      (txObj, resultSet) => setStickerrecords(resultSet.rows._array),
+      (txObj, resultSet16) => setStickerrecords(resultSet16.rows._array),
       (txObj, error) => console.log('error selecting weather')
       );
     });

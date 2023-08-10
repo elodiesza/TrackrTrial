@@ -5,7 +5,7 @@ import IsLoading from './IsLoading';
 import ChangeHabitName from './ChangeHabitName';
 import { container, colors } from '../styles';
 
-const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, db, setUpdate, update, loadx, load }) => {
+const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, type, data, db, setUpdate, update, update2, setUpdate2, loadx, load }) => {
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [changeModalVisible, setChangeModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -408,7 +408,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, db, s
                 <Pressable onPress={()=>moveRight(data)} style={{display: displayRight}}>
                   <Feather name="chevron-right" size={25} color={'gray'}/>
                 </Pressable>
-                <Pressable onPress={() => setChangeModalVisible(true)}>
+                <Pressable onPress={() => {setChangeModalVisible(true)}}>
                   <Feather name="edit" size={25}/>
                 </Pressable>
                 <Pressable onPress={() => setDeleteModalVisible(true)}>
@@ -417,7 +417,7 @@ const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, data, db, s
               </View>
             </TouchableWithoutFeedback>
           </TouchableOpacity>
-          <ChangeHabitName db={db} data={data} changeModalVisible={changeModalVisible} setChangeModalVisible={setChangeModalVisible} update={update} setUpdate={setUpdate} load={load} loadx={loadx} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+          <ChangeHabitName db={db} data={data} changeModalVisible={changeModalVisible} setChangeModalVisible={setChangeModalVisible} type={type} update={update} setUpdate={setUpdate} update2={update2} setUpdate2={setUpdate2} load={load} loadx={loadx} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
           <Modal
             animationType="none"
             transparent={true}
