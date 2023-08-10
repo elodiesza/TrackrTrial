@@ -27,11 +27,36 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
     const [newTaskVisible, setNewTaskVisible] = useState(false);
     const [newProgressVisible, setNewProgressVisible] = useState(false);
     const [selectedSection, setSelectedSection] = useState('');
-    const [showSection, setShowSection] = useState({'index':0,'show':true});
+    const [showSection, setShowSection] = useState(true);
     const [showArchive, setShowArchive] = useState(false);
 
+    const arrowArray = () => {
+        let arrowArray = [];
+        const sectionLength = sections.filter(c=>c.track==selectedTab).length;
+        for (let i=0; i<sectionLength; i++) {
+            arrowArray.push({'index':i, 'arrow':true});
+        }
+        return arrowArray;
+    }
+    const [arrow, setArrow] = useState(arrowArray());
+
+    const updateArrowAtIndex = (index, newArrowValue) => {
+        setArrow(prevArrowArray => {
+            return prevArrowArray.map(item => {
+                if (item.index === index) {
+                    return { ...item, arrow: newArrowValue };
+                }
+                return item;
+            });
+        });
+    };
+
+    console.warn('arrow', arrow);
+
     useEffect(() => {
+        setArrow(arrowArray());
         setSelectedTabColor(selectedTab==undefined? colors.primary.default:tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
+        setSelectedSection(sections.filter(c=>c.track==selectedTab).map(c=>c.section)[0]);
     }, [selectedTab,tracks]);
 
     const TransferDaily = (id) => {
@@ -243,14 +268,14 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                     <View>
                         <View style={[container.section,{flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: paleColor(selectedTabColor)}]}> 
                             <Text>{item.section}</Text>
-                            <Pressable onPress={()=>setShowSection({"index":index,"show":true})} style={{display:(showSection.index==index&&showSection.show==false)?"flex":"none",position:'absolute',right:10}}>
+                            <Pressable onPress={()=>updateArrowAtIndex(index,false)} style={{display:arrow.filter(c=>c.index==index).map(c=>c.arrow)[0]==true?"flex":"none",position:'absolute',right:10}}>
                                 <MaterialIcons name="keyboard-arrow-down" size={25}/>
                             </Pressable>
-                            <Pressable onPress={()=>setShowSection({"index":index,"show":false})}  style={{display:(showSection.index==index&&showSection.show==true)?"flex":"none",position:'absolute',right:10}}>
+                            <Pressable onPress={()=>updateArrowAtIndex(index,true)}  style={{display:arrow.filter(c=>c.index==index).map(c=>c.arrow)[0]==false?"flex":"none",position:'absolute',right:10}}>
                                 <MaterialIcons name="keyboard-arrow-up" size={25}/>
                             </Pressable>
                         </View>
-                        <View style={{display:(showSection.index==index&&showSection.show==true)?"flex":"none"}}>
+                        <View style={{display: arrow.filter(c=>c.index==index).map(c=>c.arrow)[0]==true?'flex':'none'}}>
                         <SwipeListView
                             data={tasks.filter(c=>(c.section==item.section && c.track==selectedTab && c.taskState!==2 ))}
                             renderItem={({item,index}) =>
