@@ -1,7 +1,6 @@
 import { View, SafeAreaView, Text, Pressable, Button, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../styles';
-import { container } from '../../styles';
+import { colors, container } from '../../styles';
 import { Octicons, MaterialIcons, Feather } from '@expo/vector-icons';
 
 

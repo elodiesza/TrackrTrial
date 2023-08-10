@@ -97,7 +97,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         <View style={{flex:1}}>
           <FlatList
             data={scaleNames}
-            renderItem={scaleNames!==null?({item})=><AddScale name={item} scalerecords={scalerecords} 
+            renderItem={scaleNames!==null?({item})=><AddScale name={item} scales={scales} scalerecords={scalerecords} 
             setScalerecords={setScalerecords} db={db} year={year} month={month} day={day} load={load} 
             loadx={loadx} setScaleModalVisible={undefined}/>:undefined}
             keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 

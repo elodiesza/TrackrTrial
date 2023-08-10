@@ -8,7 +8,6 @@ const width = Dimensions.get('window').width;
 
 const StickerList = ({ db, stickers, setStickers, stickerrecords, setStickerrecords, year, month, day}) => {
 
-console.warn(stickerrecords);
 
   const updateSticker = (name) => {
     const existingrecords = [...stickerrecords];

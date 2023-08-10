@@ -1,10 +1,13 @@
-import { TouchableOpacity, ScrollView, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, Pressable, ScrollView, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
 import Swiper from 'react-native-swiper'
 import MonthlyTasks from '../components/MonthlyTasks';
 import TrackersElement from './TrackersElement';
 import Statistics from '../screens/Statistics';
 import { container, colors } from '../styles';
 import { Ionicons } from '@expo/vector-icons';
+import DaySummary from './DaySummary';
+import { useState } from 'react';
+
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -16,6 +19,8 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
   var days = [];
+  const [modalVisible, setModalVisible] = useState(false);
+  const [calendarDate,setCalendarDate] = useState(0);
 
   const GetDaysInMonth = (month) => {
     var date = new Date(year, month, 1);
@@ -110,7 +115,9 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
                 </View>
               ))}
           </ScrollView>
-          <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
+          <Pressable onPress={()=>{setCalendarDate(date);setModalVisible(true);}}>
+            <Text style={{textAlign:'right', textAlignVertical:'top', marginRight:3, opacity: date==0? 0 : 1}}>{date}</Text>
+          </Pressable>
         </View>
         <View style={{flex:1, justifyContent: 'flex-end'}}>
           <FlatList 
@@ -120,6 +127,7 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
           renderItem={RenderTaskItem} 
           bounces={false} />
         </View>
+        <DaySummary modalVisible={modalVisible} setModalVisible={setModalVisible} year={year} month={month} day={calendarDate} habits={habits} states={states} staterecords={staterecords} scales={scales} scalerecords={scalerecords} diary={diary} weather={weather} stickers={stickers} stickerrecords={stickerrecords} sleep={sleep} moods={moods} daysinmonth={daysLength}/>  
       </View>
     )
   }
@@ -172,11 +180,22 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
           weather={weather} setWeather={setWeather}
           />
           <View style={{flex:1}}>
-          <FlatList
-            data={daysLines}
-            renderItem={({item}) => CalendarLine(item)}
-            keyExtractor={item => item.id}
-          />
+            <FlatList
+              data={["MON","TUE","WED","THU","FRI","SAT","SUN"]}
+              renderItem={({item}) => (
+                <View style={{backgroundColor:colors.primary.default,width:width/7, height:30, alignItems:'center', justifyContent:'center'}}>
+                  <Text>{item}</Text>
+                </View>
+              )}
+              keyExtractor={item => item.id}
+              horizontal={true}
+              contentContainerStyle={{borderBottomColor:colors.primary.defaultdark, borderBottomWidth: 1,}}
+            />
+            <FlatList
+              data={daysLines}
+              renderItem={({item}) => CalendarLine(item)}
+              keyExtractor={item => item.id}
+            />
           </View>
           <MonthlyTasks db={db} load={load} loadx={loadx} tracks={tracks} setTracks={setTracks} year={year} month={month} tasks={tasks} setTasks={setTasks}/>
         </Swiper>
@@ -191,7 +210,7 @@ const styles = StyleSheet.create({
     flex:1,
     backgroundColor: 'white',
     width: width/7,
-    height: (8/10)*(height/6),
+    height: (8/10)*((height-30)/6),
   },
   task: {
     width: width/7-1,

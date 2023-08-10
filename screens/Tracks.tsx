@@ -14,9 +14,6 @@ import NewTrack from '../modal/NewTrack';
 const width = Dimensions.get('window').width;
 
 function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, progress, setProgress}) {
-
-    console.warn(sections);
-
     const today= new Date();
     const thisYear = today.getFullYear();
     const thisMonth = today.getMonth();
@@ -349,7 +346,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                                     <FlatList
                                     horizontal
                                     data={[{'name':item.name,'rate':1},{'name':item.name,'rate':2},{'name':item.name,'rate':3},{'name':item.name,'rate':4},{'name':item.name,'rate':5}]}
-                                    renderItem={({ item }) => 
+                                    renderItem={({ item,index }) => 
                                         <Pressable onPress={()=>{
                                             let existingprogress = [...progress]; 
                                             const id=progress.filter(c=>(c.name==item.name && c.track==selectedTab)).map(c=>c.id)[0];
@@ -366,11 +363,9 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                                                 );
                                             });
                                         }} style={{justifyContent:'center'}}>
-                                            <View style={{display:item.rate>progress.filter(c=>(c.track==selectedTab&&c.name==item.name&&c.progress==100)).map(c=>c.rate)[0]?"flex":"none"}}>
+                                            <Ionicons name="star" size={25} color={item.rate<=progress.filter(c=>(c.track==selectedTab&&c.name==item.name)).map(c=>c.rate)[0]?selectedTabColor:'transparent'}/>
+                                            <View style={{position:'absolute'}}>
                                                 <Ionicons name="star-outline" size={25} />
-                                            </View>
-                                            <View style={{display:item.rate<=progress.filter(c=>(c.track==selectedTab&&c.name==item.name&&c.progress==100)).map(c=>c.rate)[0]?"flex":"none"}}>
-                                                <Ionicons name="star" size={25} />
                                             </View>
                                         </Pressable>
                                     }

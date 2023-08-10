@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 const width = Dimensions.get('window').width;
 
 const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerrecords, sleep, staterecords, month, year, tracks, moods, daysInMonth }) => {
-    console.warn(stickerrecords)
+
 
     const today=new Date();
     const thisDay= today.getDate();
@@ -36,14 +36,40 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
         );
     }
     const scaleObject = ({item}) => { 
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
+             : null;
+          }
+          function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
+            var channelA = colorChannelA*amountToMix;
+            var channelB = colorChannelB*(1-amountToMix);
+            return parseInt(channelA+channelB);
+          }
+          function colorMixer(rgbA, rgbB, amountToMix){
+            var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
+            var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
+            var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
+            return "rgb("+r+","+g+","+b+")";
+          }
         const meanvalue= scalerecords.length==0? 0: (scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).reduce((a, b) => a + b) / scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).length).toFixed(0);
+        const mincolor = scales.filter(c=>c.name==item).map(c=>c.mincolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==item).map(c=>c.mincolor)[0]);
+        const maxcolor = scales.filter(c=>c.name==item).map(c=>c.maxcolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==item).map(c=>c.maxcolor)[0]);
+        const minvalue = scales.filter(c=>c.name==item).map(c=>c.min)[0]==null?Math.min(...scalerecords.filter(c=>(c.name==item && c.value!==null)).map(c=>c.value)):scales.filter(c=>c.name==item).map(c=>c.min)[0];
+        const maxvalue = scales.filter(c=>c.name==item).map(c=>c.max)[0]==null?Math.max(...scalerecords.filter(c=>(c.name==item && c.value!==null)).map(c=>c.value)):scales.filter(c=>c.name==item).map(c=>c.max)[0];
+        const amountomix = maxvalue==minvalue? 0.5:((maxvalue-meanvalue)/(maxvalue-minvalue)).toFixed(2);
+        const colormix = mincolor!==null && maxcolor!==null?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
+        
         return(
             <View style={{flexDirection:'row', marginVertical:2,width:width, alignItems:'center'}}>
                 <View style={{width:90}}>
                     <Text style={{fontSize:10, marginHorizontal:10}}>{item}</Text>
                 </View>
-                <View style={{width:60,height:25,borderWidth:1,borderColor:colors.primary.black,borderRadius:5,backgroundColor:colors.primary.white,justifyContent:'center',alignItems:'center'}}>
+                <View style={{width:60,height:25,borderWidth:1,borderColor:colors.primary.black,borderRadius:5,backgroundColor:colormix,justifyContent:'center',alignItems:'center'}}>
                     <Text>{meanvalue}</Text>
+                </View>
+                <View>
+                    <Text style={{fontSize:10, marginHorizontal:10}}>{scales.filter(c=>c.name==item).map(c=>c.unit)[0]}</Text>
                 </View>
             </View>
         );
