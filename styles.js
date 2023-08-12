@@ -177,6 +177,15 @@ export const container = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    analytics:{
+        height:80,
+        borderColor: colors.primary.gray,
+        borderWidth:1,
+        borderRadius:10,
+        margin:10,
+        backgroundColor: colors.primary.white,
+        padding:10
+    }
 });
 
 

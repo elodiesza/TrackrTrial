@@ -51,7 +51,6 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
         });
     };
 
-
     useEffect(() => {
         setArrow(arrowArray());
         setSelectedTabColor(selectedTab==undefined? colors.primary.default:tracks.filter(c=>c.track==selectedTab).map(c=>c.color)[0]);
@@ -75,15 +74,6 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
             );
         });
     }
-
-    const deletetracks = () => {
-        db.transaction(tx => {
-          tx.executeSql('DROP TABLE IF EXISTS tracks', null,
-            (txObj, resultSet) => setTracks([]),
-            (txObj, error) => console.log('error deleting tracks')
-          );
-        });
-      }
 
     const TaskSwipeItem = ({ id }) => (
         <View style={{ flex: 1, backgroundColor: 'green', flexDirection: 'row' }}>
@@ -110,6 +100,25 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
             </View>
         </View>
       );
+
+    const ArchiveTaskSwipeItem = ({ id }) => (
+            <View style={{ paddingRight:10, justifyContent: 'center', alignItems: 'flex-end', flex: 1, backgroundColor: 'darkred' }}>
+                <Pressable onPress={() => 
+                db.transaction(tx => {
+                tx.executeSql('DELETE FROM tasks WHERE id = ?', [id],
+                    (txObj, resultSet) => {
+                    if (resultSet.rowsAffected > 0) {
+                        let existingTasks = [...tasks].filter(c => c.id !== id);
+                        setTasks(existingTasks);
+                    }
+                    },
+                    (txObj, error) => console.log(error)
+                );
+                })}>
+                    <Feather name="trash-2" size={25} color={'white'} />
+                </Pressable>
+            </View>
+    );      
 
     const ProgressSwipeItem = ({ id }) => (
         <View style={{ paddingRight:10, justifyContent: 'center', alignItems: 'flex-end', flex: 1, backgroundColor: 'darkred' }}>
@@ -280,7 +289,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             renderItem={({item,index}) =>
                             <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
                             sections={sections} date={undefined} section={item.section} task={item.task} 
-                            taskState={item.taskState} time={undefined} track={selectedTab} id={item.id} trackScreen={true}/>
+                            taskState={item.taskState} time={undefined} track={selectedTab} id={item.id} trackScreen={true} archive={false}/>
                             }
                             renderHiddenItem={({ item }) => <TaskSwipeItem id={item.id} />} 
                             bounces={false} 
@@ -351,11 +360,11 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             renderItem={({item,index}) =>
                             <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
                             sections={sections} date={undefined} section={item.section} task={item.task} 
-                            taskState={item.taskState} time={undefined} track={selectedTab} id={item.id} trackScreen={false}/>
+                            taskState={item.taskState} time={undefined} track={selectedTab} id={item.id} trackScreen={false} archive={true}/>
                             }
-                            renderHiddenItem={({ item }) => <TaskSwipeItem id={item.id} />} 
+                            renderHiddenItem={({ item }) => <ArchiveTaskSwipeItem id={item.id} />} 
                             bounces={false} 
-                            rightOpenValue={-100}
+                            rightOpenValue={-50}
                             disableRightSwipe={true}
                             closeOnRowBeginSwipe={true}
                             keyExtractor= {(item,index) => index.toString()}

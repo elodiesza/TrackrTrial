@@ -12,9 +12,9 @@ const DaySummary = ({modalVisible, setModalVisible, year, month, day, habits, st
     const goSleep1 = sleep.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.sleep)[0];
     const wakeUp = sleep.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.wakeup)[0];
     const goSleep2 = sleep.filter(c=>(c.year==year&&c.month==(day==daysinmonth?(month==11?0:month+1):month)&&c.day==(day==daysinmonth?1:day+1))).map(c=>c.sleep)[0];
-    const sleepTime = wakeUp-goSleep1+24;
-    const dayTime = 24-wakeUp-(24-goSleep2);
-    const sumTime = sleepTime+dayTime;
+    const sleepTime = wakeUp==undefined||goSleep1==undefined?0:wakeUp-goSleep1+24;
+    const dayTime = wakeUp==undefined||goSleep2==undefined?0:24-wakeUp-(24-goSleep2);
+    const sumTime = (sleepTime+dayTime)==0?1:(sleepTime+dayTime);
     const sleepColor = sleep.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.color)[0];
     const diaryNotes = diary.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.notes)[0];
 
@@ -49,12 +49,12 @@ const DaySummary = ({modalVisible, setModalVisible, year, month, day, habits, st
                                         <Ionicons name={itemIcon+'-outline'} size={30} color={colors.primary.black}/>
                                     </TouchableOpacity> 
                             )}}
-                            keyExtractor={(_, index) => index.toString()}
+                            keyExtractor={(item, index) => item.id.toString()}
                             horizontal={true}
                         />
                         <View>
                           <View style={{borderRadius: 15,position:'absolute',width:30, height:30,backgroundColor:colors.primary.black}}/>
-                          <MaterialCommunityIcons name={moodIcon} size={30} color={moodColor}/>
+                          <MaterialCommunityIcons name={moodIcon==undefined?'circle':moodIcon} size={30} color={moodColor==undefined?colors.primary.white:moodColor}/>
                         </View>
                     </View>
                 </View>
@@ -74,9 +74,9 @@ const DaySummary = ({modalVisible, setModalVisible, year, month, day, habits, st
                 <View style={{marginTop:10,width:'100%',flexDirection:'row', alignItems:'center'}}>
                     <Ionicons name="moon" size={20} style={{marginRight:10}}/>
                     <Text>{goSleep1}</Text>
-                    <View style={{marginHorizontal:10,height:10, flex:1*sleepTime/sumTime, backgroundColor:sleepColor==undefined? colors.primary.gray:sleepColor}}/>
+                    <View style={{marginHorizontal:10,height:10, flex:sleepTime/sumTime, backgroundColor:sleepColor==undefined? colors.primary.gray:sleepColor}}/>
                     <Text>{wakeUp}</Text>
-                    <View style={{marginHorizontal:10,height:10, flex:1*dayTime/sumTime, backgroundColor:colors.primary.default}}/>
+                    <View style={{marginHorizontal:10,height:10, flex:dayTime/sumTime, backgroundColor:colors.primary.default}}/>
                     <Text>{goSleep2}</Text>
                 </View>
           </View> 

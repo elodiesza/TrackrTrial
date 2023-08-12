@@ -11,6 +11,7 @@ import UpdateWeather from './UpdateWeather';
 import StickerList from './StickerList';
 import NewSticker from '../modal/NewSticker';
 import { Ionicons } from '@expo/vector-icons';
+import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
@@ -31,6 +32,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           </View>
         )
       }
+
 
     const updateState = (id) => {
         let existinghabits=[...habits];
@@ -194,11 +196,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, error) => console.log('error selecting tracks')
       );
     })}/>
-      <Button title={'delete moods'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS moods', null,
-        (txObj, resultSet) => setMoods([]),
-        (txObj, error) => console.log('error selecting moods')
-      );
-    })}/>
+      
     <Button title={'delete logs'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS logs', null,
         (txObj, resultSet) => setLogs([]),
         (txObj, error) => console.log('error selecting logs')
@@ -218,8 +216,15 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setStickerrecords([]),
         (txObj, error) => console.log('error selecting stickerrecords')
       );
-    })}/>   
-    */}      
+    })}/>       
+        <Button title={'delete moods'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS moods', null,
+        (txObj, resultSet) => setMoods([]),
+        (txObj, error) => console.log('error selecting moods')
+      );
+    })}/>  
+
+    */}     
+
     </SafeAreaView>
   );
 }

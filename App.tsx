@@ -62,7 +62,9 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Today">
-        <Tab.Screen name="Analytics" children={()=><Analytics/>} 
+        <Tab.Screen name="Analytics" children={()=><Analytics db={db}
+        habits={habits} staterecords={staterecords} scalerecords={scalerecords} stickerrecords={stickerrecords}
+        moods={moods} sleep={sleep}/>}
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>

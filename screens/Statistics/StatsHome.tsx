@@ -90,7 +90,6 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
         );
     };
 
-
     //Sleep gauges
     const sleepwidth = sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null)).length;
     const greensleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==5)).length/sleepwidth;
@@ -99,9 +98,20 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
     const orangesleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==2)).length/sleepwidth;
     const redsleep = sleepwidth==0? 0: sleep.filter(c=>(c.year==year&&c.month==month&&c.type==1)).length/sleepwidth;
     const firstcolor = Math.max(...sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null)).map(c=>c.type));
-    const lastcolor = Math.min(...sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null)).map(c=>c.type));
+    const lastcolor = Math.min(...sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null&&c.type!==0)).map(c=>c.type));
     const meansleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).length==0? undefined: (sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).map(c=>c.sleep).reduce((a, b) => a + b) / sleep.filter(c=>(c.year==year&&c.month==month&&c.sleep!==null)).map(c=>c.sleep).length).toFixed(1);
     const meanwakeup = sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).length==0? undefined:(sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).map(c=>c.wakeup).reduce((a, b) => a + b) / sleep.filter(c=>(c.year==year&&c.month==month&&c.wakeup!==null)).map(c=>c.wakeup).length).toFixed(1);
+    const meanSleepTime = () => {
+        let allSleeps = [];
+        for (let i=1;i<daysInMonth+1;i++){
+            let goSleep = sleep.filter(c=>(c.year==year&&c.month==month&&c.day==i)).map(c=>c.sleep)[0];
+            let wakeUp = sleep.filter(c=>(c.year==year&&c.month==month&&c.day==i)).map(c=>c.wakeup)[0];
+            let sleepTime = goSleep==undefined||wakeUp==undefined?undefined:goSleep<wakeUp? wakeUp-goSleep:24-goSleep+wakeUp;
+            sleepTime==undefined?undefined:allSleeps.push(sleepTime);
+        }
+        return (allSleeps.reduce((a, b) => a + b) / allSleeps.length).toFixed(1);
+        
+    }
 
     return (
         <View style={[container.body,{marginHorizontal:10}]}>
@@ -111,36 +121,40 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
             <FlatList
                 data={[...new Set(states.map(c=>c.name))]}
                 renderItem={({ item }) => (<PieChartView name={item} year={year} month={month} states={states} staterecords={staterecords} daysInMonth={daysInMonth} pieWidth={width/5}/>)}
-                keyExtractor={(_, index) => index.toString()}
+                keyExtractor={states.id}
                 contentContainerStyle={{height:100}}
                 horizontal
             />
             <View style={{flexDirection:'row', flex:1}}>
-                <FlatList
-                    data={[...new Set(habits.map(c=>c.name))]}
-                    renderItem={({ item }) =>habitBar({item})}
-                    keyExtractor={(_, index) => index.toString()}
-                    contentContainerStyle={{height:200,flex:1}}
-                />
-                <FlatList
-                    data={[...new Set(stickers)]}
-                    renderItem={({ item }) =>stickerObject({item})}
-                    keyExtractor={(_, index) => index.toString()}
-                    contentContainerStyle={{height:200,flex:1}}
-                />
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <FlatList
+                        data={[...new Set(habits.map(c=>c.name))]}
+                        renderItem={({ item }) =>habitBar({item})}
+                        keyExtractor={habits.id}
+                        contentContainerStyle={{flex:1}}
+                    />
+                </ScrollView>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <FlatList
+                        data={[...new Set(stickers)]}
+                        renderItem={({ item }) =>stickerObject({item})}
+                        keyExtractor={stickers.id}
+                        contentContainerStyle={{flex:1}}
+                    />
+                </ScrollView>
             </View>
             
             <FlatList
                 data={[...new Set(scales.map(c=>c.name))]}
                 renderItem={({ item }) =>scaleObject({item})}
-                keyExtractor={(_, index) => index.toString()}
+                keyExtractor={scales.id}
                 contentContainerStyle={{height:200,flex:1}}
             />
             <View style={{flex:1, margin:10, right:10,flexDirection:'row',alignItems:'center', justifyContent:'center',height:50,width:'100%'}}>
                 <Ionicons name="moon" size={40} color={colors.primary.defaultdark} />
                 <View style={{justifyContent:'center', alignItems:'center',marginBottom:15}}>
                     <View>
-                        <Text style={{fontSize:12}}>8HRS</Text>
+                        <Text style={{fontSize:12}}>{meanSleepTime()} HRS</Text>
                     </View>
                     <View style={{flexDirection:'row', marginLeft:10, marginVertical:5}}>
                         <View style={{marginHorizontal:10}}><Text>{meanwakeup}</Text></View>
