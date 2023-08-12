@@ -19,10 +19,10 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
   const [isLoading, setIsLoading] = useState(true);
   const [mlogs, setMLogs] = useState([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  
+
   useEffect(() => {
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id TEXT PRIMARY KEY, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS mlogs (id TEXT PRIMARY KEY, year INTEGER, month INTEGER, UNIQUE(year,month))')
     });
 
     db.transaction(tx => {
@@ -32,24 +32,24 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
       );
     });
     setIsLoading(false);
-  },[load]);
+  },[]);
 
   
   useEffect(() => {
     if (!isLoading && tasks.filter(c=>c.monthly==true).length > 0 && mlogs.filter(c=>(c.year==year && c.month==month))[0]==undefined) {
       if(mlogs.length > 0){
       let existingLogs = [...mlogs];  
-      if(existingLogs.filter(c=>(c.year==year && c.month==month))[0]==undefined && isLoading==false){
+      let lastLogIndex = mlogs.length-1;
+      let lastLog = mlogs[lastLogIndex];
         db.transaction(tx => {
-          tx.executeSql('INSERT INTO mlogs (id,year,month) values (?,?,?)',[year,month],
+          tx.executeSql('INSERT INTO mlogs (id,year,month) values (?,?,?)',[uuid.v4(),year,month],
             (txtObj,resultSet)=> {    
               existingLogs.push({ id: uuid.v4(), year:year, month:month});
               setMLogs(existingLogs);                      
             },
           );
         });
-        let lastLogIndex = mlogs.length-1;
-        let lastLog = mlogs[lastLogIndex];
+
         let existingTasks=[...tasks.filter(c=>c.monthly==true)];
 
         let existingRecurringTasks=(existingTasks.length==0)? '':existingTasks.filter(c=>(c.recurring==1 && c.year==lastLog.year && c.month==lastLog.month));
@@ -65,10 +65,10 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
               let copytrack=existingRecurringTasks[i].track;
               let copyTime=existingRecurringTasks[i].time;
               db.transaction(tx => {
-                tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring,monthly,track,time) values (?,?,?,?,?,?,?,?,?,?)',
-                [uuid.v4(),newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copytrack,copyTime],
+                tx.executeSql('INSERT INTO tasks (id,task,year,month,day,taskState,recurring,monthly,track,time,section) values (?,?,?,?,?,?,?,?,?,?,?)',
+                [uuid.v4(),newTask,newDate.getFullYear(),newDate.getMonth(),1,0,1,true,copytrack,copyTime, undefined],
                   (txtObj,resultSet)=> {   
-                    existingTasks.push({ id: uuid.v4(), task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, track:copytrack, time:copyTime});
+                    existingTasks.push({ id: uuid.v4(), task: newTask, year:newDate.getFullYear(), month:newDate.getMonth(), day:1, taskState:0, recurring:1, monthly: true, track:copytrack, time:copyTime, section:undefined});
                     setTasks(existingTasks);
                   },
                 );
@@ -78,23 +78,22 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
           setTasks(existingTasks);
         }
       }
-      }
       else {
         let existingLogs = [...mlogs];  
-        if(existingLogs.filter(c=>(c.year==year && c.month==month && c.day==thisDay))[0]==undefined && isLoading==false){
+          console.warn('enters')
           db.transaction(tx => {
-            tx.executeSql('INSERT INTO mlogs (id,year,month,day) values (?,?,?,?)',[uuid.v4(),year,month,thisDay],
+            tx.executeSql('INSERT INTO mlogs (id,year,month) values (?,?,?)',[uuid.v4(),year,month],
               (txtObj,resultSet)=> {    
-                existingLogs.push({ id: uuid.v4(), year:year, month:month, day:thisDay});
+                existingLogs.push({ id: uuid.v4(), year:year, month:month});
                 setMLogs(existingLogs);
               },
             );
           });
-        }
       }
     }
   },[isLoading, mlogs]);
 
+  
   const TransferDaily = (id) => {
     let existingTasks = [...tasks];
     let toTransfer = tasks.filter(c=>(c.id==id))[0];
@@ -298,6 +297,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
           closeOnRowBeginSwipe={true}
         />
       </View>
+      <Button title="remove" onPress={()=>removelogDb()} />
       <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
         <Feather name='plus-circle' size={50} />
       </ TouchableOpacity> 

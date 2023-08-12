@@ -11,7 +11,6 @@ import UpdateWeather from './UpdateWeather';
 import StickerList from './StickerList';
 import NewSticker from '../modal/NewSticker';
 import { Ionicons } from '@expo/vector-icons';
-import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 

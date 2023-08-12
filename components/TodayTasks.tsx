@@ -20,7 +20,6 @@ function TodayTasks({db, tasks, setTasks, tracks, setTracks, load, loadx, date, 
   const [isLoading, setIsLoading] = useState(true);
   const [addModalVisible, setAddModalVisible] = useState(false);
 
-
   useEffect(() => {
       db.transaction(tx => {
         tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id TEXT PRIMARY KEY, year INTEGER, month INTEGER, day INTEGER, UNIQUE(year,month,day))')

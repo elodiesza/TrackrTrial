@@ -109,7 +109,7 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
             let sleepTime = goSleep==undefined||wakeUp==undefined?undefined:goSleep<wakeUp? wakeUp-goSleep:24-goSleep+wakeUp;
             sleepTime==undefined?undefined:allSleeps.push(sleepTime);
         }
-        return (allSleeps.reduce((a, b) => a + b) / allSleeps.length).toFixed(1);
+        return allSleeps.length==0?undefined:(allSleeps.reduce((a, b) => a + b) / allSleeps.length).toFixed(1);
         
     }
 
