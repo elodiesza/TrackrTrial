@@ -110,7 +110,7 @@ const useDatabase = () => {
       );
     });
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS times (id TEXT PRIMARY KEY, name TEXT, type TEXT, min INTEGER, max INTEGER, mincolor TEXT, maxcolor TEXT, place INTEGER)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS times (id TEXT PRIMARY KEY, name TEXT, mincolor TEXT, maxcolor TEXT, place INTEGER)')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM times ORDER BY place', null,
@@ -119,7 +119,7 @@ const useDatabase = () => {
       );
     });
     db.transaction((tx) => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS timerecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, value INTEGER, UNIQUE(name,year,month,day))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS timerecords (id TEXT PRIMARY KEY, name TEXT, year INTEGER, month INTEGER, day INTEGER, hours INTEGER, minutes INTEGER, UNIQUE(name,year,month,day))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM timerecords ORDER BY day;', null,

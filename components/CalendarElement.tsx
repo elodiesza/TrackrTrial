@@ -12,7 +12,7 @@ import { useState } from 'react';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather, stickers, stickerrecords}) {
+export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather, stickers, stickerrecords, times, setTimes, timerecords, setTimerecords}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -178,6 +178,8 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
           scales={scales} setScales={setScales} 
           scalerecords={scalerecords} setScalerecords={setScalerecords}
           weather={weather} setWeather={setWeather}
+          times={times} setTimes={setTimes}
+          timerecords={timerecords} setTimerecords={setTimerecords}
           />
           <View style={{flex:1}}>
             <FlatList

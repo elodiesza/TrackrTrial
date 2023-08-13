@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable,TouchableOpacity, Dimensions } from 'react-native';
 
-const IndicatorTableTitle = ({name, year, month, setModalVisible,scaleInd, scalerecords}) => {
+const IndicatorTableTitle = ({name, year, month, setModalVisible,scaleInd, scalerecords, timeInd, timerecords}) => {
 
     return (
             <TouchableOpacity onPress={()=>setModalVisible(name)} style={{width:1, height:1}}>
                 <View style={[styles.polygon, {backgroundColor: 'white', 
-                width: (scaleInd&&scalerecords.filter(c=>(c.year==year && c.month==month && c.name==name && c.value>1000)).length>0)?51:(scaleInd&&scalerecords.filter(c=>(c.year==year && c.month==month && c.name==name && c.value>100)).length>0)?39:26}]} />
+                width: (scaleInd&&scalerecords.filter(c=>(c.year==year && c.month==month && c.name==name && c.value>1000)).length>0)?51:(scaleInd&&scalerecords.filter(c=>(c.year==year && c.month==month && c.name==name && c.value>100)).length>0)?39:(timeInd&&timerecords.filter(c=>(c.year==year && c.month==month && c.name==name)).map(c=>c.hours).length>0)?51:26}]} />
                 <Text numberOfLines={1} style={styles.indText}>{name}</Text>
             </TouchableOpacity>
        );     

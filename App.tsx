@@ -120,6 +120,8 @@ export default function App() {
         diary={diary} setDiary={setDiary}
         weather={weather} setWeather={setWeather}
         stickers={stickers} stickerrecords={stickerrecords}
+        times={times} setTimes={setTimes}
+        timerecords={timerecords} setTimerecords={setTimerecords}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (

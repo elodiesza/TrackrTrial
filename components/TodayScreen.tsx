@@ -11,15 +11,19 @@ import UpdateWeather from './UpdateWeather';
 import StickerList from './StickerList';
 import NewSticker from '../modal/NewSticker';
 import { Ionicons } from '@expo/vector-icons';
+import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
 const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords}) => {
 
+
     const [isLoading, setIsLoading] = useState(false);
     const [selectedName, setSelectedName] = useState('');
     const [updateStateVisible, setUpdateStateVisible] = useState(false);
     const [newStickerVisible, setNewStickerVisible] = useState(false);
+
+
 
     const allNames = habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
@@ -77,6 +81,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
     const scaleNames= [... new Set(scalerecords.map(c=>c.name))];
 
 
+
   return (
     <SafeAreaView style={container.body}>
       <View style={{width:width, height :60}}>
@@ -89,7 +94,26 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
           keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
         />
-        <UpdateWeather db={db} weather={weather} setWeather={setWeather} year={year} month={month} day={day}/>    
+        {weather.length!==0 &&
+          <UpdateWeather db={db} weather={weather} setWeather={setWeather} year={year} month={month} day={day}/>    
+        } 
+        {weather.length==0 &&
+          <TouchableOpacity onPress={()=>{
+            let existingweather=[...weather];
+            db.transaction((tx) => {
+              tx.executeSql('INSERT INTO weather (id,weather,year,month,day) values (?,?,?,?,?)',
+              [uuid.v4(),'sunny-outline',year,month,day],
+              (txtObj,resultSet)=> {    
+                  existingweather.push({id:uuid.v4(),weather:'sunny-outline',year:year,month:month,day:day});
+                  setWeather(existingweather);
+              },
+              (txtObj, error) => console.warn('Error inserting data:', error)
+              );
+          });
+          }} style={{width:100, justifyContent:'center', alignItems:'center'}}>
+            <Ionicons name={'add-circle-outline'} size={60} color={colors.primary.blue}/>
+          </TouchableOpacity>
+        }
         </View>
       <View style={{height:110, width:width}}>
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
@@ -221,9 +245,22 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, error) => console.log('error selecting moods')
       );
     })}/>  
-
+        <Button title={'delete weather'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS weather', null,
+        (txObj, resultSet) => setWeather([]),
+        (txObj, error) => console.log('error selecting weather')
+      );
+    })}/>  
     */}     
-
+          <Button title={'delete times'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
+        (txObj, resultSet) => setTimes([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/> 
+     <Button title={'delete timerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
+        (txObj, resultSet) => setTimerecords([]),
+        (txObj, error) => console.log('error selecting tasks')
+      );
+    })}/> 
     </SafeAreaView>
   );
 }

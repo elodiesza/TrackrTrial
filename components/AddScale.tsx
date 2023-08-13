@@ -71,9 +71,7 @@ const AddScale = ({ name, scales, scalerecords, setScalerecords, db,year,month,d
                             placeholder={scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0]==null?'':scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0].toString()}
                             style={[container.textinput,{backgroundColor:colormix,width: 80, borderColor: error ? 'red' : '#e8e8e8'}]}
                         />
-                        {error && (
-                            <Text style={{color: colors.primary.red, alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
-                        )}
+                        {error && console.warn(error.message || 'Error')}
                         </>
                     )}
                     rules={{

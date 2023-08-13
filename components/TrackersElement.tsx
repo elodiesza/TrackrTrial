@@ -11,14 +11,16 @@ import SleepTypeColors from '../constants/SleepTypeColors';
 import { container,colors } from '../styles';
 import Color from './Color';
 import AddScale from './AddScale';
+import AddTime from './AddTime';
 import uuid from 'react-native-uuid';
 import UpdateWeather from './UpdateWeather';
 import { Ionicons } from '@expo/vector-icons';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, weather, setWeather}) {
+export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, weather, setWeather, times, setTimes, timerecords, setTimerecords}) {
 
+  console.warn(timerecords);
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -46,14 +48,19 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
   const [isLoading, setIsLoading] = useState(true);
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
   const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(-1);
+  const [timeModalVisible, setTimeModalVisible] = useState(false);
+  const [selectedTimeIndex, setSelectedTimeIndex] = useState(-1);
+  const [selectedTimeName, setSelectedTimeName] = useState('');
 
   const [updatedhabits, setUpdatedhabits] = useState([]);
   const [updatedstates, setUpdatedstates] = useState([]);
   const [updatedscales, setUpdatedscales] = useState([]);
+  const [updatedtimes, setUpdatedtimes] = useState([]);
 
   const lastMonthData = habits.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
   const lastMonthStates = staterecords.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
   const lastMonthScales = scalerecords.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
+  const lastMonthTimes = timerecords.filter(c => c.year === (month === 0 ? year - 1 : year) && c.month === (month === 0 ? 11 : month - 1));
 
 
   useEffect(() => {
@@ -124,7 +131,6 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
       loadx(!load);
 
   }, [updatedhabits]);
-
 
   useEffect(() => {
     if (staterecords.filter(c => c.year === thisYear && c.month === thisMonth).length === 0) {
@@ -252,6 +258,69 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
 
   }, [updatedscales]);
 
+  useEffect(() => {
+    if (timerecords.filter(c => c.year === thisYear && c.month === thisMonth).length === 0) {
+      let existingrecords = [...scalerecords];
+      let lastMonthrecords = lastMonthTimes.filter(c => c.day === 1).map(c => c.name);
+      const inserttimes = async () => {
+        const promises = [];
+      for (let j = 0; j < lastMonthrecords.length; j++) {
+        const name = lastMonthrecords[j];
+
+        for (let i = 1; i <= DaysInMonth(thisYear, thisMonth); i++) {
+          promises.push(
+          new Promise((resolve, reject) => {
+            db.transaction(tx => {
+              tx.executeSql(
+                'INSERT INTO timerecords (id, name, year, month, day, hours, minutes) VALUES (?,?, ?, ?, ?, ?, ?)',
+                [ uuid.v4(),name, thisYear, thisMonth, i, undefined, undefined],
+                (txtObj, timeResultSet) => {
+                  const newTime = {
+                    id: uuid.v4(),
+                    name: name,
+                    year: thisYear,
+                    month: thisMonth,
+                    day: i,
+                    value: undefined,
+                  };
+                  existingrecords.push(newTime);
+                  resolve(newTime);
+                },
+                (_, error) => {
+                  console.log(error);
+                  reject(error);
+                }
+              );
+            });
+          })
+          );
+        }
+      }
+      return Promise.all(promises);
+      };
+      inserttimes()
+        .then(newtimes => {
+          setUpdatedtimes([...updatedtimes, ...newtimes]);
+          setIsLoading(false); 
+        })
+        .catch(error => {
+          console.log(error);
+          setIsLoading(false); 
+        });
+    } 
+    else {
+      setIsLoading(false); // Set loading scale to false if the data is already present
+    }
+
+  }, []);
+
+  useEffect(() => {
+
+      setScalerecords(updatedtimes); // Update the habits scale variable
+      loadx(!load);
+
+  }, [updatedtimes]);
+
   function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
@@ -273,12 +342,14 @@ function colorMixer(rgbA, rgbB, amountToMix){
 const habitsNames = [...new Set(habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))];
 const uniqueStatesNames = [...new Set(staterecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
 const uniqueScalesNames = [...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
-const uniqueNames = [...new Set([ ...uniqueScalesNames, ...uniqueStatesNames, ...habitsNames])];
+const uniqueTimesNames = [...new Set(timerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
+const uniqueNames = [...new Set([ ...uniqueScalesNames, ...uniqueTimesNames, ...uniqueStatesNames, ...habitsNames])];
 
 const habitsType = Array.from({ length:[...new Set(habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "habit");
 const statesType = Array.from({ length:[...new Set(staterecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "state");
 const scalesType = Array.from({ length:[...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "scale");
-const uniqueTypes = [ ...scalesType, ...statesType, ...habitsType];
+const timesType = Array.from({ length:[...new Set(timerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "time");
+const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType];
 
 
     const updateHabit = (id) => {
@@ -359,8 +430,8 @@ const uniqueTypes = [ ...scalesType, ...statesType, ...habitsType];
 
       return (
         <View>
-          <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:scalerecords.filter(c=>c.year==year&&c.month==month&&c.name==item&&c.value>1000).length>0?50:25 }}>
-            <IndicatorTableTitle name={item} year={year} month={month} setModalVisible={setModalVisible} scaleInd={true} scalerecords={scalerecords}/>
+          <Pressable style={{ height: 75, transform: [{ skewX: '-45deg' }], left: 37, width:scalerecords.filter(c=>c.year==year&&c.month==month&&c.name==item&&c.value>1000).length>0?50:timerecords.filter(c=>c.year==year&&c.month==month&&c.name==item).map(c=>c.hours).length>0?50:25 }}>
+            <IndicatorTableTitle name={item} year={year} month={month} setModalVisible={setModalVisible} scaleInd={true} scalerecords={scalerecords} timeInd={true} timerecords={timerecords}/>
           </Pressable>
           <IndicatorMenu
             data={item}
@@ -468,6 +539,52 @@ const uniqueTypes = [ ...scalesType, ...statesType, ...habitsType];
       })
     }
 
+    const showtimes = (name) => {
+      const timeslist = timerecords.filter(c=>(c.name==name && c.year==year && c.month==month));
+      const mincolor = times.filter(c=>c.name==name).map(c=>c.mincolor)[0]==null? [255,255,255]: hexToRgb(times.filter(c=>c.name==name).map(c=>c.mincolor)[0]);
+      const maxcolor = times.filter(c=>c.name==name).map(c=>c.maxcolor)[0]==null? [255,255,255]: hexToRgb(times.filter(c=>c.name==name).map(c=>c.maxcolor)[0]);
+      const minhoursvalue = Math.min(...timerecords.filter(c=>(c.name==name && c.hours!==null)).map(c=>c.hours))*60;
+      const maxhoursvalue = Math.max(...timerecords.filter(c=>(c.name==name && c.hours!==null)).map(c=>c.hours))*60;
+      const minminutesvalue = Math.min(...timerecords.filter(c=>(c.name==name && c.hours!==null)).map(c=>c.minutes));
+      const maxminutesvalue = Math.max(...timerecords.filter(c=>(c.name==name && c.hours!==null)).map(c=>c.minutes));
+      const minvalue = minhoursvalue+minminutesvalue;
+      const maxvalue = maxhoursvalue+maxminutesvalue;
+
+      return timeslist.map((item,index) => {
+        const amountomix = maxvalue==minvalue? 0.5:(maxvalue-(item.hours*60+item.minutes))/(maxvalue-minvalue);
+        const colormix = mincolor!==null && maxcolor!==null?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
+        return ( 
+          <View key={index}>
+            <TouchableOpacity onPress={()=>{setSelectedTimeIndex(index);setSelectedTimeName(name);setTimeModalVisible(true)}}>
+              <View style={[container.cell, { width:50,backgroundColor : (item.hours==undefined||item.minutes==undefined)? colors.primary.white : colormix}]}>
+                <Text>{item.hours}:{(item.minutes!==null&&item.minutes<10)?'0'+item.minutes:item.minutes}</Text>
+              </View>
+            </TouchableOpacity>
+            <Modal
+            animationType="none"
+            transparent={true}
+            visible={selectedTimeIndex === index && timeModalVisible}
+            onRequestClose={() => {
+              setSelectedTimeIndex(-1);
+              setSelectedTimeName('');
+              setScaleModalVisible(!timeModalVisible);
+              loadx(!load);
+            }}
+            >
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedScaleItem('');setSelectedScaleId('');setScaleModalVisible(!scaleModalVisible);setSelectedScaleIndex(-1);setSelectedScaleName('');}} activeOpacity={1}>
+              <TouchableWithoutFeedback>
+                <View style={[container.modal,{height:130, width: 200}]}>
+                  <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')}</Text>
+                  <AddTime name={selectedTimeName} times={times} timerecords={timerecords} setTimerecords={setTimerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setTimeModalVisible={setTimeModalVisible}/>
+                </View>
+              </TouchableWithoutFeedback>
+            </TouchableOpacity>
+          </Modal>
+          </View>
+        )
+      })
+    }
+
     const showStatesColumns = (name) => {
       return (
         <View>
@@ -480,6 +597,14 @@ const uniqueTypes = [ ...scalesType, ...statesType, ...habitsType];
       return (
         <View>
           {showscales(name.item)}
+        </View>
+      );
+    };
+
+    const showTimesColumns = (name) => {
+      return (
+        <View>
+          {showtimes(name.item)}
         </View>
       );
     };
@@ -754,6 +879,15 @@ const uniqueTypes = [ ...scalesType, ...statesType, ...habitsType];
                 <View>
                   <FlatList
                     horizontal
+                    data={uniqueTimesNames}
+                    renderItem={uniqueTimesNames!==null?(name)=>showTimesColumns(name):undefined}
+                    keyExtractor={(_, index) => index.toString()}
+                    scrollEnabled={false}
+                  />
+                </View>
+                <View>
+                  <FlatList
+                    horizontal
                     data={uniqueStatesNames}
                     renderItem={uniqueStatesNames!==null?(name)=>showStatesColumns(name):undefined}
                     keyExtractor={(_, index) => index.toString()}
@@ -797,6 +931,8 @@ const uniqueTypes = [ ...scalesType, ...statesType, ...habitsType];
         setStaterecords={setStaterecords}
         scales={scales} setScales={setScales} 
         scalerecords={scalerecords} setScalerecords={setScalerecords}
+        times={times} setTimes={setTimes}
+        timerecords={timerecords} setTimerecords={setTimerecords}
       />
     </View>
   );

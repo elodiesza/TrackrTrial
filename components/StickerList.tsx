@@ -13,7 +13,6 @@ const StickerList = ({ db, stickers, setStickers, stickerrecords, setStickerreco
     const existingrecords = [...stickerrecords];
     let currentState=stickerrecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.state)[0];
     if (stickerrecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).length==0){
-      console.warn(name, year, month, day)
       db.transaction((tx) => {
         tx.executeSql(
           'INSERT INTO stickerrecords (id, name, year, month, day, state) VALUES (?, ?, ?, ?, ?, ?)',
