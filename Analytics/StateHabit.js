@@ -58,7 +58,6 @@ function StateHabit (habits,states,setResult, setResultNumber) {
     //const whennot1then2result = (whennot1then2.filter(item => item !== null && (item === 0 || item === 1)).reduce((a, b) => (a + b), 0)/whennot1then2.filter(item => item !== null && (item === 0 || item === 1)).length*100).toFixed(0);   
     //const whennot2then1result = (whennot2then1.filter(item => item !== null && (item === 0 || item === 1)).reduce((a, b) => (a + b), 0)/whennot2then1.filter(item => item !== null && (item === 0 || item === 1)).length*100).toFixed(0);   
 
-
     finalResult = maxPwhenStatethenTrueResults>80? 
                         'When '+ statename + ' is ' + maxPwhenStatethenTrueResultsItem+' you are more likely to do '+habitname + '. (' + maxPwhenStatethenTrueResults+ '%)'
                     : 'no result';

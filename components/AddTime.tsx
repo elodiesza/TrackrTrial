@@ -11,6 +11,8 @@ const width = Dimensions.get('window').width;
 const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, load, loadx, setTimeModalVisible}) => {
     const {control, handleSubmit, reset} = useForm();
 
+
+    console.warn ( minvalue, maxvalue)
     function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
@@ -37,7 +39,7 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
     const minvalue = minhoursvalue+minminutesvalue;
     const maxvalue = maxhoursvalue+maxminutesvalue;
     const amountomix = maxvalue==minvalue? 0.5:((maxvalue-(timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.hours)[0]*60+timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.minutes)[0]))/(maxvalue-minvalue)).toFixed(2);
-    const colormix = mincolor!==null && maxcolor!==null?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
+    const colormix = mincolor!==(null||undefined) && maxcolor!==(null||undefined)?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
 
     const updateTime = (data) => {
         const existingrecords = [...timerecords];
@@ -65,13 +67,12 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
                 (txObj, error) => console.log('Error updating data', error)
             );
         });
-        console.warn(existingrecords);
-        setTimeModalVisible(false);
+        setTimeModalVisible==undefined? undefined: setTimeModalVisible(false);
         loadx(!load);
     };
 
   return (
-    <View style={{height:70, marginTop:10}}>
+    <View style={{height:70}}>
             <Text style={{textAlign:'center'}}>{name}</Text>
         <View style={{flex:1, flexDirection: 'row', width:'100%', alignItems: 'center', justifyContent:'center'}}>
         <Controller
@@ -87,7 +88,7 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
                                 onChange(sanitizedValue);
                             }}
                             onBlur={onBlur}
-                            placeholder={"HH"}
+                            placeholder={timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.hours)[0]==null?'HH':timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.hours)[0].toString()}
                             style={[container.textinput,{backgroundColor:colormix,width: 50, borderColor: error ? 'red' : '#e8e8e8'}]}
                         />
                         {error && console.warn(error.message || 'Error')}
@@ -125,7 +126,7 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
                                 onChange(sanitizedValue);
                             }}
                             onBlur={onBlur}
-                            placeholder={"mm"}
+                            placeholder={timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.minutes)[0]==null?'mm':timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.minutes)[0].toString()}
                             style={[container.textinput,{backgroundColor:colormix,width: 50, borderColor: error ? 'red' : '#e8e8e8'}]}
                         />
                         {error && console.warn(error.message || 'Error')}

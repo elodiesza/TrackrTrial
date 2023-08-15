@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text,StyleSheet, Pressable, SafeAreaView } from 'react-native';
+import { View, Text,Dimensions,StyleSheet, Pressable, SafeAreaView } from 'react-native';
 import { container, colors } from '../styles';
 import { SelectList } from 'react-native-dropdown-select-list'
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +7,7 @@ import HabitHabit from '../Analytics/HabitHabit';
 import StateHabit from '../Analytics/StateHabit';
 import MoodHabit from '../Analytics/MoodHabit';
 
-
+const width = Dimensions.get('window').width;
 
 function Analytics({db, habits, staterecords, scalerecords, stickerrecords, moods, sleep}) {
 
@@ -60,7 +60,7 @@ function Analytics({db, habits, staterecords, scalerecords, stickerrecords, mood
           <Text style={{fontSize:20}}>ANALYTICS</Text>
       </View>
       <View style={container.body}>
-        <View style={[container.button,{flex:undefined,height:80, margin:10}]}>
+        <View style={[container.button,{flex:undefined,width:width-20,height:80, margin:10}]}>
           <Text>LAUNCH ANALYTICS</Text>
         </View>
         <View style={{zIndex: 2,flexDirection:'row', alignItems:'flex-start', height:50, justifyContent:'center'}}>
@@ -87,7 +87,7 @@ function Analytics({db, habits, staterecords, scalerecords, stickerrecords, mood
             <Text style={{marginLeft:10,fontSize:20, fontWeight:'bold'}}>+1</Text>
           </View>
         </View>
-        <Pressable onPress={()=>LaunchAnalytics()} style={[container.button,{flex:undefined,margin:10,height:50}]}>
+        <Pressable onPress={()=>LaunchAnalytics()} style={[container.button,{flex:undefined,margin:10,height:50, width:width-20}]}>
           <Text>ANALYZE DUO</Text>
         </Pressable>
         <ToReview/>

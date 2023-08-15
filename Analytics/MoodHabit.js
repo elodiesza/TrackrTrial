@@ -41,7 +41,6 @@ function MoodHabit (habits,moods,setResult, setResultNumber) {
         whenMoodthenTrueResults.push(counter);
     };
 
-    console.warn(whenMoodthenTrueResults);
     const sumwhenMoodthenTrueResults = whenMoodthenTrueResults.reduce((a, b) => (a + b), 0);
     const maxPwhenMoodthenTrueResults = ((Math.max(...whenMoodthenTrueResults)/sumwhenMoodthenTrueResults)).toFixed(2)*100;
     const maxPwhenMoodthenTrueResultsmood = moodsmoods[whenMoodthenTrueResults.indexOf(Math.max(...whenMoodthenTrueResults))];

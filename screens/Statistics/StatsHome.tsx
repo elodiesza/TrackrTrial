@@ -1,20 +1,36 @@
 import React, { Component } from 'react'
 import { FlatList, ScrollView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { container } from '../../styles';
-import MoodPie from '../../components/MoodPie';
+import MoodPie from '../../components/BigPie';
 import PieChartView from '../../components/PieChartView';
 import {colors} from '../../styles';
 import { Ionicons } from '@expo/vector-icons';
 
 const width = Dimensions.get('window').width;
 
-const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerrecords, sleep, staterecords, month, year, tracks, moods, daysInMonth }) => {
-
+const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerrecords, sleep, staterecords, month, year, tracks, moods, daysInMonth, times, timerecords }) => {
 
     const today=new Date();
     const thisDay= today.getDate();
     const thisMonth= today.getMonth();
     const thisYear= today.getFullYear();
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
+         : null;
+      }
+      function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
+        var channelA = colorChannelA*amountToMix;
+        var channelB = colorChannelB*(1-amountToMix);
+        return parseInt(channelA+channelB);
+      }
+      function colorMixer(rgbA, rgbB, amountToMix){
+        var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
+        var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
+        var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
+        return "rgb("+r+","+g+","+b+")";
+      }
 
     const habitBar = ({item}) => { 
         const habitsPercentage = () => {
@@ -36,23 +52,8 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
         );
     }
     const scaleObject = ({item}) => { 
-        function hexToRgb(hex) {
-            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
-             : null;
-          }
-          function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
-            var channelA = colorChannelA*amountToMix;
-            var channelB = colorChannelB*(1-amountToMix);
-            return parseInt(channelA+channelB);
-          }
-          function colorMixer(rgbA, rgbB, amountToMix){
-            var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
-            var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
-            var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
-            return "rgb("+r+","+g+","+b+")";
-          }
-        const meanvalue= scalerecords.filter(c=>(c.year==year&&c.month==month)).length==0? 0: (scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).reduce((a, b) => a + b) / scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).length).toFixed(0);
+
+        const meanvalue= (scalerecords.filter(c=>(c.year==year&&c.month==month)).length==0)? 0: scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).length==0? 0: (scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).reduce((a, b) => a + b) / scalerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.value!==null)).map(c=>c.value).length).toFixed(0);
         const mincolor = scales.filter(c=>c.name==item).map(c=>c.mincolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==item).map(c=>c.mincolor)[0]);
         const maxcolor = scales.filter(c=>c.name==item).map(c=>c.maxcolor)[0]==null? [255,255,255]: hexToRgb(scales.filter(c=>c.name==item).map(c=>c.maxcolor)[0]);
         const minvalue = scales.filter(c=>c.name==item).map(c=>c.min)[0]==null?Math.min(...scalerecords.filter(c=>(c.name==item && c.value!==null)).map(c=>c.value)):scales.filter(c=>c.name==item).map(c=>c.min)[0];
@@ -67,6 +68,38 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
                 </View>
                 <View style={{width:60,height:25,borderWidth:1,borderColor:colors.primary.black,borderRadius:5,backgroundColor:colormix,justifyContent:'center',alignItems:'center'}}>
                     <Text>{meanvalue}</Text>
+                </View>
+                <View>
+                    <Text style={{fontSize:10, marginHorizontal:10}}>{scales.filter(c=>c.name==item).map(c=>c.unit)[0]}</Text>
+                </View>
+            </View>
+        );
+    }
+    const timeObject = ({item}) => { 
+        const totalhours= timerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month)).map(c=>c.hours*60).reduce((a, b) => a + b)
+        const totalminutes = timerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month)).map(c=>c.minutes).reduce((a, b) => a + b)
+        const meanvalue = (timerecords.filter(c=>(c.year==year&&c.month==month)).length==0)? 0: 
+        timerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.hours!==null &&c.minutes!==null)).length==0? 0: 
+        ((totalhours+totalminutes) / timerecords.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.hours!==null&&c.minutes!==null)).length).toFixed(0);
+        const mincolor = times.filter(c=>c.name==item).map(c=>c.mincolor)[0]==null? [255,255,255]: hexToRgb(times.filter(c=>c.name==item).map(c=>c.mincolor)[0]);
+        const maxcolor = times.filter(c=>c.name==item).map(c=>c.maxcolor)[0]==null? [255,255,255]: hexToRgb(times.filter(c=>c.name==item).map(c=>c.maxcolor)[0]);
+        const minhoursvalue = Math.min(...timerecords.filter(c=>(c.name==item && c.hours!==null)).map(c=>c.hours))*60;
+        const maxhoursvalue = Math.max(...timerecords.filter(c=>(c.name==item && c.hours!==null)).map(c=>c.hours))*60;
+        const minminutesvalue = Math.min(...timerecords.filter(c=>(c.name==item && c.hours!==null)).map(c=>c.minutes));
+        const maxminutesvalue = Math.max(...timerecords.filter(c=>(c.name==item && c.hours!==null)).map(c=>c.minutes));
+        const minvalue = minhoursvalue+minminutesvalue;
+        const maxvalue = maxhoursvalue+maxminutesvalue;
+
+        const amountomix = maxvalue==minvalue? 0.5:(maxvalue-meanvalue)/(maxvalue-minvalue);
+        const colormix = mincolor!==null && maxcolor!==null?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
+        
+        return(
+            <View style={{flexDirection:'row', marginVertical:2,width:width, alignItems:'center'}}>
+                <View style={{width:90}}>
+                    <Text style={{fontSize:10, marginHorizontal:10}}>{item}</Text>
+                </View>
+                <View style={{width:60,height:25,borderWidth:1,borderColor:colors.primary.black,borderRadius:5,backgroundColor:colormix,justifyContent:'center',alignItems:'center'}}>
+                    <Text>{Math.floor(meanvalue/60)}:{(meanvalue-Math.floor(meanvalue/60)*60)<10? ((meanvalue-Math.floor(meanvalue/60)*60)==0? "00" : "0"+(meanvalue-Math.floor(meanvalue/60)*60)):meanvalue-Math.floor(meanvalue/60)*60}</Text>
                 </View>
                 <View>
                     <Text style={{fontSize:10, marginHorizontal:10}}>{scales.filter(c=>c.name==item).map(c=>c.unit)[0]}</Text>
@@ -143,13 +176,24 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
                     />
                 </ScrollView>
             </View>
-            
-            <FlatList
-                data={[...new Set(scales.map(c=>c.name))]}
-                renderItem={({ item }) =>scaleObject({item})}
-                keyExtractor={scales.id}
-                contentContainerStyle={{height:200,flex:1}}
-            />
+            <View style={{flex:1,flexDirection:'row', marginTop:10}}>
+                <View style={{flex:3}}>
+                    <FlatList
+                        data={[...new Set(scales.map(c=>c.name))]}
+                        renderItem={({ item }) =>scaleObject({item})}
+                        keyExtractor={scales.id}
+                        contentContainerStyle={{height:200,flex:2}}
+                    /> 
+                </View>
+                <View style={{flex:2}}>
+                    <FlatList
+                    data={[...new Set(times.map(c=>c.name))]}
+                    renderItem={({ item }) =>timeObject({item})}
+                    keyExtractor={times.id}
+                    contentContainerStyle={{height:200,flex:1}}
+                    />
+                </View>
+            </View>
             <View style={{flex:1, margin:10, right:10,flexDirection:'row',alignItems:'center', justifyContent:'center',height:50,width:'100%'}}>
                 <Ionicons name="moon" size={40} color={colors.primary.defaultdark} />
                 <View style={{justifyContent:'center', alignItems:'center',marginBottom:15}}>

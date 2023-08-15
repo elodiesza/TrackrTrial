@@ -6,6 +6,7 @@ import AddMood from './AddMood';
 import { container,colors } from '../styles';
 import DiaryElement from './DiaryElement';
 import AddScale from './AddScale';
+import AddTime from './AddTime';
 import UpdateState from '../modal/UpdateState';
 import UpdateWeather from './UpdateWeather';
 import StickerList from './StickerList';
@@ -27,6 +28,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
 
     const allNames = habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
     const uniqueNames = [...new Set (allNames)];
+
 
     if (isLoading) {
         return (
@@ -79,7 +81,8 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
     };
 
     const scaleNames= [... new Set(scalerecords.map(c=>c.name))];
-
+    const timeNames= [... new Set(timerecords.map(c=>c.name))];
+    const scaleCounts= scaleNames.length;
 
 
   return (
@@ -92,7 +95,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           horizontal
           data={uniqueNames}
           renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
-          keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
+          keyExtractor={(_, index) => index.toString()}
         />
         {weather.length!==0 &&
           <UpdateWeather db={db} weather={weather} setWeather={setWeather} year={year} month={month} day={day}/>    
@@ -119,17 +122,22 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
       </View>
       <View style={{flex:1, width:width, flexDirection:'row'}}>
-        <View style={{flex:1,marginLeft:20}}>
+        <View style={{flex:2,marginLeft:20}}>
           <FlatList
-            data={scaleNames}
-            renderItem={scaleNames!==null?({item})=><AddScale name={item} scales={scales} scalerecords={scalerecords} 
+            data={[...scaleNames, ...timeNames]}
+            renderItem={[...scaleNames, ...timeNames].length!==0?({item,index})=>
+            index<scaleCounts? 
+            <AddScale name={item} scales={scales} scalerecords={scalerecords} 
             setScalerecords={setScalerecords} db={db} year={year} month={month} day={day} load={load} 
-            loadx={loadx} setScaleModalVisible={undefined}/>:undefined}
-            keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
+            loadx={loadx} setScaleModalVisible={undefined}/> : <AddTime name={item} times={times} timerecords={timerecords} 
+            setTimerecords={setTimerecords} db={db} year={year} month={month} day={day} load={load} 
+            loadx={loadx} setTimeModalVisible={undefined}/>
+            :undefined}
+            keyExtractor={(_, index) => index.toString()} 
             showsVerticalScrollIndicator={false}
           />
         </View>
-        <View style={{flex:2}}>
+        <View style={{flex:3}}>
           <FlatList
             data={[... new Set(states.map(c=>c.name))]}
             renderItem={(item)=>
@@ -208,7 +216,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setHabits([]),
         (txObj, error) => console.log('error selecting habits')
       );
-    })}/>
+    })}/>    
     <Button title={'delete tasks'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS tasks', null,
         (txObj, resultSet) => setTasks([]),
         (txObj, error) => console.log('error selecting tasks')
@@ -244,23 +252,13 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, resultSet) => setMoods([]),
         (txObj, error) => console.log('error selecting moods')
       );
-    })}/>  
+    })}/> 
         <Button title={'delete weather'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS weather', null,
         (txObj, resultSet) => setWeather([]),
         (txObj, error) => console.log('error selecting weather')
       );
     })}/>  
-    */}     
-          <Button title={'delete times'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
-        (txObj, resultSet) => setTimes([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
-     <Button title={'delete timerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
-        (txObj, resultSet) => setTimerecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
+     */} 
     </SafeAreaView>
   );
 }

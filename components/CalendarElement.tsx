@@ -166,7 +166,8 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
           stickers={stickers} stickerrecords={stickerrecords}
           staterecords={staterecords} tracks={tracks} 
           setHabits={setHabits} setTracks={setTracks} 
-          sleep={sleep} moods={moods}/>
+          sleep={sleep} moods={moods}
+          times={times} timerecords={timerecords}/>
           <TrackersElement db={db} load={load} loadx={loadx} 
           tracks={tracks} setTracks={setTracks} 
           year={year} month={month} 

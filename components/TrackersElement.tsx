@@ -20,8 +20,6 @@ const width = Dimensions.get('window').width;
 
 export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, weather, setWeather, times, setTimes, timerecords, setTimerecords}) {
 
-  console.warn(timerecords);
-
   var today = new Date();
   var thisMonth = today.getMonth();
   var thisYear = today.getFullYear();
@@ -567,11 +565,11 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
             onRequestClose={() => {
               setSelectedTimeIndex(-1);
               setSelectedTimeName('');
-              setScaleModalVisible(!timeModalVisible);
+              setTimeModalVisible(!timeModalVisible);
               loadx(!load);
             }}
             >
-            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedScaleItem('');setSelectedScaleId('');setScaleModalVisible(!scaleModalVisible);setSelectedScaleIndex(-1);setSelectedScaleName('');}} activeOpacity={1}>
+            <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setTimeModalVisible(!scaleModalVisible);setSelectedTimeIndex(-1);setSelectedTimeName('');}} activeOpacity={1}>
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{height:130, width: 200}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')}</Text>
