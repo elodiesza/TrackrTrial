@@ -16,7 +16,7 @@ import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords}) => {
+const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics}) => {
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -259,6 +259,11 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
       );
     })}/>  
      */} 
+           <Button title={'delete analytics'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS analytics', null,
+        (txObj, resultSet) => setAnalytics([]),
+        (txObj, error) => console.log('error selecting analytics')
+      );
+    })}/>  
     </SafeAreaView>
   );
 }

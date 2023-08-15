@@ -8,7 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 
 
-const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scales, setScales, scalerecords, setScalerecords, diary, setDiary, setStaterecords, staterecords, states, setStates, sections, times, setTimes, timerecords, setTimerecords, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords}) => {
+const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scales, setScales, scalerecords, setScalerecords, diary, setDiary, setStaterecords, staterecords, states, setStates, sections, times, setTimes, timerecords, setTimerecords, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics}) => {
 
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +61,7 @@ const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods
         weather={weather} setWeather={setWeather}
         stickers={stickers} setStickers={setStickers}
         stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
+        analytics={analytics} setAnalytics={setAnalytics}
         />
         <TodayTasks db={db} 
         tasks={tasks} setTasks={setTasks} 

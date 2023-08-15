@@ -9,6 +9,8 @@ const SettingsHome = () => {
     
     const onAccountPressed =()=> {navigation.navigate('Account')};
     const onAboutPressed =()=> {navigation.navigate('About')};
+    const onAdditionalFeaturesPressed =()=> {navigation.navigate('Additional Features')};
+    const onCustomizationPressed =()=> {navigation.navigate('Customization')};
     const onHelpPressed =()=> {navigation.navigate('Help')};
 
     return (
@@ -26,12 +28,22 @@ const SettingsHome = () => {
                 <Text style={styles.text}>About</Text>
                 <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
             </Pressable>
+            <Pressable onPress={onAdditionalFeaturesPressed} style={styles.pressable}>
+                <Feather name="plus-circle" size={25} style={styles.icon}/>
+                <Text style={styles.text}>Additional Features</Text>
+                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
+            </Pressable>
+            <Pressable onPress={onCustomizationPressed} style={styles.pressable}>
+                <MaterialIcons name="auto-awesome" size={25} style={styles.icon}/>
+                <Text style={styles.text}>Customization</Text>
+                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
+            </Pressable>
             <Pressable onPress={onHelpPressed} style={styles.pressable}>
                 <Feather name="help-circle" size={25} style={styles.icon}/>
                 <Text style={styles.text}>Help Center</Text>
                 <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
             </Pressable>
-            <Pressable onPress={onHelpPressed} style={styles.pressable}>
+            <Pressable style={styles.pressable}>
                 <MaterialIcons name="exit-to-app" size={25} style={styles.icon}/>
                 <Text style={styles.text}>Sign Out</Text>
                 <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>

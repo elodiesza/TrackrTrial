@@ -37,6 +37,8 @@ export default function App() {
     stickers,
     stickerrecords,
     analytics,
+    statuslist,
+    statusrecords,
     loadx,
     setTracks,
     setHabits,
@@ -57,7 +59,9 @@ export default function App() {
     setWeather,
     setStickers,
     setStickerrecords,
-    setAnalytics
+    setAnalytics,
+    setStatuslist,
+    setStatusrecords,
   } = useDatabase();
 
 
@@ -77,7 +81,9 @@ export default function App() {
         tracks={tracks} setTracks={setTracks} db={db}
         sections={sections} setSections={setSections}
         tasks={tasks} setTasks={setTasks}
-        progress={progress} setProgress={setProgress}/>} 
+        progress={progress} setProgress={setProgress}
+        statuslist={statuslist} setStatuslist={setStatuslist}
+        statusrecords={statusrecords} setStatusrecords={setStatusrecords}/>} 
         options={{ headerShown: false, tabBarShowLabel: false,
           tabBarIcon: ({focused}) => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -102,6 +108,7 @@ export default function App() {
         weather={weather} setWeather={setWeather}
         stickers={stickers} setStickers={setStickers}
         stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
+        analytics={analytics} setAnalytics={setAnalytics}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (

@@ -185,7 +185,18 @@ export const container = StyleSheet.create({
         margin:10,
         backgroundColor: colors.primary.white,
         padding:10
-    }
+    },
+    setting:{
+        width: "100%",
+        height:40,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        backgroundColor: colors.primary.white,
+        paddingHorizontal: 10,
+        borderBottomWidth:1,
+        borderBottomColor: colors.primary.gray,
+    },
 });
 
 

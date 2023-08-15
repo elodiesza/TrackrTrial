@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Account from './Settings/Account';
 import About from './Settings/About';
 import Help from './Settings/Help';
+import Customization from './Settings/Customization';
+import AdditionalFeatures from './Settings/AdditionalFeatures';
 import SettingsHome from './Settings/SettingsHome';
 
 const Stack = createNativeStackNavigator();
@@ -14,6 +16,8 @@ const SettingsNavigator =()=> {
       <Stack.Screen name="SettingsHome" component={SettingsHome} options={{ headerShown: false }} />
       <Stack.Screen name="Account" component={Account} options={{ headerShown: false }} />
       <Stack.Screen name="About" component={About} options={{ headerShown: false }} />
+      <Stack.Screen name="Additional Features" component={AdditionalFeatures} options={{ headerShown: false }} />
+      <Stack.Screen name="Customization" component={Customization} options={{ headerShown: false }} />
       <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
     </Stack.Navigator>
   );

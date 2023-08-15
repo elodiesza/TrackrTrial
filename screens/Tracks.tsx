@@ -10,10 +10,12 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import ProgressBar from '../components/ProgressBar';
 import NewProgress from '../modal/NewProgress';
 import NewTrack from '../modal/NewTrack';
+import NewStatus from '../modal/NewStatus';
+import Status from '../components/Status';
 
 const width = Dimensions.get('window').width;
 
-function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, progress, setProgress}) {
+function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, progress, setProgress, statuslist, setStatuslist, statusrecords, setStatusrecords}) {
     const today= new Date();
     const thisYear = today.getFullYear();
     const thisMonth = today.getMonth();
@@ -26,6 +28,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
     const [newTrackVisible, setNewTrackVisible] = useState(false);
     const [newTaskVisible, setNewTaskVisible] = useState(false);
     const [newProgressVisible, setNewProgressVisible] = useState(false);
+    const [newStatusVisible, setNewStatusVisible] = useState(false);
     const [selectedSection, setSelectedSection] = useState('');
     const [showSection, setShowSection] = useState(true);
     const [showArchive, setShowArchive] = useState(false);
@@ -310,10 +313,24 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             closeOnRowBeginSwipe={true}
                             keyExtractor= {(item,index) => index.toString()}
                         />
+                        <SwipeListView
+                            data={statusrecords.filter(c=>(c.list==item.section && c.track==selectedTab))}
+                            renderItem={({item,index}) =>
+                            <Status db={db} name={item.name} statuslist={statuslist} statusrecords={statusrecords} setStatusrecords={setStatusrecords} index={item.index}/>
+                            }
+                            bounces={false} 
+                            rightOpenValue={-50}
+                            disableRightSwipe={true}
+                            closeOnRowBeginSwipe={true}
+                            keyExtractor= {(item,index) => index.toString()}
+                        />
                         <View style={{flex:1, backgroundColor: colors.primary.white, flexDirection:'row', justifyContent:'flex-end'}}>
                             <TouchableOpacity onPress={()=>{DeleteSection();setSelectedSection(item.section)}} style={{justifyContent: 'center', alignItems:'flex-end',marginVertical:2, marginHorizontal:2}}>
                                 <Feather name='trash-2' size={30} color={colors.primary.blue} />
                             </TouchableOpacity>  
+                            <TouchableOpacity onPress={()=>{setNewStatusVisible(true);setSelectedSection(item.section)}} style={{justifyContent: 'center', alignItems:'flex-end',marginVertical:2, marginHorizontal:2}}>
+                                <Entypo name="progress-full" size={30} color={colors.primary.blue} />
+                            </TouchableOpacity>
                             <TouchableOpacity onPress={()=>{setNewProgressVisible(true);setSelectedSection(item.section)}} style={{justifyContent: 'center', alignItems:'flex-end',marginVertical:2, marginHorizontal:2}}>
                                 <Entypo name="progress-two" size={30} color={colors.primary.blue} />
                             </TouchableOpacity>
@@ -324,6 +341,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                         </View>
                         <NewTask addModalVisible={newTaskVisible} setAddModalVisible={setNewTaskVisible} db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} track={selectedTab} section={selectedSection} pageDate={undefined} tracksScreen={true}/>
                         <NewProgress addModalVisible={newProgressVisible} setAddModalVisible={setNewProgressVisible} db={db} progress={progress} setProgress={setProgress} track={selectedTab} section={selectedSection}/>
+                        <NewStatus newStatusVisible={newStatusVisible} setNewStatusVisible={setNewStatusVisible} db={db} statuslist={statuslist} setStatuslist={setStatuslist} statusrecords={statusrecords} setStatusrecords={setStatusrecords}/>
                     </View>
                     }
                     keyExtractor= {(item,index) => index.toString()}

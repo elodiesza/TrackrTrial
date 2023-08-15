@@ -80,7 +80,6 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
       }
       else {
         let existingLogs = [...mlogs];  
-          console.warn('enters')
           db.transaction(tx => {
             tx.executeSql('INSERT INTO mlogs (id,year,month) values (?,?,?)',[uuid.v4(),year,month],
               (txtObj,resultSet)=> {    
@@ -290,7 +289,7 @@ export default function MonthlyTasks({db, load, loadx, tracks, setTracks, year, 
           scrollEnabled={true} 
           renderItem={({ item }) => <Task db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} setTracks={setTracks} 
           sections={undefined} date={new Date(year,month,1)} task={item.task} taskState={item.taskState} id={item.id} track={undefined} 
-          time={undefined} section={undefined} trackScreen={false}/>} 
+          time={undefined} section={undefined} trackScreen={false} archive={false}/>} 
           renderHiddenItem={({ item }) => <DeleteItem id={item.id} />} bounces={false} 
           rightOpenValue={-100}
           disableRightSwipe={true}

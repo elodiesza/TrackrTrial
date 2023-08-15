@@ -24,6 +24,8 @@ const useDatabase = () => {
   const [stickers, setStickers] = useState([]);
   const [stickerrecords, setStickerrecords] = useState([]);
   const [analytics, setAnalytics] = useState([]);
+  const [statuslist, setStatuslist] = useState([]);
+  const [statusrecords, setStatusrecords] = useState([]);
 
 
   useEffect(() => {
@@ -198,6 +200,25 @@ const useDatabase = () => {
       );
     });
 
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS statuslist (id TEXT PRIMARY KEY, name TEXT, item TEXT, color TEXT, index INTEGER)')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM statuslist ORDER BY index;', null,
+      (txObj, resultSet18) => setStatuslist(resultSet18.rows._array),
+      (txObj, error) => console.log('error selecting status list')
+      );
+    });
+    db.transaction((tx) => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS statusrecords (id TEXT PRIMARY KEY, name TEXT, track TEXT, section TEXT, statuslist TEXT, index INTEGER, archived BOOLEAN, UNIQUE(name,statuslist))')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM statusrecords', null,
+      (txObj, resultSet19) => setStatusrecords(resultSet19.rows._array),
+      (txObj, error) => console.log('error selecting status records')
+      );
+    });
+
     setIsLoading(false);
   
   },[load]);
@@ -225,6 +246,8 @@ const useDatabase = () => {
     stickers,
     stickerrecords,
     analytics,
+    statuslist,
+    statusrecords,
     loadx,
     setHabits,
     setTasks,
@@ -246,6 +269,9 @@ const useDatabase = () => {
     setStickers,
     setStickerrecords,
     setAnalytics,
+    setStatuslist,
+    setStatusrecords,
+
   };
 };
 

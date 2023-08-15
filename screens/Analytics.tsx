@@ -12,13 +12,8 @@ const width = Dimensions.get('window').width;
 
 function Analytics({db, habits, staterecords, scalerecords, stickerrecords, moods, sleep, analytics, setAnalytics}) {
 
-  console.warn(analytics)
-
   const [indicator1, setIndicator1] = useState("");
   const [indicator2, setIndicator2] = useState("");
-
-  const [result, setResult] = useState("");
-  const [resultNumber, setResultNumber] = useState(0);
 
   const moodsNames = 'MOOD';
   const sleepqualityNames = 'SLEEP QUALITY';
@@ -64,7 +59,7 @@ function Analytics({db, habits, staterecords, scalerecords, stickerrecords, mood
     );
   }
 
-  const RecordObject = ({ind1,typ1,ind2,typ2,section}) => { 
+  const RecordObject = ({ind1,typ1,ind2,typ2,status}) => { 
     let result = LaunchAnalytics(ind1,ind2,typ1,typ2)==undefined? '' : LaunchAnalytics(ind1,ind2,typ1,typ2).result;
     let resultNumber = LaunchAnalytics(ind1,ind2,typ1,typ2)==undefined? 0 : LaunchAnalytics(ind1,ind2,typ1,typ2).resultNumber;
     return(
@@ -73,22 +68,23 @@ function Analytics({db, habits, staterecords, scalerecords, stickerrecords, mood
         <View style={{flex:1,flexDirection:'row', justifyContent:'flex-end', alignItems:'flex-end'}}>
           <Ionicons name="close" size={24} color="black" />
           <Ionicons name="sync" size={24} color="black" />
-          <Ionicons onPress={()=>AddRecord(ind1,typ1,ind2,typ2,2)} name="checkmark" size={24} color="black" />
+          <Ionicons onPress={()=>AddRecord(ind1,typ1,ind2,typ2,2)} name="checkmark" size={24} color="black" style={{display: status==2?"none":"flex"}} />
         </View>
       </View>
     );
   };
 
   const LaunchAnalytics = (ind1, ind2, type1, type2) => {
-    console.warn(ind1, ind2, type1, type2)
     return(
       type1 == "habit" && type2 == "habit" ?
         {'result':HabitHabit(habits.filter(c=>c.name==ind1),habits.filter(c=>c.name==ind2)).result,
-          'resultNumber': HabitHabit(habits.filter(c=>c.name==ind1),habits.filter(c=>c.name==ind2)).resultNumber} :
+        'resultNumber': HabitHabit(habits.filter(c=>c.name==ind1),habits.filter(c=>c.name==ind2)).resultNumber} :
       type1 == "state" && type2 == "habit" ?
-        StateHabit(habits.filter(c=>c.name==ind2),staterecords.filter(c=>c.name==ind1),setResult,setResultNumber) :
-        type1 == "mood" && type2 == "habit" ?
-        MoodHabit(habits.filter(c=>c.name==ind2),moods,setResult,setResultNumber) :
+        {'result':StateHabit(habits.filter(c=>c.name==ind1),staterecords.filter(c=>c.name==ind2)).result,
+        'resultNumber': StateHabit(habits.filter(c=>c.name==ind1),staterecords.filter(c=>c.name==ind2)).resultNumber} :
+      (type1 == "mood" && type2 == "habit")||(type2 == "mood" && type1 == "habit")?
+        {'result':MoodHabit(moods,habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="mood"?true:false).result,
+        'resultNumber': MoodHabit(moods,habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="mood"?true:false).resultNumber} :
       undefined
     )
   }
@@ -130,7 +126,9 @@ function Analytics({db, habits, staterecords, scalerecords, stickerrecords, mood
         style={[container.button,{flex:undefined,margin:10,height:50, width:width-20}]}>
           <Text>ANALYZE DUO</Text>
         </Pressable>
-        <RecordObject ind1={indicator1} typ1={type1} ind2={indicator2} typ2={type2} section={'self'}/>
+        {indicator1!==undefined && indicator2!==undefined && type1!==undefined && type2!==undefined && 
+          <RecordObject ind1={indicator1} typ1={type1} ind2={indicator2} typ2={type2} status={0}/>
+        }
         <View style={[container.section, {backgroundColor:colors.primary.white}]}>
           <Text>TO REVIEW</Text>
         </View>
@@ -141,13 +139,15 @@ function Analytics({db, habits, staterecords, scalerecords, stickerrecords, mood
           <Text>RECORDS</Text>
         </View>
         <View style={{flex:1}}>
-          <FlatList
-            data={analytics.filter(c=>c.status==2)}
-            renderItem={({ item }) => (
-              <RecordObject ind1={item.indicator1} typ1={item.type1} ind2={item.indicator2} typ2={item.type2} section={'records'}/>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-          />
+          {analytics!==undefined &&
+            <FlatList
+              data={analytics.filter(c=>c.status==2)}
+              renderItem={({ item }) => (
+                <RecordObject ind1={item.indicator1} typ1={item.type1} ind2={item.indicator2} typ2={item.type2} status={2}/>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          }
         </View>
       </View>
     </SafeAreaView>

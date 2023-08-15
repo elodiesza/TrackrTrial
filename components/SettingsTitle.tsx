@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet,Pressable } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { colors } from '../styles';
+import { colors, container } from '../styles';
 
 
 const SettingsTitle = ({title, returnpress}) => {
     return (
-        <View style={styles.header}>
+        <View style={container.setting}>
             <Pressable onPress={returnpress}>
                 <MaterialIcons name="keyboard-arrow-left" size={25} style={{left:10}} color={colors.primary.blue}/>
             </Pressable>
@@ -16,12 +16,3 @@ const SettingsTitle = ({title, returnpress}) => {
 };
     
 export default SettingsTitle;
-
-const styles = StyleSheet.create({
-    header:{
-        height:40,
-        alignItems:'center',
-        justifyContent:'flex-start',
-        flexDirection:'row',
-    }
-});

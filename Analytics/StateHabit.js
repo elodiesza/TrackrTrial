@@ -1,6 +1,6 @@
 
 
-function StateHabit (habits,states,setResult, setResultNumber) {
+function StateHabit (habits,states) {
 
     let whenTruethenState = [];
     let whenStatethenHabit = [];
@@ -62,10 +62,7 @@ function StateHabit (habits,states,setResult, setResultNumber) {
                         'When '+ statename + ' is ' + maxPwhenStatethenTrueResultsItem+' you are more likely to do '+habitname + '. (' + maxPwhenStatethenTrueResults+ '%)'
                     : 'no result';
 
-
-
-    setResultNumber(maxPwhenStatethenTrueResults);
-    setResult(finalResult);
+    return {'result':finalResult,'resultNumber':maxPwhenStatethenTrueResults};
 
 }
 
