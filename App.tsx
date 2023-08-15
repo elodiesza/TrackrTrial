@@ -36,6 +36,7 @@ export default function App() {
     weather,
     stickers,
     stickerrecords,
+    analytics,
     loadx,
     setTracks,
     setHabits,
@@ -56,6 +57,7 @@ export default function App() {
     setWeather,
     setStickers,
     setStickerrecords,
+    setAnalytics
   } = useDatabase();
 
 
@@ -64,7 +66,7 @@ export default function App() {
       <Tab.Navigator initialRouteName="Today">
         <Tab.Screen name="Analytics" children={()=><Analytics db={db}
         habits={habits} staterecords={staterecords} scalerecords={scalerecords} stickerrecords={stickerrecords}
-        moods={moods} sleep={sleep}/>}
+        moods={moods} sleep={sleep} analytics={analytics} setAnalytics={setAnalytics}/>}
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>

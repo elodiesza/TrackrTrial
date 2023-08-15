@@ -23,6 +23,7 @@ const useDatabase = () => {
   const [weather, setWeather] = useState([]);
   const [stickers, setStickers] = useState([]);
   const [stickerrecords, setStickerrecords] = useState([]);
+  const [analytics, setAnalytics] = useState([]);
 
 
   useEffect(() => {
@@ -187,6 +188,16 @@ const useDatabase = () => {
       );
     });
 
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS analytics (id TEXT PRIMARY KEY, indicator1 TEXT, type1 TEXT, indicator2 TEXT, type2 TEXT, status INTEGER, UNIQUE(indicator1,indicator2))')
+    });
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM analytics', null,
+      (txObj, resultSet17) => setAnalytics(resultSet17.rows._array),
+      (txObj, error) => console.log('error selecting analytics')
+      );
+    });
+
     setIsLoading(false);
   
   },[load]);
@@ -213,6 +224,7 @@ const useDatabase = () => {
     weather,
     stickers,
     stickerrecords,
+    analytics,
     loadx,
     setHabits,
     setTasks,
@@ -233,6 +245,7 @@ const useDatabase = () => {
     setWeather,
     setStickers,
     setStickerrecords,
+    setAnalytics,
   };
 };
 

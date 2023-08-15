@@ -1,6 +1,6 @@
 
 
-function HabitHabit (habits1,habits2,setResult, setResultNumber) {
+function HabitHabit (habits1,habits2) {
 
     let when1then2 = [];
     let when2then1 = [];
@@ -53,9 +53,8 @@ function HabitHabit (habits1,habits2,setResult, setResultNumber) {
                                 "You do "+ name1 +" there is more chance you do "+name2+" ("+when2then1result+ "%)." :
                             "nothing") :
                         "nothing";
-    setResultNumber(when2then1result);
-    setResult(finalResult);
 
+    return {'result':finalResult,'resultNumber':when2then1result};
 }
 
 export default HabitHabit;
