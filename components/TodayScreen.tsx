@@ -16,7 +16,8 @@ import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
 
-const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics}) => {
+const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
+                    statuslist, setStatuslist, statusrecords, setStatusrecords}) => {
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -258,10 +259,21 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         (txObj, error) => console.log('error selecting weather')
       );
     })}/>  
-     */} 
-           <Button title={'delete analytics'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS analytics', null,
+               <Button title={'delete analytics'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS analytics', null,
         (txObj, resultSet) => setAnalytics([]),
         (txObj, error) => console.log('error selecting analytics')
+      );
+    })}/>  
+     */} 
+
+            <Button title={'delete statuslist'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS statuslist', null,
+        (txObj, resultSet) => setStatuslist([]),
+        (txObj, error) => console.log('error selecting status list')
+      );
+    })}/> 
+        <Button title={'delete statusrecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS statusrecords', null,
+        (txObj, resultSet) => setStatusrecords([]),
+        (txObj, error) => console.log('error selecting status records')
       );
     })}/>  
     </SafeAreaView>

@@ -109,6 +109,8 @@ export default function App() {
         stickers={stickers} setStickers={setStickers}
         stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
         analytics={analytics} setAnalytics={setAnalytics}
+        statuslist={statuslist} setStatuslist={setStatuslist}
+        statusrecords={statusrecords} setStatusrecords={setStatusrecords}
         />} 
         options={{ headerShown: false, tabBarShowLabel: false, 
           tabBarIcon: ({focused}) => (

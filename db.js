@@ -201,16 +201,16 @@ const useDatabase = () => {
     });
 
     db.transaction(tx => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS statuslist (id TEXT PRIMARY KEY, name TEXT, item TEXT, color TEXT, index INTEGER)')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS statuslist (id TEXT PRIMARY KEY, name TEXT, item TEXT, color TEXT, number INTEGER)')
     });
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM statuslist ORDER BY index;', null,
+      tx.executeSql('SELECT * FROM statuslist', null,
       (txObj, resultSet18) => setStatuslist(resultSet18.rows._array),
-      (txObj, error) => console.log('error selecting status list')
+      (txObj, error) => console.log('error selecting statuslist')
       );
     });
     db.transaction((tx) => {
-      tx.executeSql('CREATE TABLE IF NOT EXISTS statusrecords (id TEXT PRIMARY KEY, name TEXT, track TEXT, section TEXT, statuslist TEXT, index INTEGER, archived BOOLEAN, UNIQUE(name,statuslist))')
+      tx.executeSql('CREATE TABLE IF NOT EXISTS statusrecords (id TEXT PRIMARY KEY, name TEXT, track TEXT, section TEXT, list TEXT, number INTEGER, archive BOOLEAN, UNIQUE(name,list))')
     });
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM statusrecords', null,
@@ -271,7 +271,6 @@ const useDatabase = () => {
     setAnalytics,
     setStatuslist,
     setStatusrecords,
-
   };
 };
 

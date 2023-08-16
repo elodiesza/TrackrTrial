@@ -16,6 +16,9 @@ import Status from '../components/Status';
 const width = Dimensions.get('window').width;
 
 function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, progress, setProgress, statuslist, setStatuslist, statusrecords, setStatusrecords}) {
+
+    console.warn(statusrecords)
+
     const today= new Date();
     const thisYear = today.getFullYear();
     const thisMonth = today.getMonth();
@@ -71,6 +74,22 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                   existingTasks[toTransfer].month = thisMonth;
                   existingTasks[toTransfer].day = day;
                   setTasks(existingTasks);
+                }
+              },
+              (txObj, error) => console.log('Error updating data', error)
+            );
+        });
+    }
+
+    const TransferArchive = (id,reverse) => {
+        let existingrecords = [...statusrecords];
+        const toTransfer = existingrecords.map(c=>c.id).findIndex(c=>c==id);
+        db.transaction(tx=> {
+            tx.executeSql('UPDATE statusrecords SET archive=? WHERE id= ?', [reverse?false:true, id],
+              (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                  existingrecords[toTransfer].archive = reverse?false:true;
+                  setStatusrecords(existingrecords);
                 }
               },
               (txObj, error) => console.log('Error updating data', error)
@@ -141,6 +160,32 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
             </Pressable>
         </View>
     );
+
+    const StatusSwipeItem = ({ id, reverse }) => (
+        <View style={{ flex: 1, backgroundColor: 'green', flexDirection: 'row' }}>
+            <View style={{ width: width - 50, paddingRight: 12, justifyContent: 'center', alignItems: 'flex-end', backgroundColor: colors.primary.yellowgreen }}>
+                <Pressable onPress={()=>TransferArchive(id,reverse)}>
+                    <Feather name="archive" size={25} color={'white'} />
+                </Pressable>
+            </View>
+            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: 'darkred' }}>
+                <Pressable onPress={() => 
+                db.transaction(tx => {
+                tx.executeSql('DELETE FROM statusrecords WHERE id = ?', [id],
+                    (txObj, resultSet) => {
+                    if (resultSet.rowsAffected > 0) {
+                        let existingrecords = [...statusrecords].filter(c => c.id !== id);
+                        setStatusrecords(existingrecords);
+                    }
+                    },
+                    (txObj, error) => console.log(error)
+                );
+                })}>
+                    <Feather name="trash-2" size={25} color={'white'} />
+                </Pressable>
+            </View>
+        </View>
+      );
 
     const TabItem = ({item,index, selected}) => {
         return (
@@ -314,12 +359,13 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             keyExtractor= {(item,index) => index.toString()}
                         />
                         <SwipeListView
-                            data={statusrecords.filter(c=>(c.list==item.section && c.track==selectedTab))}
+                            data={statusrecords.filter(c=>(c.section==item.section && c.track==selectedTab && c.archive==false))}
                             renderItem={({item,index}) =>
-                            <Status db={db} name={item.name} statuslist={statuslist} statusrecords={statusrecords} setStatusrecords={setStatusrecords} index={item.index}/>
+                            <Status db={db} name={item.name} list={item.list} statuslist={statuslist} statusrecords={statusrecords} setStatusrecords={setStatusrecords} number={item.number} id={item.id}/>
                             }
+                            renderHiddenItem={({ item }) => <StatusSwipeItem id={item.id} reverse={false}/>} 
                             bounces={false} 
-                            rightOpenValue={-50}
+                            rightOpenValue={-100}
                             disableRightSwipe={true}
                             closeOnRowBeginSwipe={true}
                             keyExtractor= {(item,index) => index.toString()}
@@ -341,7 +387,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                         </View>
                         <NewTask addModalVisible={newTaskVisible} setAddModalVisible={setNewTaskVisible} db={db} tasks={tasks} setTasks={setTasks} tracks={tracks} track={selectedTab} section={selectedSection} pageDate={undefined} tracksScreen={true}/>
                         <NewProgress addModalVisible={newProgressVisible} setAddModalVisible={setNewProgressVisible} db={db} progress={progress} setProgress={setProgress} track={selectedTab} section={selectedSection}/>
-                        <NewStatus newStatusVisible={newStatusVisible} setNewStatusVisible={setNewStatusVisible} db={db} statuslist={statuslist} setStatuslist={setStatuslist} statusrecords={statusrecords} setStatusrecords={setStatusrecords}/>
+                        <NewStatus newStatusVisible={newStatusVisible} setNewStatusVisible={setNewStatusVisible} db={db} statuslist={statuslist} setStatuslist={setStatuslist} statusrecords={statusrecords} setStatusrecords={setStatusrecords} selectedTab={selectedTab} selectedSection={selectedSection}/>
                     </View>
                     }
                     keyExtractor= {(item,index) => index.toString()}
@@ -349,17 +395,6 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                     showsHorizontalScrollIndicator={false}
                 />
                 <NewSection db={db} sections={sections} setSections={setSections} track={selectedTab} newSectionVisible={newSectionVisible} setNewSectionVisible={setNewSectionVisible}/>
-                {/*<Button title="delete tracks" onPress={deletetracks}/>
-                <Button title={'delete progress'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS progress', null,
-                    (txObj, resultSet) => setProgress([]),
-                    (txObj, error) => console.log('error selecting progress')
-                );
-                })}/>
-                <Button title={'delete sections'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sections', null,
-                    (txObj, resultSet) => setSections([]),
-                    (txObj, error) => console.log('error selecting sections')
-                );
-                })}/>*/}
                 <NewTrack db={db} tracks={tracks} setTracks={setTracks} newTrackVisible={newTrackVisible} setNewTrackVisible={setNewTrackVisible} setSelectedTab={setSelectedTab} setSelectedTabColor={setSelectedTabColor}/>
             </View>
             <View>
@@ -372,7 +407,7 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                         <MaterialIcons name="keyboard-arrow-down" size={25}/>
                     </Pressable>
                 </View>
-                <View style={{display: showArchive==true?"flex":"none",height:200,justifyContent:'flex-start'}}>
+                <View style={{display: showArchive==true?"flex":"none",maxHeight:200,justifyContent:'flex-start'}}>
                     <SwipeListView
                             data={tasks.filter(c=>(c.track==selectedTab && c.taskState==2 ))}
                             renderItem={({item,index}) =>
@@ -431,6 +466,18 @@ function Tracks({tracks, setTracks, db, sections, setSections, tasks, setTasks, 
                             disableRightSwipe={true}
                             closeOnRowBeginSwipe={true}
                             keyExtractor= {(item,index) => index.toString()}
+                    />
+                    <SwipeListView
+                        data={statusrecords.filter(c=>(c.track==selectedTab && c.archive==true))}
+                        renderItem={({item,index}) =>
+                        <Status db={db} name={item.name} list={item.list} statuslist={statuslist} statusrecords={statusrecords} setStatusrecords={setStatusrecords} number={item.number} id={item.id}/>
+                        }
+                        renderHiddenItem={({ item,index }) => <StatusSwipeItem id={item.id} reverse={true}/>} 
+                        bounces={false} 
+                        rightOpenValue={-100}
+                        disableRightSwipe={true}
+                        closeOnRowBeginSwipe={true}
+                        keyExtractor= {(item,index) => index.toString()}
                     />
                 </View>
                     
