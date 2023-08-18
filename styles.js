@@ -188,7 +188,7 @@ export const container = StyleSheet.create({
     },
     setting:{
         width: "100%",
-        height:40,
+        height:50,
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
@@ -197,6 +197,22 @@ export const container = StyleSheet.create({
         borderBottomWidth:1,
         borderBottomColor: colors.primary.gray,
     },
+    statTitle:{
+        width: "100%",
+        height:40,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.primary.white,
+        paddingHorizontal: 10,
+        borderBottomWidth:1,
+        borderBottomColor: colors.primary.gray,
+    },
+    settingsArrow: {
+        position: 'absolute',
+        right: 0,
+        color: colors.primary.blue,
+    }
 });
 
 

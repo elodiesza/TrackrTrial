@@ -5,6 +5,7 @@ import Swiper from 'react-native-swiper';
 import Habits from './Statistics/HabitsStats';
 import StatsHome from './Statistics/StatsHome';
 import StatesStats from './Statistics/StatesStats';
+import ScalesStats from './Statistics/ScalesStats';
 
 const width = Dimensions.get('window').width;
 
@@ -32,6 +33,7 @@ const Statistics = ({year, month, habits, states, scales, scalerecords, staterec
           times={times} timerecords={timerecords} />
           <Habits habits={habits} month={month} year={year} tracks={tracks}/>
           <StatesStats moods={moods} states={states} staterecords={staterecords} year={year} month={month} daysInMonth={DaysInMonth(year,month)}/>
+          <ScalesStats scales={scales} scalerecords={scalerecords} year={year} month={month} daysInMonth={DaysInMonth(year,month)}/>
           <SleepLog sleep={sleep} year={year} month={month}/>
         </Swiper>
       </View>

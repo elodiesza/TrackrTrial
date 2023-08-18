@@ -13,12 +13,20 @@ import StickerList from './StickerList';
 import NewSticker from '../modal/NewSticker';
 import { Ionicons } from '@expo/vector-icons';
 import uuid from 'react-native-uuid';
+import * as Font from 'expo-font';
 
 const width = Dimensions.get('window').width;
 
 const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
                     statuslist, setStatuslist, statusrecords, setStatusrecords}) => {
 
+
+                      async function loadFonts() {
+                        await Font.loadAsync({
+                          'MyFont': require('../assets/fonts/AvenirNextCondensed.ttf'),
+                          // ... other fonts
+                        });
+                      }
 
     const [isLoading, setIsLoading] = useState(false);
     const [selectedName, setSelectedName] = useState('');
@@ -88,6 +96,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
 
   return (
     <SafeAreaView style={container.body}>
+      <Text style={{fontFamily:'MyFont'}}>TODAY</Text>
       <View style={{width:width, height :60}}>
         <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} load={load} loadx={loadx} setMoodModalVisible={undefined}/>
       </View>
@@ -123,7 +132,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
       </View>
       <View style={{flex:1, width:width, flexDirection:'row'}}>
-        <View style={{flex:2,marginLeft:20}}>
+        <View style={{flex:2,marginLeft:20, marginBottom:10}}>
           <FlatList
             data={[...scaleNames, ...timeNames]}
             renderItem={[...scaleNames, ...timeNames].length!==0?({item,index})=>
@@ -182,100 +191,6 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         />
       </View>
       <NewSticker db={db} stickers={stickers} setStickers={setStickers} newStickerVisible={newStickerVisible} setNewStickerVisible={setNewStickerVisible}/>
-     {/*  <Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
-        (txObj, resultSet) => setStaterecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-      <Button title={'delete scalerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS scalerecords', null,
-        (txObj, resultSet) => setScalerecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-      <Button title={'delete states'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS states', null,
-        (txObj, resultSet) => setStaterecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-      <Button title={'delete scales'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS scales', null,
-        (txObj, resultSet) => setScales([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
-      <Button title={'delete times'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
-        (txObj, resultSet) => setTimes([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
-     <Button title={'delete timerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
-        (txObj, resultSet) => setTimerecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
-
-    <Button title={'delete habits'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS habits', null,
-        (txObj, resultSet) => setHabits([]),
-        (txObj, error) => console.log('error selecting habits')
-      );
-    })}/>    
-    <Button title={'delete tasks'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS tasks', null,
-        (txObj, resultSet) => setTasks([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-        <Button title={'delete tracks'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS tracks', null,
-        (txObj, resultSet) => setTracks([]),
-        (txObj, error) => console.log('error selecting tracks')
-      );
-    })}/>
-      
-    <Button title={'delete logs'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS logs', null,
-        (txObj, resultSet) => setLogs([]),
-        (txObj, error) => console.log('error selecting logs')
-      );
-    })}/>
-            <Button title={'delete sleep'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sleep', null,
-        (txObj, resultSet) => setSleep([]),
-        (txObj, error) => console.log('error selecting sleep')
-      );
-    })}/>
-    <Button title={'delete diary'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS diary', null,
-        (txObj, resultSet) => setDiary([]),
-        (txObj, error) => console.log('error selecting diary')
-      );
-    })}/>  
-        <Button title={'delete stickerrecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS stickerrecords', null,
-        (txObj, resultSet) => setStickerrecords([]),
-        (txObj, error) => console.log('error selecting stickerrecords')
-      );
-    })}/>       
-        <Button title={'delete moods'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS moods', null,
-        (txObj, resultSet) => setMoods([]),
-        (txObj, error) => console.log('error selecting moods')
-      );
-    })}/> 
-        <Button title={'delete weather'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS weather', null,
-        (txObj, resultSet) => setWeather([]),
-        (txObj, error) => console.log('error selecting weather')
-      );
-    })}/>  
-               <Button title={'delete analytics'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS analytics', null,
-        (txObj, resultSet) => setAnalytics([]),
-        (txObj, error) => console.log('error selecting analytics')
-      );
-    })}/>  
-     */} 
-
-            <Button title={'delete statuslist'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS statuslist', null,
-        (txObj, resultSet) => setStatuslist([]),
-        (txObj, error) => console.log('error selecting status list')
-      );
-    })}/> 
-        <Button title={'delete statusrecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS statusrecords', null,
-        (txObj, resultSet) => setStatusrecords([]),
-        (txObj, error) => console.log('error selecting status records')
-      );
-    })}/>  
     </SafeAreaView>
   );
 }

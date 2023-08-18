@@ -60,7 +60,7 @@ const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods
         staterecords={staterecords} setStaterecords={setStaterecords}
         states={states} setStates={setStates}
         times={times} setTimes={setTimes}
-        timerecords={times} setTimerecords={setTimes}
+        timerecords={timerecords} setTimerecords={setTimerecords}
         scales={scales} setScales={setScales}
         weather={weather} setWeather={setWeather}
         stickers={stickers} setStickers={setStickers}

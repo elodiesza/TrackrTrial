@@ -1,5 +1,5 @@
-import { colors
- } from "../styles";
+import { colors } from "../styles";
+
 export const MoodIcons = [
     {"name":"productive","color":colors.primary.green,"icon":"emoticon-devil"},
     {"name":"happy","color":colors.primary.yellowgreen,"icon":"emoticon"},

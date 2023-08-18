@@ -6,8 +6,6 @@ import { useForm, Controller, set } from 'react-hook-form';
 
 
 
-const width = Dimensions.get('window').width;
-
 const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, load, loadx, setTimeModalVisible}) => {
     const {control, handleSubmit, reset} = useForm();
 
@@ -36,8 +34,8 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
     const maxminutesvalue = Math.max(...timerecords.filter(c=>(c.name==name && c.hours!==null)).map(c=>c.minutes));
     const minvalue = minhoursvalue+minminutesvalue;
     const maxvalue = maxhoursvalue+maxminutesvalue;
-    const amountomix = maxvalue==minvalue? 0.5:((maxvalue-(timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.hours)[0]*60+timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.minutes)[0]))/(maxvalue-minvalue)).toFixed(2);
-    const colormix = mincolor!==(null||undefined) && maxcolor!==(null||undefined)?colorMixer(mincolor,maxcolor,amountomix):colors.primary.white;
+    const amountomix = (maxvalue==minvalue || minvalue==null || maxvalue==null)? 0.5:((maxvalue-(timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.hours)[0]*60+timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.minutes)[0]))/(maxvalue-minvalue)).toFixed(2);
+    const colormix = (mincolor==(null||undefined) || maxcolor==(null||undefined))?colors.primary.white:colorMixer(mincolor,maxcolor,amountomix);
 
     const updateTime = (data) => {
         const existingrecords = [...timerecords];

@@ -26,12 +26,13 @@ const StatesStats = ({ moods, states, staterecords, year, month, daysInMonth }) 
     }
 
     const totalStatesNames = ["MOOD",...new Set(states.map(c=>c.name))];
-
-  const moodColors = [colors.primary.green,colors.primary.yellowgreen,colors.primary.yellow,colors.primary.orange,colors.primary.red,colors.primary.pink,colors.primary.purple,colors.primary.lightblue];
-
+    const moodColors = [colors.primary.green,colors.primary.yellowgreen,colors.primary.yellow,colors.primary.orange,colors.primary.red,colors.primary.pink,colors.primary.purple,colors.primary.lightblue];
 
     return (
         <View style={{flex:1}}>
+            <View style={[container.statTitle]}>
+                <Text style={{fontSize:20}}>STATES</Text>
+            </View>
             <View style={{height:50, flex:1}}>
                 <SelectList 
                     setSelected={(val) => setSelected(val)} 
@@ -52,7 +53,7 @@ const StatesStats = ({ moods, states, staterecords, year, month, daysInMonth }) 
                         renderItem={({item,index}) => 
                         <View style={{flexDirection:'row'}}>
                             <View style={{height:14,width:14, alignSelf:'center', 
-                            backgroundColor:selected=="MOOD"?moodColors[index]:states.filter(c=>(c.name==selected&&c.item==item.item)).map(c=>c.color),borderRadius:7}}/>
+                            backgroundColor:selected=="MOOD"?moodColors[index]:states.filter(c=>(c.name==selected&&c.item==item)).map(c=>c.color)[0],borderRadius:7}}/>
                             <Text style={{fontSize: 14,width:40, margin:3, marginLeft:10, color: 'gray'}}>
                                 {selected=="MOOD"? (moodCounts.map(c=>c.count).reduce((a,b)=>a+b,0)==0? 0:
                                  (item.count*100/moodCounts.map(c=>c.count).reduce((a,b)=>a+b,0)).toFixed(0)) :

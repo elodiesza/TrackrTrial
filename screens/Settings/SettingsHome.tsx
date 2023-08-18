@@ -9,7 +9,7 @@ const SettingsHome = () => {
     
     const onAccountPressed =()=> {navigation.navigate('Account')};
     const onAboutPressed =()=> {navigation.navigate('About')};
-    const onAdditionalFeaturesPressed =()=> {navigation.navigate('Additional Features')};
+    const onDataPressed =()=> {navigation.navigate('Data')};
     const onCustomizationPressed =()=> {navigation.navigate('Customization')};
     const onHelpPressed =()=> {navigation.navigate('Help')};
 
@@ -17,40 +17,37 @@ const SettingsHome = () => {
 
         <SafeAreaView style={container.container}>
             <View style={[container.body,{justifyContent:'flex-start'}]}>
-            <View style={styles.drawer} >
-            <Pressable onPress={onAccountPressed} style={styles.pressable}>
-                <MaterialIcons name="account-circle" size={25} style={styles.icon}/>
-                <Text style={styles.text}>Account</Text>
-                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
-            </Pressable>
-            <Pressable onPress={onAboutPressed} style={styles.pressable}>
-                <Octicons name="info" size={25} style={styles.icon}/>
-                <Text style={styles.text}>About</Text>
-                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
-            </Pressable>
-            <Pressable onPress={onAdditionalFeaturesPressed} style={styles.pressable}>
-                <Feather name="plus-circle" size={25} style={styles.icon}/>
-                <Text style={styles.text}>Additional Features</Text>
-                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
-            </Pressable>
-            <Pressable onPress={onCustomizationPressed} style={styles.pressable}>
-                <MaterialIcons name="auto-awesome" size={25} style={styles.icon}/>
-                <Text style={styles.text}>Customization</Text>
-                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
-            </Pressable>
-            <Pressable onPress={onHelpPressed} style={styles.pressable}>
-                <Feather name="help-circle" size={25} style={styles.icon}/>
-                <Text style={styles.text}>Help Center</Text>
-                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
-            </Pressable>
-            <Pressable style={styles.pressable}>
-                <MaterialIcons name="exit-to-app" size={25} style={styles.icon}/>
-                <Text style={styles.text}>Sign Out</Text>
-                <MaterialIcons name="keyboard-arrow-right" size={25} style={styles.arrow}/>
-            </Pressable>
-
+                <Pressable onPress={onAccountPressed} style={container.setting}>
+                    <MaterialIcons name="account-circle" size={25}/>
+                    <Text style={{marginLeft:10}}>Account</Text>
+                    <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
+                </Pressable>
+                <Pressable onPress={onAboutPressed} style={container.setting}>
+                    <Octicons name="info" size={25}/>
+                    <Text style={{marginLeft:10}}>About</Text>
+                    <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
+                </Pressable>
+                <Pressable onPress={onDataPressed} style={container.setting}>
+                    <Feather name="server" size={25}/>
+                    <Text style={{marginLeft:10}}>Data</Text>
+                    <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
+                </Pressable>
+                <Pressable onPress={onCustomizationPressed} style={container.setting}>
+                    <MaterialIcons name="auto-awesome" size={25}/>
+                    <Text style={{marginLeft:10}}>Customization</Text>
+                    <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
+                </Pressable>
+                <Pressable onPress={onHelpPressed} style={container.setting}>
+                    <Feather name="help-circle" size={25}/>
+                    <Text style={{marginLeft:10}}>Help Center</Text>
+                    <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
+                </Pressable>
+                <Pressable style={container.setting}>
+                    <MaterialIcons name="exit-to-app" size={25}/>
+                    <Text style={{marginLeft:10}}>Sign Out</Text>
+                    <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
+                </Pressable>
             </View>
-        </View>
         </SafeAreaView>
 
     );
@@ -58,29 +55,3 @@ const SettingsHome = () => {
     
 export default SettingsHome;
 
-const styles = StyleSheet.create({
-    drawer: {
-        width: '100%',
-        backgroundColor: 'white',
-        paddingLeft: 20,
-        paddingRight: 20,
-        
-    },
-    pressable: {
-        height: 50,
-        justifyContent: 'center',
-    },
-    text: {
-        fontSize: 16,
-        marginLeft: 35,
-    },
-    icon: {
-        position: 'absolute',
-    },
-    arrow: {
-        position: 'absolute',
-        right: 0,
-        color: colors.primary.blue,
-    }
-
-});

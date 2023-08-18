@@ -140,7 +140,27 @@ export default function App() {
             <Feather name="calendar" size={28} />  
           </View>)}}
         />
-        <Tab.Screen name="Settings" component={Settings}
+        <Tab.Screen name="Settings" children={()=><Settings 
+        db={db} tasks={tasks} setTasks={setTasks} 
+        tracks={tracks} setTracks={setTracks} 
+        habits={habits} setHabits={setHabits} 
+        moods={moods} setMoods={setMoods} 
+        sleep={sleep} setSleep={setSleep} 
+        load={load} loadx={loadx} 
+        scalerecords={scalerecords} setScalerecords={setScalerecords}
+        diary={diary} setDiary={setDiary}
+        staterecords={staterecords} setStaterecords={setStaterecords}
+        states={states} setStates={setStates}
+        times={times} setTimes={setTimes}
+        timerecords={timerecords} setTimerecords={setTimerecords}
+        scales={scales} setScales={setScales}
+        weather={weather} setWeather={setWeather}
+        stickers={stickers} setStickers={setStickers}
+        stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
+        analytics={analytics} setAnalytics={setAnalytics}
+        statusrecords={statusrecords} setStatusrecords={setStatusrecords}
+        statuslist={statuslist} setStatuslist={setStatuslist}
+        />} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
