@@ -78,7 +78,6 @@ function MoodHabit (moods, habits, direction) {
 
     const sumwhenMoodthenTrueResults = whenMoodthenTrueResults.reduce((a, b) => (a + b), 0);
     const maxPwhenMoodthenTrueResults = ((Math.max(...whenMoodthenTrueResults)/sumwhenMoodthenTrueResults)).toFixed(2)*100;
-    const maxPwhenMoodthenTrueResultsmood = moodsmoods[whenMoodthenTrueResults.indexOf(Math.max(...whenMoodthenTrueResults))];
     const maxMoodNumber = Math.max(...whenMoodthenTrueResults);
     const maxMoodIndex = maxMoodNumber==undefined? 0: whenMoodthenTrueResults.indexOf(Math.max(...whenMoodthenTrueResults));
     const maxMoodName = moodsmoods[maxMoodIndex];

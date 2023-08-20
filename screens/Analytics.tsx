@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import HabitHabit from '../Analytics/HabitHabit';
 import StateHabit from '../Analytics/StateHabit';
 import MoodHabit from '../Analytics/MoodHabit';
+import ScaleHabit from '../Analytics/ScaleHabit';
 import uuid from 'react-native-uuid';
 
 const width = Dimensions.get('window').width;
@@ -79,13 +80,16 @@ function Analytics({db, habits, staterecords, scalerecords, stickerrecords, mood
       type1 == "habit" && type2 == "habit" ?
         {'result':HabitHabit(habits.filter(c=>c.name==ind1),habits.filter(c=>c.name==ind2)).result,
         'resultNumber': HabitHabit(habits.filter(c=>c.name==ind1),habits.filter(c=>c.name==ind2)).resultNumber} :
-      type1 == "state" && type2 == "habit" ?
-        {'result':StateHabit(habits.filter(c=>c.name==ind1),staterecords.filter(c=>c.name==ind2)).result,
-        'resultNumber': StateHabit(habits.filter(c=>c.name==ind1),staterecords.filter(c=>c.name==ind2)).resultNumber} :
+      (type1 == "state" && type2 == "habit")||(type2 == "state" && type1 == "habit")?
+        {'result':StateHabit(staterecords.filter(c=>c.name==(type1=='state'?ind1:ind2)),habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="state"?true:false).result,
+        'resultNumber': StateHabit(staterecords.filter(c=>c.name==(type1=='state'?ind1:ind2)),habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="state"?true:false).resultNumber} :
       (type1 == "mood" && type2 == "habit")||(type2 == "mood" && type1 == "habit")?
         {'result':MoodHabit(moods,habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="mood"?true:false).result,
         'resultNumber': MoodHabit(moods,habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="mood"?true:false).resultNumber} :
-      undefined
+      (type1 == "scale" && type2 == "habit")||(type2 == "scale" && type1 == "habit")?
+        {'result':ScaleHabit(scalerecords.filter(c=>c.name==(type1=='scale'?ind1:ind2)),habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="scale"?true:false).result,
+        'resultNumber': ScaleHabit(scalerecords.filter(c=>c.name==(type1=='scale'?ind1:ind2)),habits.filter(c=>c.name==(type1=='habit'?ind1:ind2)),type1=="scale"?true:false).resultNumber} :
+        undefined
     )
   }
 

@@ -151,13 +151,15 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
             <View  style={{width:'100%', height:100, alignItems:'flex-start', margin:10}}>
                 <MoodPie moods={moods} year={year} month={month} daysInMonth={daysInMonth} pieWidth={width/5}/>
             </View>
-            <FlatList
-                data={[...new Set(states.map(c=>c.name))]}
-                renderItem={({ item }) => (<PieChartView name={item} year={year} month={month} states={states} staterecords={staterecords} daysInMonth={daysInMonth} pieWidth={width/5}/>)}
-                keyExtractor={states.id}
-                contentContainerStyle={{height:100}}
-                horizontal
-            />
+            <View>
+                <FlatList
+                    data={[...new Set(states.map(c=>c.name))]}
+                    renderItem={({ item }) => (<PieChartView name={item} year={year} month={month} states={states} staterecords={staterecords} daysInMonth={daysInMonth} pieWidth={width/5}/>)}
+                    keyExtractor={states.id}
+                    contentContainerStyle={{height:100}}
+                    horizontal
+                />
+            </View>
             <View style={{flexDirection:'row', flex:1}}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <FlatList

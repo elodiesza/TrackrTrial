@@ -9,7 +9,8 @@ const width = Dimensions.get('window').width;
 
 const StatesStats = ({ moods, states, staterecords, year, month, daysInMonth }) => {
     const moodCounts = [{"item":"productive", "count":0},{"item":"happy", "count":0},{"item":"sick", "count":0},{"item":"stressed", "count":0},{"item":"angry", "count":0},{"item":"calm", "count":0},{"item":"bored", "count":0},{"item":"sad", "count":0}];
-    const [selected, setSelected] = useState('');
+
+
     if (moods.length!==0){
         for(var i=1; i<daysInMonth+1;i++){
         moods.filter(c=>c.day==i).length==0? undefined: moodCounts.filter(c=>c.item==moods.filter(c=>c.day==i).map(c=>c.mood)[0])[0].count++;
@@ -27,6 +28,8 @@ const StatesStats = ({ moods, states, staterecords, year, month, daysInMonth }) 
 
     const totalStatesNames = ["MOOD",...new Set(states.map(c=>c.name))];
     const moodColors = [colors.primary.green,colors.primary.yellowgreen,colors.primary.yellow,colors.primary.orange,colors.primary.red,colors.primary.pink,colors.primary.purple,colors.primary.lightblue];
+
+    const [selected, setSelected] = useState("MOOD");
 
     return (
         <View style={{flex:1}}>

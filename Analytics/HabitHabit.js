@@ -45,8 +45,8 @@ function HabitHabit (habits1,habits2) {
                 ? when2then1result === 100
                     ? "You also always do " + name2 + " when you do: " + name1 + "."
                     : "When you do " + name1 + " there is more chance you do " + name2 + " (" + when2then1result + "%)."
-                : "nothing"
-        : "nothing";
+                : 'no relevant result for '+ name1 + ' > '+ name2 + '.'
+        : 'no relevant result for '+ name1 + ' > '+ name2 + '.';
         return {'result':finalResult,'resultNumber':when2then1result};
     
     }
