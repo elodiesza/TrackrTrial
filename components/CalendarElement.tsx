@@ -198,6 +198,7 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
               data={daysLines}
               renderItem={({item}) => CalendarLine(item)}
               keyExtractor={item => item.id}
+              scrollEnabled={false}
             />
           </View>
           <MonthlyTasks db={db} load={load} loadx={loadx} tracks={tracks} setTracks={setTracks} year={year} month={month} tasks={tasks} setTasks={setTasks}/>

@@ -5,6 +5,7 @@ import moment from 'moment';
 import SleepColorPicker from './SleepColorPicker';
 import { container } from '../styles';
 import uuid from 'react-native-uuid';
+import CircularSlider from 'react-native-circular-slider';
 
 
 const width = Dimensions.get('window').width;
@@ -128,6 +129,18 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
                     style={{marginRight:8}}
                 />
                 <Pressable onPress={addWakeup} style={[container.button,{width:105}]}><Text>SAVE</Text></Pressable>
+                <CircularSlider
+                    startAngle={0}
+                    angleLength={70}
+                    segments={5}
+                    strokeWidth={40}
+                    radius={145}
+                    gradientColorFrom="#ff9800"
+                    gradientColorTo="#ffcf00"
+                    showClockFace
+                    clockFaceColor="#9d9d9d"
+                    bgCircleColor="#171717"
+                />
             </View>
         </View>
     </SafeAreaView>

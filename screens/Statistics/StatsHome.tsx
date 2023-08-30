@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { FlatList, ScrollView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { container } from '../../styles';
-import MoodPie from '../../components/BigPie';
+import BigPie from '../../components/BigPie';
 import PieChartView from '../../components/PieChartView';
 import {colors} from '../../styles';
 import { Ionicons } from '@expo/vector-icons';
@@ -122,6 +122,8 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
             </View>
         );
     };
+    const moodCounts = [{"item":"productive", "count":0},{"item":"happy", "count":0},{"item":"sick", "count":0},{"item":"stressed", "count":0},{"item":"angry", "count":0},{"item":"calm", "count":0},{"item":"bored", "count":0},{"item":"sad", "count":0}];
+
 
     //Sleep gauges
     const sleepwidth = sleep.filter(c=>(c.year==year&&c.month==month&&c.type!==null)).length;
@@ -149,7 +151,7 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
     return (
         <View style={[container.body,{marginHorizontal:10}]}>
             <View  style={{width:'100%', height:100, alignItems:'flex-start', margin:10}}>
-                <MoodPie moods={moods} year={year} month={month} daysInMonth={daysInMonth} pieWidth={width/5}/>
+                <BigPie data={moodCounts} name={"MOOD"} states={undefined} year={year} month={month} daysInMonth={daysInMonth} pieWidth={width/5}/>
             </View>
             <View>
                 <FlatList

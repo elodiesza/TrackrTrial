@@ -177,7 +177,7 @@ const useDatabase = () => {
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM stickers', null,
       (txObj, resultSet15) => setStickers(resultSet15.rows._array),
-      (txObj, error) => console.log('error selecting weather')
+      (txObj, error) => console.log('error selecting stickers')
       );
     });
     db.transaction(tx => {
@@ -186,7 +186,7 @@ const useDatabase = () => {
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM stickerrecords ORDER BY day;', null,
       (txObj, resultSet16) => setStickerrecords(resultSet16.rows._array),
-      (txObj, error) => console.log('error selecting weather')
+      (txObj, error) => console.log('error selecting sticker records')
       );
     });
 

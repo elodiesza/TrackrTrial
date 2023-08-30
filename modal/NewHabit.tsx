@@ -26,7 +26,7 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
 
   const addState = async (data) => {
     let existinghabits = [...habits]; 
-    var newPlace = existinghabits.filter(c => c.day === 1).map(c => c.name).length;
+    var newPlace = existinghabits.filter(c =>(c.year==year&&c.month==month&&c.day==1)).map(c => c.name).length;
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems:'center', 
     justifyContent: 'center', 
     height: 30,
-    borderColor:  colors.blue, 
+    borderColor:  colors.primary.blue, 
     borderRadius: 10,
   },
   typeContainer: {

@@ -7,8 +7,8 @@ import Help from './Settings/Help';
 import Customization from './Settings/Customization';
 import Data from './Settings/Data';
 import SettingsHome from './Settings/SettingsHome';
-import DeleteDB
- from './Settings/DeleteDB';
+import DeleteDB from './Settings/DeleteDB';
+import AddDB from './Settings/AddDB';
 const Stack = createNativeStackNavigator();
 
 const SettingsNavigator =({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
@@ -23,6 +23,8 @@ const SettingsNavigator =({db, tasks, setTasks, tracks, setTracks, habits, setHa
       <Stack.Screen name="Customization" component={Customization} options={{ headerShown: false }} />
       <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
       <Stack.Screen name="DeleteDB" component={()=>DeleteDB({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
+    statuslist, setStatuslist, statusrecords, setStatusrecords})} options={{ headerShown: false }} />
+      <Stack.Screen name="AddDB" component={()=>AddDB({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
     statuslist, setStatuslist, statusrecords, setStatusrecords})} options={{ headerShown: false }} />
     </Stack.Navigator>
   );

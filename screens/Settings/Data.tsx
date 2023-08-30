@@ -9,6 +9,7 @@ const Data = () => {
     const navigation = useNavigation();
     const onReturnPressed =()=> {navigation.dispatch(CommonActions.goBack())};
     const onDeleteDBPressed =()=> {navigation.navigate('DeleteDB')};
+    //const onAddDBPressed =()=> {navigation.navigate('AddDB')};
 
     return (
 
@@ -24,6 +25,13 @@ const Data = () => {
                     <Text style={{marginLeft:10}}>Delete databases</Text>
                     <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
                 </Pressable>
+                {/*
+                <Pressable onPress={onAddDBPressed} style={container.setting}>
+                    <Ionicons name="add-circle-outline" size={25}/>
+                    <Text style={{marginLeft:10}}>Add a personal databases</Text>
+                    <MaterialIcons name="keyboard-arrow-right" size={25} style={container.settingsArrow}/>
+                </Pressable>
+                */}
             </View>
         </SafeAreaView>
 
