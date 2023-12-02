@@ -6,7 +6,7 @@ import { useForm, Controller, set } from 'react-hook-form';
 
 
 
-const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, load, loadx, setTimeModalVisible}) => {
+const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, setTimeModalVisible}) => {
     const {control, handleSubmit, reset} = useForm();
 
     function hexToRgb(hex) {
@@ -64,7 +64,6 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
             );
         });
         setTimeModalVisible==undefined? undefined: setTimeModalVisible(false);
-        loadx(!load);
     };
 
   return (

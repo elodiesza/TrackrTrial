@@ -6,20 +6,17 @@ import Calendar from './screens/Calendar';
 import Settings from './screens/Settings';
 import Today from './screens/Today';
 import Analytics from './screens/Analytics';
-import Tracks from './screens/Tracks';
 import Feather from '@expo/vector-icons/Feather';
-import { SimpleLineIcons } from '@expo/vector-icons';
 import useDatabase from './db'; // Import the useDatabase function
+import Trackers from './screens/Trackers';
+import { colors } from './styles';
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
 
   const {
-    isLoading,
     habits,
-    tracks,
-    tasks,
     moods,
     sleep,
     states,
@@ -31,18 +28,10 @@ export default function App() {
     diary,
     load,
     db,
-    sections,
-    progress,
     weather,
-    stickers,
-    stickerrecords,
     analytics,
-    statuslist,
-    statusrecords,
     loadx,
-    setTracks,
     setHabits,
-    setTasks,
     setMoods,
     setSleep,
     setStates,
@@ -52,97 +41,89 @@ export default function App() {
     setTimes,
     setTimerecords,
     setDiary,
-    setDb,
-    setIsLoading,
-    setSections,
-    setProgress,
     setWeather,
-    setStickers,
-    setStickerrecords,
     setAnalytics,
-    setStatuslist,
-    setStatusrecords,
   } = useDatabase();
 
 
   return (
     <NavigationContainer>
-      <Tab.Navigator initialRouteName="Today">
+      <Tab.Navigator initialRouteName="Today"
+      screenOptions={{
+        tabBarStyle: { shadowColor:colors.primary.black,shadowOffset:{height:2,width:2},shadowRadius:5,shadowOpacity:0.2, borderWidth:0.5,borderColor:colors.primary.gray},
+      }}>
         <Tab.Screen name="Analytics" children={()=><Analytics db={db}
-        habits={habits} staterecords={staterecords} scalerecords={scalerecords} stickerrecords={stickerrecords}
+        habits={habits} staterecords={staterecords} scalerecords={scalerecords}
         moods={moods} sleep={sleep} analytics={analytics} setAnalytics={setAnalytics}/>}
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
-              <Feather name="activity" size={28} />  
+              <Feather name="activity" size={28} color={focused?colors.primary.black:colors.primary.defaultdark}/>  
             </View>)}}
         />
-        <Tab.Screen name="Tracks" children={()=><Tracks 
-        tracks={tracks} setTracks={setTracks} db={db}
-        sections={sections} setSections={setSections}
-        tasks={tasks} setTasks={setTasks}
-        progress={progress} setProgress={setProgress}
-        statuslist={statuslist} setStatuslist={setStatuslist}
-        statusrecords={statusrecords} setStatusrecords={setStatusrecords}/>} 
-        options={{ headerShown: false, tabBarShowLabel: false,
-          tabBarIcon: ({focused}) => (
-          <View style={{alignItems: 'center', justifyContent: 'center'}}>
-            <SimpleLineIcons name="notebook" size={28} />  
-          </View>)}}
+        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits}
+          setHabits={setHabits}
+          load={load} loadx={loadx} 
+          moods={moods} setMoods={setMoods} 
+          sleep={sleep} setSleep={setSleep} 
+          states={states} setStates={setStates} 
+          staterecords={staterecords} setStaterecords={setStaterecords}
+          scales={scales} setScales={setScales} 
+          scalerecords={scalerecords} setScalerecords={setScalerecords}
+          diary={diary} setDiary={setDiary}
+          weather={weather} setWeather={setWeather}
+          times={times} setTimes={setTimes}
+          timerecords={timerecords} setTimerecords={setTimerecords}
+          />} 
+          options={{ headerShown: false, tabBarShowLabel: false,
+            tabBarIcon: ({focused}) => (
+            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+              <Feather name="calendar" size={28} color={focused?colors.primary.black:colors.primary.defaultdark}/>  
+            </View>)}}
         />
         <Tab.Screen name="Today" children={()=><Today db={db} 
-        tasks={tasks} setTasks={setTasks} 
-        tracks={tracks} setTracks={setTracks} 
-        habits={habits} setHabits={setHabits} 
-        moods={moods} setMoods={setMoods} 
-        sleep={sleep} setSleep={setSleep} 
-        load={load} loadx={loadx}
-        scales={scales} setScales={setScales} 
-        scalerecords={scalerecords} setScalerecords={setScalerecords}
-        diary={diary} setDiary={setDiary}
-        staterecords={staterecords} setStaterecords={setStaterecords}
-        states={states} setStates={setStates}
-        sections={sections}
-        times={times} setTimes={setTimes}
-        timerecords={timerecords} setTimerecords={setTimerecords}
-        weather={weather} setWeather={setWeather}
-        stickers={stickers} setStickers={setStickers}
-        stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
-        analytics={analytics} setAnalytics={setAnalytics}
-        statuslist={statuslist} setStatuslist={setStatuslist}
-        statusrecords={statusrecords} setStatusrecords={setStatusrecords}
-        />} 
-        options={{ headerShown: false, tabBarShowLabel: false, 
-          tabBarIcon: ({focused}) => (
-          <View style={{alignItems: 'center', justifyContent: 'center'}}>
-             <Feather name="sun" size={28} />  
-          </View>) }}
+          habits={habits} setHabits={setHabits} 
+          moods={moods} setMoods={setMoods} 
+          sleep={sleep} setSleep={setSleep} 
+          load={load} loadx={loadx}
+          scales={scales} setScales={setScales} 
+          scalerecords={scalerecords} setScalerecords={setScalerecords}
+          diary={diary} setDiary={setDiary}
+          staterecords={staterecords} setStaterecords={setStaterecords}
+          states={states} setStates={setStates}
+          times={times} setTimes={setTimes}
+          timerecords={timerecords} setTimerecords={setTimerecords}
+          weather={weather} setWeather={setWeather}
+          analytics={analytics} setAnalytics={setAnalytics}
+          />} 
+          options={{ headerShown: false, tabBarShowLabel: false, 
+            tabBarIcon: ({focused}) => (
+            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+              <Feather name="sun" size={28} color={focused?colors.primary.black:colors.primary.defaultdark} />  
+            </View>) }}
         />
-        <Tab.Screen name="Calendar" children={()=><Calendar db={db} habits={habits} tracks={tracks} 
-        tasks={tasks} setTasks={setTasks} 
-        setHabits={setHabits} setTracks={setTracks} 
-        load={load} loadx={loadx} 
-        moods={moods} setMoods={setMoods} 
-        sleep={sleep} setSleep={setSleep} 
-        states={states} setStates={setStates} 
-        staterecords={staterecords} setStaterecords={setStaterecords}
-        scales={scales} setScales={setScales} 
-        scalerecords={scalerecords} setScalerecords={setScalerecords}
-        diary={diary} setDiary={setDiary}
-        weather={weather} setWeather={setWeather}
-        stickers={stickers} stickerrecords={stickerrecords}
-        times={times} setTimes={setTimes}
-        timerecords={timerecords} setTimerecords={setTimerecords}
-        />} 
-        options={{ headerShown: false, tabBarShowLabel: false,
-          tabBarIcon: ({focused}) => (
-          <View style={{alignItems: 'center', justifyContent: 'center'}}>
-            <Feather name="calendar" size={28} />  
-          </View>)}}
+        <Tab.Screen name="Trackers" children={()=><Trackers db={db} habits={habits}
+          setHabits={setHabits}
+          load={load} loadx={loadx} 
+          moods={moods} setMoods={setMoods} 
+          sleep={sleep} setSleep={setSleep} 
+          states={states} setStates={setStates} 
+          staterecords={staterecords} setStaterecords={setStaterecords}
+          scales={scales} setScales={setScales} 
+          scalerecords={scalerecords} setScalerecords={setScalerecords}
+          diary={diary} setDiary={setDiary}
+          weather={weather} setWeather={setWeather}
+          times={times} setTimes={setTimes}
+          timerecords={timerecords} setTimerecords={setTimerecords}
+          />} 
+          options={{ headerShown: false, tabBarShowLabel: false,
+            tabBarIcon: ({focused}) => (
+            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+              <Feather name="check" size={28} color={focused?colors.primary.black:colors.primary.defaultdark} />  
+            </View>)}}
         />
         <Tab.Screen name="Settings" children={()=><Settings 
-        db={db} tasks={tasks} setTasks={setTasks} 
-        tracks={tracks} setTracks={setTracks} 
+        db={db} 
         habits={habits} setHabits={setHabits} 
         moods={moods} setMoods={setMoods} 
         sleep={sleep} setSleep={setSleep} 
@@ -155,16 +136,12 @@ export default function App() {
         timerecords={timerecords} setTimerecords={setTimerecords}
         scales={scales} setScales={setScales}
         weather={weather} setWeather={setWeather}
-        stickers={stickers} setStickers={setStickers}
-        stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
         analytics={analytics} setAnalytics={setAnalytics}
-        statusrecords={statusrecords} setStatusrecords={setStatusrecords}
-        statuslist={statuslist} setStatuslist={setStatuslist}
         />} 
           options={{ headerShown: false, tabBarShowLabel: false,
             tabBarIcon: ({focused}) => (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
-              <Feather name="settings" size={28} />  
+              <Feather name="settings" size={28} color={focused?colors.primary.black:colors.primary.defaultdark} />  
             </View>)}}
         />
       </Tab.Navigator>

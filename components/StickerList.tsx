@@ -3,23 +3,26 @@ import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text,
 import { Ionicons } from '@expo/vector-icons';
 import {colors,container} from '../styles.js';
 import uuid from 'react-native-uuid';
+import UpdateHabit from '../modal/UpdateHabit';
 
 const width = Dimensions.get('window').width;
 
-const StickerList = ({ db, stickers, setStickers, stickerrecords, setStickerrecords, year, month, day}) => {
+const StickerList = ({ db, habits, setHabits, year, month, day, load, loadx}) => {
 
+  const [changeModalVisible, setChangeModalVisible] = useState(false);
+  const [selectedHabit, setSelectedHabit] = useState(null);
 
   const updateSticker = (name) => {
-    const existingrecords = [...stickerrecords];
-    let currentState=stickerrecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.state)[0];
-    if (stickerrecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).length==0){
+    const existingrecords = [...habits];
+    let currentState=habits.filter(c=>(c.productive==false && c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.state)[0];
+    if (habits.filter(c=>(c.productive==false && c.year==year&&c.month==month&&c.day==day&&c.name==name)).length==0){
       db.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO stickerrecords (id, name, year, month, day, state) VALUES (?, ?, ?, ?, ?, ?)',
+          'INSERT INTO habits (id, name, year, month, day, state) VALUES (?, ?, ?, ?, ?, ?)',
           [ uuid.v4(), name, year, month, day, true],
           (txtObj, stateResultSet) => {
             existingrecords.push({id:uuid.v4(), name:name, year:year, month:month, day:day, state:true});
-            setStickerrecords(existingrecords);
+            setHabits(existingrecords);
           }
         );
       });
@@ -28,10 +31,10 @@ const StickerList = ({ db, stickers, setStickers, stickerrecords, setStickerreco
       let stickerId = existingrecords.filter(c=>(c.name==name && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0];
       let stickerIndex = existingrecords.findIndex(c => c.id === stickerId);
       db.transaction(tx=> {
-          tx.executeSql('UPDATE stickerrecords SET state = ? WHERE id= ?', [!currentState, stickerId],
+          tx.executeSql('UPDATE habits SET state = ? WHERE id= ?', [!currentState, stickerId],
               (txObj, resultSet) => {
                 existingrecords[stickerIndex].state = !currentState;
-                setStickerrecords(existingrecords);
+                setHabits(existingrecords);
                 currentState = !currentState;
               },
               (txObj, error) => console.log('Error updating data', error)
@@ -42,19 +45,34 @@ const StickerList = ({ db, stickers, setStickers, stickerrecords, setStickerreco
   };
 
   return (
-    <View style={[container.body,{height:30,width:'100%',flexDirection:'row'}]}>
+    <View style={[container.body,{height:30,width:'100%',alignItems:'flex-start'}]}>
       <FlatList
-        data={stickers}
+        data={habits.filter(c=>(c.productive==false && c.year==year&&c.month==month&&c.day==day))}
         renderItem={({item}) =>(
-          <TouchableOpacity onPress={()=>updateSticker(item.name)} style={{marginHorizontal:5}}>
+          <TouchableOpacity onPress={()=>updateSticker(item.name)} onLongPress={()=>{setSelectedHabit(item.name);setChangeModalVisible(true);}} style={{marginHorizontal:5}}>
             <View style={{position:'absolute'}}>
-              <Ionicons name={item.icon} size={30} color={stickerrecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==item.name)).map(c=>c.state)[0]==true?item.color:'transparent'}/>
+              <Ionicons name={item.icon} size={30} color={item.state==true?item.color:'transparent'}/>
             </View>
-            <Ionicons name={item.icon+'-outline'} size={30} color={stickerrecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==item.name)).map(c=>c.state)[0]==true?colors.primary.black:colors.primary.blue}/>
+            <Ionicons name={item.icon+'-outline'} size={30} color={item.state==true?colors.primary.black:colors.primary.blue}/>
           </TouchableOpacity> 
         )}
         keyExtractor={(_, index) => index.toString()}
         horizontal={true}
+        scrollEnabled={true}
+        showsHorizontalScrollIndicator={true}
+      />
+      <UpdateHabit
+            changeModalVisible={changeModalVisible}
+            setChangeModalVisible={setChangeModalVisible}
+            db={db}
+            data={habits.filter(c=>(c.name==selectedHabit))[0]}
+            type={'habit'}
+            update={habits}
+            setUpdate={setHabits}
+            update2={undefined}
+            setUpdate2={undefined}
+            load={load}
+            loadx={loadx}
       />
     </View>
   );

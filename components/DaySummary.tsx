@@ -4,7 +4,7 @@ import moment from 'moment';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { MoodIcons } from '../constants/MoodIcons';
 
-const DaySummary = ({modalVisible, setModalVisible, year, month, day, habits, states, staterecords, scales, scalerecords, sleep, stickers, stickerrecords, moods, diary, weather, daysinmonth }) => {
+const DaySummary = ({modalVisible, setModalVisible, year, month, day, habits, states, staterecords, scales, scalerecords, sleep, moods, diary, weather, daysinmonth }) => {
 
     const thisdayWeather = weather.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.weather)[0];
     const moodIcon = MoodIcons.filter(c=>c.name==moods.filter(c=>(c.year==year&&c.month==month&&c.day==day)).map(c=>c.mood)[0]).map(c=>c.icon)[0];
@@ -37,10 +37,10 @@ const DaySummary = ({modalVisible, setModalVisible, year, month, day, habits, st
                 <View style={{width:'100%',flexDirection:'row',justifyContent:'space-between', alignItems:'center'}}>
                     <View style={[container.body,{height:30,width:'100%',flexDirection:'row'}]}>
                         <FlatList
-                            data={stickerrecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.state==true))}
+                            data={habits.filter(c=>(c.productive==false && c.year==year&&c.month==month&&c.day==day&&c.state==true))}
                             renderItem={({item}) =>{
-                                const itemColor=stickers.filter(c=>(c.name==item.name)).map(c=>c.color)[0];
-                                const itemIcon=stickers.filter(c=>(c.name==item.name)).map(c=>c.icon)[0];
+                                const itemColor=habits.filter(c=>(c.productive==false && c.name==item.name)).map(c=>c.color)[0];
+                                const itemIcon=habits.filter(c=>(c.productive==false && c.name==item.name)).map(c=>c.icon)[0];
                                 return(
                                     <TouchableOpacity style={{marginHorizontal:2}}>
                                         <View style={{position:'absolute'}}>

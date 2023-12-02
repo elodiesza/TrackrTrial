@@ -3,11 +3,17 @@ import { Platform, Button, Modal, Alert, TouchableWithoutFeedback,TouchableOpaci
 import { useForm, Controller } from 'react-hook-form';
 import { container,colors } from '../styles';
 import uuid from 'react-native-uuid';
+import NewSticker from './NewSticker';
+import Color from '../components/Color';
+import ColorPicker from '../components/ColorPicker';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
-
-function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits}) {
-
-
+function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddModalVisible, db, habits, setHabits, load, loadx}) {
+  
+  const [colorPickerVisible, setColorPickerVisible] = useState(false);
+  const [pickedIcon, setPickedIcon] = useState('');
+  const [picked, setPicked] = useState(colors.primary.white);
+  const [productive, setProductive] = useState(true); 
   const {control, handleSubmit, reset} = useForm();
 
   const [type, setType] = useState(0);
@@ -16,22 +22,20 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
   var year = today.getFullYear();
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
-
   useEffect(() => {
     if (!newHabitVisible) {
       reset();
     }
   }, [newHabitVisible, reset]);
 
-
-  const addState = async (data) => {
+  const addHabit = async (data) => {
     let existinghabits = [...habits]; 
     var newPlace = existinghabits.filter(c =>(c.year==year&&c.month==month&&c.day==1)).map(c => c.name).length;
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO habits (id,name, year, month, day, state, type, track, place) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
-              [ uuid.v4(),data.name, year, month, i, 0, type, 0, newPlace],
+              'INSERT INTO habits (id,name, year, month, day, state, type, productive, icon, color, place) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+              [ uuid.v4(),data.name, year, month, i, false, type, productive,pickedIcon, picked, newPlace],
               (txtObj,) => {
                 const newState = {
                   id: uuid.v4(),
@@ -39,9 +43,11 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
                   year: year,
                   month: month,
                   day: i,
-                  state: 0,
+                  state: false,
                   type: type,
-                  track: 0,
+                  productive: productive,
+                  icon: pickedIcon,
+                  color: picked,
                   place: newPlace,
                 };
                 existinghabits.push(newState);
@@ -51,11 +57,11 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
             );
         });
       }
+
     setNewHabitVisible(false);
     setAddModalVisible(false);
-    loadx(!load);
-  };
 
+  };
 
   return (
     <Modal
@@ -64,63 +70,88 @@ function NewHabit({newHabitVisible, setNewHabitVisible, addModalVisible, setAddM
       visible={newHabitVisible}
       onRequestClose={() => {
         setNewHabitVisible(!newHabitVisible);
-        loadx(!load);
+        setAddModalVisible(!addModalVisible);
       }}
     > 
-      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible),setNewHabitVisible(!newHabitVisible)}} activeOpacity={1}>
+      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible);setNewHabitVisible(!newHabitVisible)}} activeOpacity={1}>
         <TouchableWithoutFeedback>
-          <View style={container.modal}>
-              <Text style={{marginBottom:10}}>Create a new Habit</Text>
-              <Controller
-              control= {control}
-              name="name"
-              render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-                <>
-                  <TextInput
-                    value={value}
-                    onChangeText={onChange}
-                    autoCapitalize = {"characters"}
-                    onBlur={onBlur}
-                    placeholder="NAME"
-                    style={[container.textinput,{borderColor: error ? 'red' : '#e8e8e8'}]}
-                  />
-                  {error && (
-                    <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
-                  )}
-                </>
-              )}
-              rules={{
-                required: 'Input a Habit',
-                minLength: {
-                  value: 3,
-                  message: 'Task should be at least 3 characters long',
-                },
-                maxLength: {
-                  value: 14,
-                  message: 'Task should be max 14 characters long',
-                },
-                validate: (name) => {
-                  if (name.includes('  ')) {
-                    return 'Name should not contain consecutive spaces';
+          <>
+          <View style={container.backmodal}/>
+          <View style={container.frontmodal}>
+            <View style={{width:"100%",flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginBottom:10}}>
+                    <Pressable onPress={() => setNewStateVisible(!newStateVisible)}>
+                        <MaterialIcons name="keyboard-arrow-left" size={25} color={colors.primary.blue}/>
+                    </Pressable>
+                    <Text style={{left:20}}>NEW HABIT</Text>
+                </View>
+              <View style={{flexDirection:'row', width:"100%", alignItems:'center'}}>
+                <Pressable onPress={()=>setColorPickerVisible(true)} style={{ width:'15%', marginRight: 5, marginLeft:-5}}>
+                  <Color color={picked} />
+                </Pressable>
+                <ColorPicker
+                  colorPickerVisible={colorPickerVisible}
+                  setColorPickerVisible={setColorPickerVisible}
+                  picked={picked}
+                  setPicked={setPicked}
+                />
+                <Controller
+                control= {control}
+                name="name"
+                render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
+                  <>
+                    <TextInput
+                      value={value}
+                      onChangeText={onChange}
+                      autoCapitalize = {"characters"}
+                      onBlur={onBlur}
+                      placeholder="NAME"
+                      style={[container.textinput,{borderColor: error ? 'red' : '#e8e8e8', width:'85%'}]}
+                    />
+                    {error && (
+                      <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
+                    )}
+                  </>
+                )}
+                rules={{
+                  required: 'Input a Habit',
+                  minLength: {
+                    value: 3,
+                    message: 'Task should be at least 3 characters long',
+                  },
+                  maxLength: {
+                    value: 14,
+                    message: 'Task should be max 14 characters long',
+                  },
+                  validate: (name) => {
+                    if (name.includes('  ')) {
+                      return 'Name should not contain consecutive spaces';
+                    }
+                    return true;
                   }
-                  return true;
-                }
-              }}
-              />
-              <View style={styles.typeContainer}>
-                <Pressable onPress={type => setType(2)} style={[styles.type,{borderWidth: type===2 ? 1 : 0, backgroundColor: type===2 ? '#FFD1D1' : 'transparent'}]}>
-                    <Text>Bad</Text>
-                </Pressable>
-                <Pressable onPress={type => setType(0)} style={[styles.type,{borderWidth: type===0 ? 1 : 0, backgroundColor: type===0 ? '#F4F9FA' : 'transparent'}]}>
-                    <Text>Neutral</Text>
-                </Pressable>
-                <Pressable onPress={type => setType(1)} style={[styles.type,{borderWidth: type===1 ? 1 : 0, backgroundColor: type===1 ? 'palegreen' : 'transparent'}]}>
-                    <Text>Good</Text>
-                </Pressable>
+                }}
+                />
               </View>
-              <Pressable onPress={handleSubmit(addState)} style={container.button}><Text>CREATE</Text></Pressable>
-            <Text style={{color: 'gray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
+              <View style={{width:'100%', flexDirection:'row', alignItems:'center'}}>
+                <Pressable onPress={()=>setProductive(!productive)} style={{width:'15%', justifyContent:'center'}}>
+                  <Ionicons name="flame" color={colors.primary.defaultdark} size={30} style={{position:'absolute', display: productive?'flex':'none'}}/>
+                  <Ionicons name="flame-outline" color={colors.primary.blue} size={30}/>
+                </Pressable>
+                <View style={styles.typeContainer}>
+                  <Pressable onPress={type => setType(2)} style={[styles.type,{borderWidth: type===2 ? 1 : 0, backgroundColor: type===2 ? '#FFD1D1' : 'transparent'}]}>
+                      <Text>Bad</Text>
+                  </Pressable>
+                  <Pressable onPress={type => setType(0)} style={[styles.type,{borderWidth: type===0 ? 1 : 0, backgroundColor: type===0 ? '#F4F9FA' : 'transparent'}]}>
+                      <Text>Neutral</Text>
+                  </Pressable>
+                  <Pressable onPress={type => setType(1)} style={[styles.type,{borderWidth: type===1 ? 1 : 0, backgroundColor: type===1 ? 'palegreen' : 'transparent'}]}>
+                      <Text>Good</Text>
+                  </Pressable>
+                </View>
+              </View>
+              <NewSticker db={db} pickedIcon={pickedIcon} setPickedIcon={setPickedIcon} picked={picked}/>
+              <Pressable onPress={handleSubmit(addHabit)} style={container.button}><Text>CREATE</Text></Pressable>
           </View> 
+          </>
         </TouchableWithoutFeedback>
       </TouchableOpacity>
     </Modal>
@@ -155,7 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   typeContainer: {
-    width: '100%',
+    width: '85%',
     flexDirection:'row',
     borderWidth: 1,
     borderColor: 'gray',

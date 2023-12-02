@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+{/*import { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
 
@@ -117,4 +117,20 @@ const db = SQLite.openDatabase('example.db');
 
 */}
 
-  
+const XLSX = require('xlsx'); // Make sure you have the 'xlsx' library installed
+
+const readExcelFile = async () => {
+  try {
+    const workbook = XLSX.readFile('../../assets/data/Book1.xlsx');
+    const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
+    const worksheet = workbook.Sheets[sheetName];
+    const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    return excelData;
+  } catch (error) {
+    console.error('Error reading Excel file:', error);
+    return [];
+  }
+};
+
+module.exports = readExcelFile;

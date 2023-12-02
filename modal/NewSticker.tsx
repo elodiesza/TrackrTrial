@@ -3,72 +3,29 @@ import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, Styl
 import { useForm, Controller, set } from 'react-hook-form';
 import { container,colors } from '../styles';
 import { Ionicons } from '@expo/vector-icons';
-import Color from '../components/Color';
-import ColorPicker from '../components/ColorPicker';
 import uuid from 'react-native-uuid';
 import { StickerIcons } from '../constants/StickerIcons';
 
 
-function NewSticker({db, stickers, setStickers, newStickerVisible, setNewStickerVisible}) {
+function NewSticker({db, picked, pickedIcon, setPickedIcon}) {
 
-  const {control, handleSubmit, reset} = useForm();
-  const [colorPickerVisible, setColorPickerVisible] = useState(false);
-  const [picked, setPicked] = useState(colors.primary.white);
-  const [pickedIcon, setPickedIcon] = useState('');
 
-  const data = [Object.values(StickerIcons.outline).slice(0,8),
-                Object.values(StickerIcons.outline).slice(8,16),
-                Object.values(StickerIcons.outline).slice(16,24),
-                Object.values(StickerIcons.outline).slice(24,32),
-                Object.values(StickerIcons.outline).slice(32,40)
+
+  const data = [Object.values(StickerIcons.outline).slice(0,7),
+                Object.values(StickerIcons.outline).slice(7,14),
+                Object.values(StickerIcons.outline).slice(14,21),
+                Object.values(StickerIcons.outline).slice(21,28),
+                Object.values(StickerIcons.outline).slice(28,35)
               ]
-  const dataFill = [Object.values(StickerIcons.fill).slice(0,8),
-                Object.values(StickerIcons.fill).slice(8,16),
-                Object.values(StickerIcons.fill).slice(16,24),
-                Object.values(StickerIcons.fill).slice(24,32),
-                Object.values(StickerIcons.fill).slice(32,40)
+  const dataFill = [Object.values(StickerIcons.fill).slice(0,7),
+                Object.values(StickerIcons.fill).slice(7,14),
+                Object.values(StickerIcons.fill).slice(14,21),
+                Object.values(StickerIcons.fill).slice(21,28),
+                Object.values(StickerIcons.fill).slice(28,35)
               ]
-
-  const addSticker = async (data) => {
-    let existingstickers = [...stickers]; 
-      if(pickedIcon !== ''){
-        db.transaction((tx) => {
-            tx.executeSql(
-              'INSERT INTO stickers (id, name, icon, color) VALUES (?, ?, ?, ?)',
-              [ uuid.v4(),data.name, pickedIcon, picked],
-              (txtObj, stateResultSet) => {
-                const newSticker = {
-                  id: uuid.v4(),
-                  name: data.name,
-                  icon: pickedIcon,
-                  color: picked,
-                };
-                existingstickers.push(newSticker);
-                setStickers(existingstickers); 
-              }
-            );
-        });
-        setNewStickerVisible(false);
-      }
-      else {
-        console.warn('Please pick an icon')
-      }
-  };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={newStickerVisible}
-      onRequestClose={() => {
-        setNewStickerVisible(!newStickerVisible);
-        setPickedIcon('');
-        setPicked(colors.primary.white);
-      }}
-    > 
-      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setNewStickerVisible(!newStickerVisible);setPickedIcon('');setPicked(colors.primary.white);}} activeOpacity={1}>
-        <TouchableWithoutFeedback>
-          <View style={container.modal}>
+          <View style={{height:150, width:"100%", backgroundColor:colors.primary.default, borderRadius:10, padding:10, alignItems:'center', marginVertical:5}}>
             <FlatList 
               data={data}
               renderItem={({item,index}) =>{
@@ -92,36 +49,7 @@ function NewSticker({db, stickers, setStickers, newStickerVisible, setNewSticker
               keyExtractor={(c) => c!==undefined ? c.toString():''}
               scrollEnabled={false}
             />
-            <View style={{marginHorizontal:20,marginTop:10,flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-            <Pressable onPress={()=>setColorPickerVisible(true)} style={{ marginRight:5 }}>
-              <Color color={picked} />
-            </Pressable>
-            <ColorPicker
-              colorPickerVisible={colorPickerVisible}
-              setColorPickerVisible={setColorPickerVisible}
-              picked={picked}
-              setPicked={setPicked}
-            />
-            <Controller
-              control={control}
-              name="name"
-              render={({field: {onChange, onBlur, value}}) => (
-                <TextInput
-                  style={container.textinput}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                  placeholder="name"
-                />
-              )}
-              rules={{required: true}}
-            />
-            </View>
-            <Pressable onPress={handleSubmit(addSticker)} style={container.button}><Text>CREATE</Text></Pressable>
           </View> 
-        </TouchableWithoutFeedback>
-      </TouchableOpacity>
-    </Modal>
   );
 };
 

@@ -1,12 +1,12 @@
 import { Pressable, Text, View, Dimensions, SafeAreaView } from 'react-native';
 import { useState, useEffect } from 'react';
 import moment from 'moment';
-import CalendarElement from '../components/CalendarElement';
-import { container, colors } from '../styles';
+import TrackersElement from '../components/TrackersElement';
+import { container } from '../styles';
 import { Feather } from '@expo/vector-icons';
 
 
-const Calendar = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather, stickers, stickerrecords, times, setTimes, timerecords, setTimerecords}) => {
+const Trackers = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather, stickers, stickerrecords, times, setTimes, timerecords, setTimerecords}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   var today = new Date();
@@ -17,9 +17,8 @@ const Calendar = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, s
   const [year,setYear] = useState(thisYear);
   const [day, setDay] = useState(thisDay);
   const [firstMonth, setFirstMonth] = useState(false);
-  const [lastMonth, setLastMonth] = useState(today.getFullYear()==year && today.getMonth()==month);
+  const [lastMonth, setLastMonth] = useState(false);
   const [displayMonth, setDisplayMonth] = useState(true);
-
 
   useEffect(() => {
     if (habits.filter(c=>(c.year==year && c.month==month-1))==undefined) {
@@ -28,13 +27,13 @@ const Calendar = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, s
     else{
       setFirstMonth(false);
     }
-    if (today.getFullYear()==year && today.getMonth()==month) {
+    if (habits.filter(c=>(c.year==year && c.month==month+1))==undefined) {
       setLastMonth(true);
     }
     else{
       setLastMonth(false);
     }
-  },[month])
+  },[])
 
   const LastMonth = () => {
     if (month==0){
@@ -47,6 +46,7 @@ const Calendar = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, s
     if (habits.filter(c=>(c.year==year && c.month==month-2))==""){
       setFirstMonth(true);
     }
+    setLastMonth(false);
   };
 
   const NextMonth = () => {
@@ -57,9 +57,10 @@ const Calendar = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, s
     else {
       setMonth(month+1);
     }
-    if (today.getFullYear()==year && today.getMonth()==month){
+    if (habits.filter(c=>(c.year==year && c.month==month+1))==""){
       setLastMonth(true);
     }
+    setFirstMonth(false);
   };
 
 
@@ -82,11 +83,11 @@ const Calendar = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, s
           <Text style={{fontSize:10, textAlign:'center'}}>{displayMonth==true?moment(new Date(year,1,1)).format('YYYY'):moment(new Date(0,month,1)).format('MMMM')}</Text>
           <Text style={{fontSize:22, textAlign:'center'}}>{displayMonth==true?moment(new Date(0,month,1)).format('MMMM'):moment(new Date(year,1,1)).format('YYYY')}</Text>
         </Pressable>
-        <Pressable onPress={!lastMonth? displayMonth==true? ()=>NextMonth(habits): ()=>setYear(year+1) : undefined}>
-          <Feather name='chevron-right' size={40} style={{left:30}} color={lastMonth?colors.primary.gray:colors.primary.black}/>
+        <Pressable onPress={displayMonth==true? ()=>NextMonth(habits): ()=>setYear(year+1)}>
+          <Feather name='chevron-right' size={40} style={{left:30}} color={'black'}/>
         </Pressable>
       </View>
-      <CalendarElement year={year} month={month} day={day} 
+      <TrackersElement year={year} month={month} 
       load={load} loadx={loadx} db={db}
       habits={habits} setHabits={setHabits} 
       moods={moods} setMoods={setMoods} 
@@ -95,14 +96,13 @@ const Calendar = ({db, habits, setHabits, load, loadx, moods, setMoods, sleep, s
       staterecords={staterecords} setStaterecords={setStaterecords}
       scales={scales} setScales={setScales} 
       scalerecords={scalerecords} setScalerecords={setScalerecords}
-      diary={diary} setDiary={setDiary}
       weather={weather} setWeather={setWeather}
-      stickers={stickers} stickerrecords={stickerrecords}
       times={times} setTimes={setTimes}
       timerecords={timerecords} setTimerecords={setTimerecords}
+      load={load} loadx={loadx}
       />
     </SafeAreaView>
   );
 };
 
-export default Calendar;
+export default Trackers;

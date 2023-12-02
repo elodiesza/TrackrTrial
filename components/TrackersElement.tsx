@@ -18,7 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 const width = Dimensions.get('window').width;
 
-export default function TrackersElement({db, year, month, load, loadx, setHabits, habits, tracks, setTracks, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, weather, setWeather, times, setTimes, timerecords, setTimerecords}) {
+export default function TrackersElement({db, year, month, setHabits, habits, moods, setMoods, sleep, setSleep, states, setStates, 
+  staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, weather, setWeather, times, setTimes, timerecords, setTimerecords, load, loadx}) {
 
   var today = new Date();
   var thisMonth = today.getMonth();
@@ -44,6 +45,7 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
   const [selectedScaleItem, setSelectedScaleItem] = useState('');
   const [scaleValue, setScaleValue] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
   const [selectedWeatherIndex, setSelectedWeatherIndex] = useState(-1);
   const [timeModalVisible, setTimeModalVisible] = useState(false);
@@ -66,8 +68,10 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
       let existinghabits = [...habits];
       let lastMonthhabits = lastMonthData.filter(c => c.day === 1).map(c => c.name);
       let lastMonthTypes = lastMonthData.filter(c => c.day === 1).map(c => c.type);
-      let lastMonthtracks = lastMonthData.filter(c => c.day === 1).map(c => c.track);
-
+      let lastMonthColor = lastMonthData.filter(c => c.day === 1).map(c => c.color);
+      let lastMonthIcon = lastMonthData.filter(c => c.day === 1).map(c => c.icon);
+      let lastMonthProductive = lastMonthData.filter(c => c.day === 1).map(c => c.productive);
+      
       const inserthabits = async () => {
         const promises = [];
       for (let j = 0; j < lastMonthhabits.length; j++) {
@@ -78,8 +82,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
           new Promise((resolve, reject) => {
             db.transaction(tx => {
               tx.executeSql(
-                'INSERT INTO habits (id,name, year, month, day, state, type, track, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [ uuid.v4(),name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthtracks[j], j],
+                'INSERT INTO habits (id,name, year, month, day, state, type, productive, icon, color, place) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [ uuid.v4(),name, thisYear, thisMonth, i, 0, lastMonthTypes[j], lastMonthProductive[j], lastMonthIcon[j], lastMonthColor[j], j],
                 (txtObj, habitResultSet) => {
                   const newHabit = {
                     id: uuid.v4(),
@@ -89,7 +93,9 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
                     day: i,
                     state: 0,
                     type: lastMonthTypes[j],
-                    track: lastMonthtracks[j],
+                    productive: lastMonthProductive[j],
+                    icon: lastMonthIcon[j],
+                    color: lastMonthColor[j],
                     place: j,
                   };
                   existinghabits.push(newHabit);
@@ -319,6 +325,8 @@ export default function TrackersElement({db, year, month, load, loadx, setHabits
 
   }, [updatedtimes]);
 
+
+
   function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? [parseInt(result[1], 16),parseInt(result[2], 16),parseInt(result[3], 16)]
@@ -337,16 +345,18 @@ function colorMixer(rgbA, rgbB, amountToMix){
   return "rgb("+r+","+g+","+b+")";
 }
 
-const habitsNames = [...new Set(habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))];
-const uniqueStatesNames = [...new Set(staterecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
-const uniqueScalesNames = [...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
-const uniqueTimesNames = [...new Set(timerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map(c=>c.name))];
+
+
+const habitsNames = [...new Set(habits.filter(c => (c.productive==1 && c.day==1 && c.year==year && c.month==month)).map((c) => c.name))];
+const uniqueStatesNames = [...new Set(staterecords.filter(c => (c.day==1&& c.year==year&& c.month==month)).map(c=>c.name))];
+const uniqueScalesNames = [...new Set(scalerecords.filter(c => (c.day==1&& c.year==year&& c.month==month)).map(c=>c.name))];
+const uniqueTimesNames = [...new Set(timerecords.filter(c => (c.day==1&& c.year==year&& c.month==month)).map(c=>c.name))];
 const uniqueNames = [...new Set([ ...uniqueScalesNames, ...uniqueTimesNames, ...uniqueStatesNames, ...habitsNames])];
 
-const habitsType = Array.from({ length:[...new Set(habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "habit");
-const statesType = Array.from({ length:[...new Set(staterecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "state");
-const scalesType = Array.from({ length:[...new Set(scalerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "scale");
-const timesType = Array.from({ length:[...new Set(timerecords.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name))].length }, () => "time");
+const habitsType = Array.from({ length:[...new Set(habits.filter(c => (c.productive==1 && c.day==1&& c.year==year&& c.month==month)).map((c) => c.name))].length }, () => "habit");
+const statesType = Array.from({ length:[...new Set(staterecords.filter(c => (c.day==1&& c.year==year&& c.month==month)).map((c) => c.name))].length }, () => "state");
+const scalesType = Array.from({ length:[...new Set(scalerecords.filter(c => (c.day==1&& c.year==year&& c.month==month)).map((c) => c.name))].length }, () => "scale");
+const timesType = Array.from({ length:[...new Set(timerecords.filter(c => (c.day==1&& c.year==year&& c.month==month)).map((c) => c.name))].length }, () => "time");
 const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType];
 
 
@@ -400,7 +410,6 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
               setSelectedStateName('');
               setSelectedStateItem('');
               setStateModalVisible(!stateModalVisible);
-              loadx(!load);
     };
 
     const showhabits = (ind) => {
@@ -443,8 +452,6 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
             update={uniqueTypes[index]=='habit'? habits : uniqueTypes[index]=='state'? staterecords : scalerecords}
             update2={uniqueTypes[index]=='state'? states : scales}
             setUpdate2={uniqueTypes[index]=='state'? setStates : setScales}
-            loadx={loadx}
-            load={load}
           />
         </View>
       );
@@ -468,7 +475,6 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
               setSelectedStateName('');
               setSelectedStateItem('');
               setStateModalVisible(!stateModalVisible);
-              loadx(!load);
             }}
             >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedStateItem('');setSelectedStateId('');setStateModalVisible(!stateModalVisible);setSelectedStateIndex(-1);setSelectedStateName('');}} activeOpacity={1}>
@@ -520,14 +526,13 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
               setSelectedScaleName('');
               setSelectedScaleItem('');
               setScaleModalVisible(!scaleModalVisible);
-              loadx(!load);
             }}
             >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedScaleItem('');setSelectedScaleId('');setScaleModalVisible(!scaleModalVisible);setSelectedScaleIndex(-1);setSelectedScaleName('');}} activeOpacity={1}>
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{height:130, width: 200}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} scale</Text>
-                  <AddScale name={selectedScaleName} scales={scales} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setScaleModalVisible={setScaleModalVisible}/> 
+                  <AddScale name={selectedScaleName} scales={scales} scalerecords={scalerecords} setScalerecords={setScalerecords} db={db} year={year} month={month} day={index+1} setScaleModalVisible={setScaleModalVisible}/> 
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -566,14 +571,13 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
               setSelectedTimeIndex(-1);
               setSelectedTimeName('');
               setTimeModalVisible(!timeModalVisible);
-              loadx(!load);
             }}
             >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setTimeModalVisible(!scaleModalVisible);setSelectedTimeIndex(-1);setSelectedTimeName('');}} activeOpacity={1}>
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{height:130, width: 200}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')}</Text>
-                  <AddTime name={selectedTimeName} times={times} timerecords={timerecords} setTimerecords={setTimerecords} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setTimeModalVisible={setTimeModalVisible}/>
+                  <AddTime name={selectedTimeName} times={times} timerecords={timerecords} setTimerecords={setTimerecords} db={db} year={year} month={month} day={index+1} setTimeModalVisible={setTimeModalVisible}/>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -634,7 +638,6 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
           onRequestClose={() => {
             setSelectedWeatherIndex(index);
             setWeatherModalVisible(!weatherModalVisible);
-            loadx(!load);
           }}
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSelectedWeatherIndex(index);setWeatherModalVisible(!weatherModalVisible);}} activeOpacity={1}>
@@ -663,14 +666,13 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
           onRequestClose={() => {
             setSelectedMoodIndex(-1);
             setMoodModalVisible(!moodModalVisible);
-            loadx(!load);
           }}
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setMoodModalVisible(!moodModalVisible);setSelectedMoodIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{width:380, height:170}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} mood</Text>
-                  <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={index+1} loadx={loadx} load={load} setMoodModalVisible={setMoodModalVisible}/>
+                  <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={index+1} setMoodModalVisible={setMoodModalVisible}/>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -707,14 +709,13 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
             onRequestClose={() => {
               setSelectedSleepIndex(-1);
               setSleepModalVisible(!sleepModalVisible);
-              loadx(!load);
             }}
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{height:170}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
-                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
+                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -735,14 +736,13 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
             onRequestClose={() => {
               setSelectedSleepIndex(-1);
               setSleepModalVisible(!sleepModalVisible);
-              loadx(!load);
             }}
           >
             <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setSleepModalVisible(!sleepModalVisible);setSelectedSleepIndex(-1);}} activeOpacity={1}>
               <TouchableWithoutFeedback>
                 <View style={[container.modal,{height:170}]}>
                   <Text>Update {moment(new Date(year,month,index+1)).format('MMMM Do')} sleep log</Text>
-                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} load={load} loadx={loadx} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
+                  <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={index+1} setSleepModalVisible={setSleepModalVisible} sleepModalVisible={sleepModalVisible}/>
                 </View>
               </TouchableWithoutFeedback>
             </TouchableOpacity>
@@ -810,7 +810,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
             <FlatList
               data={listDays()}
               renderItem={({item,index})=>(showNumber({item,index}))}
-              keyExtractor={(_, index) => index.toString()}
+              keyExtractor={(_, index) => "listDays"+index.toString()}
               style={{marginTop:75,width:50,flexDirection:'row'}}
               scrollEnabled={false}
             />
@@ -821,7 +821,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
               <FlatList
                 data={thismonthWeather(year,month)}
                 renderItem={({item,index})=>(showWeather(item,index))}
-                keyExtractor={(_, index) => index.toString()}
+                keyExtractor={(_, index) => "thismonthWeather"+index.toString()}
                 style={{width:25,flexDirection:'row'}}
                 scrollEnabled={false}
               />
@@ -831,7 +831,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
               <FlatList
                 data={thismonthMoods(year,month)}
                 renderItem={({item,index})=>(showMood(item,index))}
-                keyExtractor={(_, index) => index.toString()}
+                keyExtractor={(_, index) => "thismonthMoods"+index.toString()}
                 style={{width:25,flexDirection:'row'}}
                 scrollEnabled={false}
               />
@@ -841,7 +841,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
                 <FlatList
                   data={thismonthSleep(year,month)}
                   renderItem={({item, index}) => showSleep(item, index)}
-                  keyExtractor={(_, index) => index.toString()}
+                  keyExtractor={(_, index) => "thismonthSleep"+index.toString()}
                   style={{width:25,flexDirection:'row'}}
                   scrollEnabled={false}
                 />
@@ -851,7 +851,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
                 <FlatList
                   data={thismonthSleepQuality(year,month)}
                   renderItem={({item, index}) => showSleepQuality(item, index)}
-                  keyExtractor={(_, index) => index.toString()}
+                  keyExtractor={(_, index) => "thismonthSleepQuality"+index.toString()}
                   style={{width:25,flexDirection:'row'}}
                   scrollEnabled={false}
                 />
@@ -870,7 +870,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
                     horizontal
                     data={uniqueScalesNames}
                     renderItem={uniqueScalesNames!==null?(name)=>showScalesColumns(name):undefined}
-                    keyExtractor={(_, index) => index.toString()}
+                    keyExtractor={(_, index) => "uniqueScalesNames"+index.toString()}
                     scrollEnabled={false}
                   />
                 </View>
@@ -879,7 +879,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
                     horizontal
                     data={uniqueTimesNames}
                     renderItem={uniqueTimesNames!==null?(name)=>showTimesColumns(name):undefined}
-                    keyExtractor={(_, index) => index.toString()}
+                    keyExtractor={(_, index) => "uniqueTimesNames"+index.toString()}
                     scrollEnabled={false}
                   />
                 </View>
@@ -888,7 +888,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
                     horizontal
                     data={uniqueStatesNames}
                     renderItem={uniqueStatesNames!==null?(name)=>showStatesColumns(name):undefined}
-                    keyExtractor={(_, index) => index.toString()}
+                    keyExtractor={(_, index) => "uniqueStatesNames"+index.toString()}
                     scrollEnabled={false}
                   />
                 </View>
@@ -897,7 +897,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
                     horizontal
                     data={habitsNames}
                     renderItem={habitsNames!==null?(name)=>showHabitsColumns(name):undefined}
-                    keyExtractor={(_, index) => index.toString()}
+                    keyExtractor={(_, index) => "habitsNames"+index.toString()}
                     scrollEnabled={false}
                   />
                 </View>
@@ -910,19 +910,15 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
       </ScrollView >
       )}
 
-      <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', bottom:15, right: 15, flex: 1}}>
-        <Feather name='plus-circle' size={50} color={colors.primary.blue} />
+      <TouchableOpacity onPress={() => setAddModalVisible(true)} style={{justifyContent: 'center', position: 'absolute', top:10, left: 15, flex: 1}}>
+        <Feather name='plus-circle' size={40} color={colors.primary.blue} />
       </ TouchableOpacity> 
       <NewIndicator
         addModalVisible={addModalVisible===true}
         setAddModalVisible={setAddModalVisible}
-        load={load}
-        loadx={loadx}
         db={db}
         habits={habits}
         setHabits={setHabits}
-        tracks={tracks}
-        setTracks={setTracks}
         states={states}
         setStates={setStates}
         staterecords={staterecords}
@@ -931,6 +927,7 @@ const uniqueTypes = [ ...scalesType, ...timesType, ...statesType, ...habitsType]
         scalerecords={scalerecords} setScalerecords={setScalerecords}
         times={times} setTimes={setTimes}
         timerecords={timerecords} setTimerecords={setTimerecords}
+        load={load} loadx={loadx}
       />
     </View>
   );

@@ -1,45 +1,66 @@
-import { View, Text, StyleSheet, Pressable,SafeAreaView } from 'react-native';
-import { container } from '../styles';
+import { ImageBackground, View, Text, StyleSheet, Pressable,SafeAreaView } from 'react-native';
+import { container,colors } from '../styles';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Account from './Settings/Account';
 import About from './Settings/About';
 import Help from './Settings/Help';
-import Customization from './Settings/Customization';
+import Preferences from './Settings/Preferences';
 import Data from './Settings/Data';
 import SettingsHome from './Settings/SettingsHome';
 import DeleteDB from './Settings/DeleteDB';
-import AddDB from './Settings/AddDB';
+import Linkdata from './Settings/Linkdata';
+
 const Stack = createNativeStackNavigator();
 
-const SettingsNavigator =({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
-  statuslist, setStatuslist, statusrecords, setStatusrecords})=> {
-  
+const SettingsNavigator =({db, tasks, setTasks, tracks, setTracks, load, loadx, 
+   logs, setLogs, habits, setHabits, moods, setMoods, sleep, setSleep, scalerecords, 
+   setScalerecords, scales, setScales, states, setStates, staterecords, setStaterecords, 
+   times, setTimes, weather, setWeather, timerecords, setTimerecords, diary, 
+   setDiary, stickers, setStickers, stickerrecords, setStickerrecords,
+  analytics, setAnalytics})=> {
+
+
     return (
-    <Stack.Navigator>
-      <Stack.Screen name="SettingsHome" component={SettingsHome} options={{ headerShown: false }} />
-      <Stack.Screen name="Account" component={Account} options={{ headerShown: false }} />
-      <Stack.Screen name="About" component={About} options={{ headerShown: false }} />
-      <Stack.Screen name="Data" component={Data} options={{ headerShown: false }} />
-      <Stack.Screen name="Customization" component={Customization} options={{ headerShown: false }} />
-      <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
-      <Stack.Screen name="DeleteDB" component={()=>DeleteDB({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
-    statuslist, setStatuslist, statusrecords, setStatusrecords})} options={{ headerShown: false }} />
-      <Stack.Screen name="AddDB" component={()=>AddDB({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
-    statuslist, setStatuslist, statusrecords, setStatusrecords})} options={{ headerShown: false }} />
+    <Stack.Navigator screenOptions={{headerShown:false}}> 
+      <Stack.Screen name="SettingsHome" component={SettingsHome} />
+      <Stack.Screen name="Account" component={Account} />
+      <Stack.Screen name="About" component={About}/>
+      <Stack.Screen name="Data" component={Data}/>
+      <Stack.Screen name="Preferences" component={()=>Preferences({db})} />
+      <Stack.Screen name="Help" component={Help} />
+      <Stack.Screen
+        name="DeleteDB"
+        component={()=>DeleteDB({db, tasks, setTasks, tracks, setTracks, load, loadx,
+           logs, setLogs, habits, setHabits, moods, setMoods, sleep, setSleep, scalerecords, 
+           setScalerecords, scales, setScales, states, setStates, staterecords, setStaterecords, 
+           times, setTimes, weather, setWeather, timerecords, setTimerecords, diary, setDiary, 
+           stickers, setStickers, stickerrecords, setStickerrecords,analytics, setAnalytics})} />
+      <Stack.Screen
+        name="Linkdata"
+        component={()=>Linkdata({db, tasks, setTasks, tracks, setTracks, load, loadx,
+          logs, setLogs, habits, setHabits, moods, setMoods, sleep, setSleep, scalerecords, 
+          setScalerecords, scales, setScales, states, setStates, staterecords, setStaterecords, 
+          times, setTimes, weather, setWeather, timerecords, setTimerecords, diary, setDiary, 
+          stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics})} />
+
     </Stack.Navigator>
   );
 }
 
-function Settings({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
-  statuslist, setStatuslist, statusrecords, setStatusrecords}) {
+function Settings({db, tasks, setTasks, tracks, setTracks,load, loadx, 
+  logs, setLogs, 
+  habits, setHabits, moods, setMoods, sleep, setSleep, scalerecords, setScalerecords, 
+  scales, setScales, states, setStates, staterecords, setStaterecords, times, setTimes, 
+  weather, setWeather, timerecords, setTimerecords, diary, setDiary, stickers, 
+  setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics}) {
 
 
   return (
-    <SafeAreaView style={container.container}>
-        <View style={container.header}>
-            <Text style={container.headertitle}>SETTINGS</Text>
-        </View>
-        <SettingsNavigator db={db} tasks={tasks} setTasks={setTasks} 
+      <SafeAreaView style={container.container}>
+          <View style={container.header}>
+              <Text style={container.headertitle}>SETTINGS</Text>
+          </View>
+          <SettingsNavigator db={db} tasks={tasks} setTasks={setTasks} 
         tracks={tracks} setTracks={setTracks} 
         habits={habits} setHabits={setHabits} 
         moods={moods} setMoods={setMoods} 
@@ -55,11 +76,8 @@ function Settings({db, tasks, setTasks, tracks, setTracks, habits, setHabits, mo
         weather={weather} setWeather={setWeather}
         stickers={stickers} setStickers={setStickers}
         stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
-        analytics={analytics} setAnalytics={setAnalytics}
-        statusrecords={statusrecords} setStatusrecords={setStatusrecords}
-        statuslist={statuslist} setStatuslist={setStatuslist}/>
-    </SafeAreaView>
-      
+        analytics={analytics} setAnalytics={setAnalytics}/>
+      </SafeAreaView>
   );
 }
 

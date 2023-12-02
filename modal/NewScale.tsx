@@ -22,6 +22,7 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
     const [addColor, setAddColor] = useState(false);
     const [addUnit, setAddUnit] = useState(false);
     const [addValue, setAddValue] = useState(false);
+    const [pickedIcon, setPickedIcon] = useState('');
 
 
   useEffect(() => {
@@ -30,13 +31,12 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
     }
   }, [newScaleVisible, reset]);
 
-
   const addScale = async (data) => {
     let existingscales = [...scales]; 
     var newPlace = existingscales.length;
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO scales (id,name, min, max, mincolor, maxcolor, unit, place) VALUES (?,?, ?, ?, ?, ?, ?, ?)',
+              'INSERT INTO scales (id,name, min, max, mincolor, maxcolor, unit, icon, place) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
               [ uuid.v4(),data.name, addValue? data.valueMin : undefined, addValue? data.valueMax : undefined, 
                 addColor? pickedMin : undefined, addColor? pickedMax : undefined ,addUnit? data.unit : undefined, newPlace],
               (txtObj, scaleResultSet) => {
@@ -48,6 +48,7 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                     mincolor: addColor? pickedMin : undefined,
                     maxcolor: addColor? pickedMax : undefined,
                     unit: addUnit? data.unit : undefined,
+                    icon: 'heart',
                     place: newPlace,
                 };
                 existingscales.push(newScale);

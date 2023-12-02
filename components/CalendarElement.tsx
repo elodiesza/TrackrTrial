@@ -1,18 +1,21 @@
 import { TouchableOpacity, Pressable, ScrollView, FlatList, StyleSheet, Text, View, Dimensions } from 'react-native';
 import Swiper from 'react-native-swiper'
-import MonthlyTasks from '../components/MonthlyTasks';
-import TrackersElement from './TrackersElement';
-import Statistics from '../screens/Statistics';
 import { container, colors } from '../styles';
 import { Ionicons } from '@expo/vector-icons';
 import DaySummary from './DaySummary';
 import { useState } from 'react';
+import StatsHome from '../screens/Statistics/StatsHome';
+import HabitsStats from '../screens/Statistics/HabitsStats';
+import ScalesStats from '../screens/Statistics/ScalesStats';
+import StatesStats from '../screens/Statistics/StatesStats';
+import SleepLogStats from '../screens/Statistics/SleepLogStats';
 
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export default function CalendarElement({year, month, day, tasks, tracks, setTracks, load, loadx, db, setTasks, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather, stickers, stickerrecords, times, setTimes, timerecords, setTimerecords}) {
+export default function CalendarElement({year, month, day, db, habits, setHabits, moods, setMoods, sleep, setSleep, states, setStates, 
+  staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, diary, setDiary, weather, setWeather, times, setTimes, timerecords, setTimerecords}) {
 
   var today = new Date();
   var thisDay = today.getDate();
@@ -21,6 +24,8 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
   var days = [];
   const [modalVisible, setModalVisible] = useState(false);
   const [calendarDate,setCalendarDate] = useState(0);
+
+  const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
   const GetDaysInMonth = (month) => {
     var date = new Date(year, month, 1);
@@ -90,21 +95,14 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
 
   var daysLines = [line1,line2,line3,line4,line5(),line6()];
 
-  const monthTodo = (tasks, year, month, day) => {
-    if(day>0 && day<32) {
-      return(tasks.filter(
-        c=>(c.year==year && c.month==month && c.day==day)
-      ))
-    }
-  };
 
   const CalendarCell = (date) => {
-    const thisdaySticker=stickerrecords.filter(c=>(c.year==year && c.month==month &&c.state==true && c.day==date)).map(c=>c.name);
+    const thisdaySticker=habits.filter(c=>(c.productive==false && c.year==year && c.month==month &&c.state==true && c.day==date)).map(c=>c.name);
     return(
       <View style={[styles.calendarCell,{backgroundColor: date==0? 'lightgray' : 'white', borderColor: (date==thisDay && month==thisMonth && year==thisYear)? 'red':'gray', borderWidth: (date==thisDay && month==thisMonth && year==thisYear)? 2:0.5}]}>
         <View style={{height:15, flexDirection:'row', justifyContent:'flex-end'}}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
-            {stickers
+            {habits.filter(c=>c.productive==false)
               .filter(c => thisdaySticker.includes(c.name))
               .map((item, index) => (
                 <View key={index}>
@@ -120,14 +118,11 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
           </Pressable>
         </View>
         <View style={{flex:1, justifyContent: 'flex-end'}}>
-          <FlatList 
-          data={monthTodo(tasks.filter(c=>c.recurring==false), year, month, date)}
-          horizontal={false} 
-          scrollEnabled={true} 
-          renderItem={RenderTaskItem} 
-          bounces={false} />
+
         </View>
-        <DaySummary modalVisible={modalVisible} setModalVisible={setModalVisible} year={year} month={month} day={calendarDate} habits={habits} states={states} staterecords={staterecords} scales={scales} scalerecords={scalerecords} diary={diary} weather={weather} stickers={stickers} stickerrecords={stickerrecords} sleep={sleep} moods={moods} daysinmonth={daysLength}/>  
+        <DaySummary modalVisible={modalVisible} setModalVisible={setModalVisible} 
+        year={year} month={month} day={calendarDate} habits={habits} states={states} staterecords={staterecords} scales={scales} scalerecords={scalerecords} 
+        diary={diary} weather={weather} sleep={sleep} moods={moods} daysinmonth={daysLength}/>  
       </View>
     )
   }
@@ -146,42 +141,10 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
     )
   }
 
-  const CalendarTaskItem = ({task, track}) => (
-    <>
-      <TouchableOpacity style={[styles.task,{backgroundColor: tracks.filter(c=>c.track==track).map(c=>c.color)[0]}]}>
-        <Text style={{fontSize:10}}>{task}</Text>
-      </TouchableOpacity>
-    </>
-  );
-  const RenderTaskItem = ({item}) => (
-    <CalendarTaskItem task={item.task} track={item.track} />
-  );
 
   return (
     <View style={container.body}>
-        <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={1}>
-          <Statistics year={year} month={month} 
-          habits={habits} states={states} 
-          scales={scales} scalerecords={scalerecords} 
-          stickers={stickers} stickerrecords={stickerrecords}
-          staterecords={staterecords} tracks={tracks} 
-          setHabits={setHabits} setTracks={setTracks} 
-          sleep={sleep} moods={moods}
-          times={times} timerecords={timerecords}/>
-          <TrackersElement db={db} load={load} loadx={loadx} 
-          tracks={tracks} setTracks={setTracks} 
-          year={year} month={month} 
-          habits={habits} setHabits={setHabits} 
-          moods={moods} setMoods={setMoods} 
-          sleep={sleep} setSleep={setSleep} 
-          states={states} setStates={setStates} 
-          staterecords={staterecords} setStaterecords={setStaterecords}
-          scales={scales} setScales={setScales} 
-          scalerecords={scalerecords} setScalerecords={setScalerecords}
-          weather={weather} setWeather={setWeather}
-          times={times} setTimes={setTimes}
-          timerecords={timerecords} setTimerecords={setTimerecords}
-          />
+        <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false} index={0}>
           <View style={{flex:1}}>
             <FlatList
               data={["MON","TUE","WED","THU","FRI","SAT","SUN"]}
@@ -201,7 +164,15 @@ export default function CalendarElement({year, month, day, tasks, tracks, setTra
               scrollEnabled={false}
             />
           </View>
-          <MonthlyTasks db={db} load={load} loadx={loadx} tracks={tracks} setTracks={setTracks} year={year} month={month} tasks={tasks} setTasks={setTasks}/>
+          <Swiper horizontal={true} showsButtons={false} showsPagination={true} loop={false} index={0}>
+            <StatsHome moods={moods.filter(c=>(c.year==year && c.month==month))} habits={habits} sleep={sleep} states={states} staterecords={staterecords} 
+            scales={scales} scalerecords={scalerecords} times={times} timerecords={timerecords} 
+            year={year} month={month} daysInMonth={DaysInMonth(year,month)}/>
+            <HabitsStats habits={habits} month={month} year={year}/>
+            <StatesStats moods={moods.filter(c=>(c.year==year && c.month==month))} states={states} staterecords={staterecords} year={year} month={month} daysInMonth={DaysInMonth(year,month)}/>
+            <ScalesStats scales={scales} scalerecords={scalerecords} times={times} timerecords={timerecords} year={year} month={month} daysInMonth={DaysInMonth(year,month)}/>
+            <SleepLogStats sleep={sleep} year={year} month={month}/>
+          </Swiper>
         </Swiper>
     </View>
   );

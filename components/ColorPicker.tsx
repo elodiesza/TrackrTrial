@@ -6,7 +6,8 @@ import { colors } from '../styles';
 const ColorPicker = ( {colorPickerVisible, setColorPickerVisible, picked, setPicked} ) => {
     
   const colorChoice=[colors.primary.red,colors.primary.orange,colors.primary.yellow,colors.primary.yellowgreen,colors.primary.green,
-    colors.primary.blue,colors.primary.turquoise,colors.primary.purple,colors.primary.magenta,colors.primary.pink,colors.primary.beige,colors.primary.brown,colors.primary.default,colors.primary.gray,colors.primary.black];
+    colors.primary.blue,colors.primary.turquoise,colors.primary.purple,colors.primary.magenta,colors.primary.pink,colors.primary.beige,
+    colors.primary.brown,colors.primary.lavender,colors.primary.gray,colors.primary.tungstene];
 
   const TrackColor = ({ item }) => {
     return (

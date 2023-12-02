@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View, FlatList } from 'react-native';
 import { useForm, Controller, set } from 'react-hook-form';
 import { container,colors } from '../styles';
-import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { MaterialIcons, Feather, Ionicons } from '@expo/vector-icons';
 import Color from '../components/Color';
 import ColorPicker from '../components/ColorPicker';
 import uuid from 'react-native-uuid';
+import NewSticker from './NewSticker';
 
 
 function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddModalVisible, load, loadx, db, states, setStates, staterecords, setStaterecords}) {
@@ -15,10 +16,12 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
   const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
 
   const {control, handleSubmit, reset} = useForm();
+  const [pickedIcon, setPickedIcon] = useState('');
+  const [pickIcon, setPickIcon] = useState(false);
   const [itemlist, setItemlist] = useState([{ colorPickerVisible: false, picked: '', value: undefined }]);
   
   const AddItemtolist = () => {
-    setItemlist((prevList) => [...prevList, { colorPickerVisible: false, picked: '' }]);
+    setItemlist((prevList) => [...prevList, { colorPickerVisible: false, picked: '', value: undefined}]);
   };
 
   const RemoveItemfromlist = (index) => {
@@ -39,13 +42,14 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
       for (let i = 0; i < itemlist.length; i++) {
         db.transaction((tx) => {
             tx.executeSql(
-              'INSERT INTO states (id,name, item, color, place) VALUES (?,?, ?, ?, ?)',
-              [ uuid.v4(),data.name, itemlist[i].value, itemlist[i].picked, newPlace],
+              'INSERT INTO states (id, name, item, icon, color, place) VALUES (?,?,?, ?, ?, ?)',
+              [ uuid.v4(),data.name, itemlist[i].value, pickedIcon, itemlist[i].picked, newPlace],
               (txtObj, stateResultSet) => {
                 const newState = {
                   id: uuid.v4(),
                   name: data.name,
                   item: itemlist[i].value,
+                  icon: pickedIcon,
                   color: itemlist[i].picked,
                   place: newPlace,
                 };
@@ -134,8 +138,7 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
           }
       }}
       />
-          <Pressable onPress={() => {
-          // Toggle the colorPickerVisible state for this specific item
+        <Pressable onPress={() => {
           setItemlist((prevList) =>
             prevList.map((item, i) =>
               i === index ? { ...item, colorPickerVisible: !item.colorPickerVisible } : item
@@ -180,42 +183,48 @@ function NewState({newStateVisible, setNewStateVisible, addModalVisible, setAddM
                     </Pressable>
                     <Text style={{left:20}}>NEW STATE</Text>
                 </View>
-                <Controller
-                control= {control}
-                name="name"
-                render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-                    <>
-                  <TextInput
-                    value={value}
-                    onChangeText={onChange}
-                    autoCapitalize = {"characters"}
-                    onBlur={onBlur}
-                    placeholder="NAME"
-                    style={[container.textinput,{borderColor: error ? 'red' : '#e8e8e8'}]}
-                  />
-                  {error && (
-                    <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
+                <View style={{flexDirection:'row', width:'100%', alignItems:'center'}}>
+                  <Ionicons onPress={()=>setPickIcon(!pickIcon)} name={pickedIcon==''?'circle':pickedIcon} size={30} color={colors.primary.blue} style={{paddingRight:10}}/>
+                  <Controller
+                  control= {control}
+                  name="name"
+                  render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
+                      <>
+                    <TextInput
+                      value={value}
+                      onChangeText={onChange}
+                      autoCapitalize = {"characters"}
+                      onBlur={onBlur}
+                      placeholder="NAME"
+                      style={[container.textinput,{borderColor: error ? 'red' : '#e8e8e8', flex:1}]}
+                    />
+                    {error && (
+                      <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
+                    )}
+                  </>
                   )}
-                </>
-              )}
-              rules={{
-                required: 'Input a Habit',
-                minLength: {
-                  value: 3,
-                  message: 'Task should be at least 3 characters long',
-                },
-                maxLength: {
-                  value: 14,
-                  message: 'Task should be max 14 characters long',
-                },
-                validate: (name) => {
-                  if (name.includes('  ')) {
-                    return 'Name should not contain consecutive spaces';
-                  }
-                  return true;
-                }
-              }}
-              />
+                  rules={{
+                    required: 'Input a Habit',
+                    minLength: {
+                      value: 3,
+                      message: 'Task should be at least 3 characters long',
+                    },
+                    maxLength: {
+                      value: 14,
+                      message: 'Task should be max 14 characters long',
+                    },
+                    validate: (name) => {
+                      if (name.includes('  ')) {
+                        return 'Name should not contain consecutive spaces';
+                      }
+                      return true;
+                    }
+                  }}
+                  />
+                </View>
+                <View style={{display:pickIcon?'flex':'none'}}>
+                  <NewSticker db={db} picked={colors.primary.white} pickedIcon ={pickedIcon} setPickedIcon={setPickedIcon}/>
+                </View>
             <FlatList
                 data={itemlist}
                 renderItem={({item,index})=>ItemList({item,index})}

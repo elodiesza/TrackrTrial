@@ -1,14 +1,19 @@
-import { FlatList, TextInput, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
+import { TextInput, Pressable, Text, View, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import {container, colors} from '../styles.js';
 import { useForm, Controller, set } from 'react-hook-form';
 
-
-const width = Dimensions.get('window').width;
-
-const AddScale = ({ name, scales, scalerecords, setScalerecords, db,year,month,day, load, loadx, setScaleModalVisible}) => {
+const AddScale = ({ name, scales, scalerecords, setScalerecords, db,year,month,day, setScaleModalVisible ,load, loadx}) => {
     const {control, handleSubmit, reset} = useForm();
+    const scale= scales.filter(c=>c.name==name);
+    const thisScale= scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0];
+    const [scaleExists, setScaleExists] = useState(thisScale!==null);
+
+    useEffect(()=>{
+        setScaleExists(thisScale!==null);
+    },[thisScale])
+
 
     function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -52,44 +57,43 @@ const AddScale = ({ name, scales, scalerecords, setScalerecords, db,year,month,d
         loadx(!load);
     };
 
-  return (
-    <View style={{height:70, marginTop:10}}>
+    return (
+        <View style={{height:70, marginTop:10}}>
             <Text style={{textAlign:'center'}}>{name}</Text>
-        <View style={{flex:1, flexDirection: 'row', width:'100%', alignItems: 'center', justifyContent:'center'}}>
-            <Controller
-                control= {control}
-                name="value"
-                render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-                    <>
-                        <TextInput
-                            value={value}
-                            onChangeText={(text) => {// Remove any non-numeric characters using a regular expression
-                                const intValue = text.replace(/\D/g, '');
-                                // Set the cleaned integer value back to the input field
-                                onChange(intValue);}}
-                            onBlur={onBlur}
-                            placeholder={scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0]==null?'':scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0].toString()}
-                            style={[container.textinput,{backgroundColor:colormix,width: 80, borderColor: error ? 'red' : '#e8e8e8'}]}
-                        />
-                        {error && console.warn(error.message || 'Error')}
-                        </>
-                    )}
-                    rules={{
-                        required: 'Input a value',
-                        validate: (value) => {
-                            if (!/^\d*$/.test(value)) {
-                            return 'Please enter a valid integer';
-                            }
-                            return true;
-                        },
-                }}
-            />
-            <Pressable onPress={handleSubmit(updateScale)} style={[container.button,{width:40}]}>
-                <Feather name="chevron-right" size={30} />
-            </Pressable>
+            <View style={{flex:1, flexDirection: 'row', width:'100%', alignItems: 'center', justifyContent:'center'}}>
+                <Controller
+                    control= {control}
+                    name="value"
+                    render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
+                        <>
+                            <TextInput
+                                value={value}
+                                onChangeText={(text) => {
+                                    const intValue = text.replace(/\D/g, '');
+                                    onChange(intValue);}}
+                                onBlur={onBlur}
+                                placeholder={scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0]==null?'':scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0].toString()}
+                                style={[container.textinput,{backgroundColor:colormix,width: 80, borderColor: error ? 'red' : '#e8e8e8'}]}
+                            />
+                            {error && console.warn(error.message || 'Error')}
+                            </>
+                        )}
+                        rules={{
+                            required: 'Input a value',
+                            validate: (value) => {
+                                if (!/^\d*$/.test(value)) {
+                                return 'Please enter a valid integer';
+                                }
+                                return true;
+                            },
+                    }}
+                />
+                <Pressable onPress={handleSubmit(updateScale)} style={[container.button,{width:30,backgroundColor:scaleExists?colors.primary.defaultdark:colors.primary.blue}]}>
+                    <Feather name="chevron-right" size={30} color={scaleExists?colors.primary.black:colors.primary.white}/>
+                </Pressable>
+            </View>
         </View>
-    </View>
-  );
+    );
 }
 
 export default AddScale;

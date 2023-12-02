@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "trial",
+    "name": "track app",
     "slug": "trial",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,24 +17,21 @@
     "ios": {
       "supportsTablet": true,
       "usesIcloudStorage": true,
-      "bundleIdentifier": "com.misscoding.sqliteexample"
+      "bundleIdentifier": "com.elodiesza.Bullet"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.misscoding.sqliteexample"
+      "package": "com.elodiesza.Bullet"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
-        "expo-document-picker",
-        {
-          "iCloudContainerEnvironment": "Development"
-        }
+        "expo-document-picker"
       ]
     ],
     "extra": {

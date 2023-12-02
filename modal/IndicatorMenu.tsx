@@ -2,7 +2,7 @@ import React, { useState,  useEffect } from 'react';
 import { StyleSheet, Modal, Alert, TouchableWithoutFeedback, Pressable, TouchableOpacity, Text, View } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import IsLoading from './IsLoading';
-import ChangeHabitName from './ChangeHabitName';
+import ChangeHabitName from './UpdateHabit';
 import { container, colors } from '../styles';
 
 const IndicatorMenu = ({ month, year, modalVisible, setModalVisible, type, data, db, setUpdate, update, update2, setUpdate2, loadx, load }) => {

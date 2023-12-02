@@ -1,132 +1,107 @@
-import { View, SafeAreaView, Pressable, Text, Modal, TouchableWithoutFeedback, Button, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, ScrollView, SafeAreaView, Pressable, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import { CommonActions } from '@react-navigation/native';
 import { container,colors } from '../../styles';
 import SettingsTitle from '../../components/SettingsTitle';
-import { Ionicons, MaterialIcons, Feather, MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import Color from '../../components/Color';
+import DeleteDBvalid from '../../modal/DeleteDBvalid';
 
-const DeleteDB = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
-    statuslist, setStatuslist, statusrecords, setStatusrecords}) => {
+const DeleteDB = ({db,
+    habits, setHabits, moods, setMoods, sleep, setSleep, scalerecords, 
+    setScalerecords, scales, setScales, states, setStates, staterecords, setStaterecords, 
+    times, setTimes, weather, setWeather, timerecords, setTimerecords, diary, 
+    setDiary, analytics, setAnalytics}) => {
 
     const navigation = useNavigation();
     const onReturnPressed =()=> {navigation.dispatch(CommonActions.goBack())};
 
+      const [selectedData, setSelectedData] = useState('');
+      const [deleteVisible, setDeleteVisible] = useState(false);
 
     return (
 
         <SafeAreaView style={container.container}>
             <SettingsTitle returnpress={onReturnPressed}title={'Delete databases'}/>
-            <View style={container.body}>
-                <Pressable style={container.setting}>
-                    <Ionicons name="sync" size={25}/>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('habits');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
                     <Text style={{marginLeft:10, flex:1}}>Habits</Text>
                     <Color color={habits.length==0?colors.primary.white:colors.primary.blue}/>
                 </Pressable>
-                <Pressable style={container.setting} onPress={()=>
-                        db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS statusrecords', null,
-                        (txObj, resultSet) => setStatusrecords([]),
-                        (txObj, error) => console.log('error selecting status records')
-                        )})}>
-                    <Entypo name="progress-full" size={25}/>
-                    <Text style={{marginLeft:10, flex:1}}>Status records</Text>
-                    <Color color={statusrecords.length==0?colors.primary.white:colors.primary.blue}/>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('moods');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Moods</Text>
+                    <Color color={moods.length==0?colors.primary.white:colors.primary.blue}/>
                 </Pressable>
-                <Button title={'delete staterecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS staterecords', null,
-        (txObj, resultSet) => setStaterecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-      <Button title={'delete scalerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS scalerecords', null,
-        (txObj, resultSet) => setScalerecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-      <Button title={'delete states'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS states', null,
-        (txObj, resultSet) => setStaterecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-      <Button title={'delete scales'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS scales', null,
-        (txObj, resultSet) => setScales([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
-      <Button title={'delete times'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
-        (txObj, resultSet) => setTimes([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
-     <Button title={'delete timerecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
-        (txObj, resultSet) => setTimerecords([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/> 
-
-    <Button title={'delete habits'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS habits', null,
-        (txObj, resultSet) => setHabits([]),
-        (txObj, error) => console.log('error selecting habits')
-      );
-    })}/>    
-    <Button title={'delete tasks'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS tasks', null,
-        (txObj, resultSet) => setTasks([]),
-        (txObj, error) => console.log('error selecting tasks')
-      );
-    })}/>
-        <Button title={'delete tracks'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS tracks', null,
-        (txObj, resultSet) => setTracks([]),
-        (txObj, error) => console.log('error selecting tracks')
-      );
-    })}/>
-      
-    <Button title={'delete logs'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS logs', null,
-        (txObj, resultSet) => setLogs([]),
-        (txObj, error) => console.log('error selecting logs')
-      );
-    })}/>
-            <Button title={'delete sleep'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sleep', null,
-        (txObj, resultSet) => setSleep([]),
-        (txObj, error) => console.log('error selecting sleep')
-      );
-    })}/>
-    <Button title={'delete diary'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS diary', null,
-        (txObj, resultSet) => setDiary([]),
-        (txObj, error) => console.log('error selecting diary')
-      );
-    })}/>  
-        <Button title={'delete stickerrecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS stickerrecords', null,
-        (txObj, resultSet) => setStickerrecords([]),
-        (txObj, error) => console.log('error selecting stickerrecords')
-      );
-    })}/>       
-        <Button title={'delete moods'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS moods', null,
-        (txObj, resultSet) => setMoods([]),
-        (txObj, error) => console.log('error selecting moods')
-      );
-    })}/> 
-        <Button title={'delete weather'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS weather', null,
-        (txObj, resultSet) => setWeather([]),
-        (txObj, error) => console.log('error selecting weather')
-      );
-    })}/>  
-               <Button title={'delete analytics'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS analytics', null,
-        (txObj, resultSet) => setAnalytics([]),
-        (txObj, error) => console.log('error selecting analytics')
-      );
-    })}/>  
-                <Button title={'delete statuslist'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS statuslist', null,
-        (txObj, resultSet) => setStatuslist([]),
-        (txObj, error) => console.log('error selecting status list')
-      );
-    })}/> 
-        <Button title={'delete statusrecords'} onPress={()=>db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS statusrecords', null,
-        (txObj, resultSet) => setStatusrecords([]),
-        (txObj, error) => console.log('error selecting status records')
-      );
-    })}/>  
-
-            </View>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('states');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>States</Text>
+                    <Color color={states.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('staterecords');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>State records</Text>
+                    <Color color={staterecords.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('scales');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Scales</Text>
+                    <Color color={scales.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('scalerecords');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Scale records</Text>
+                    <Color color={scalerecords.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('sleep');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Sleep Log</Text>
+                    <Color color={sleep.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('times');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Times</Text>
+                    <Color color={times.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('timerecords');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Time records</Text>
+                    <Color color={timerecords.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('diary');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Diaries</Text>
+                    <Color color={diary.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('weather');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Weather</Text>
+                    <Color color={weather.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <Pressable style={container.setting} onPress={()=>{setSelectedData('analytics');setDeleteVisible(true)}}>
+                    <Ionicons name="checkbox-outline" size={25}/>
+                    <Text style={{marginLeft:10, flex:1}}>Analytics</Text>
+                    <Color color={analytics.length==0?colors.primary.white:colors.primary.blue}/>
+                </Pressable>
+                <DeleteDBvalid db={db} 
+                    selectedData={selectedData}
+                    habits={habits} setHabits={setHabits} 
+                    moods={moods} setMoods={setMoods} 
+                    sleep={sleep} setSleep={setSleep} 
+                    scalerecords={scalerecords} setScalerecords={setScalerecords}
+                    diary={diary} setDiary={setDiary}
+                    staterecords={staterecords} setStaterecords={setStaterecords}
+                    states={states} setStates={setStates}
+                    times={times} setTimes={setTimes}
+                    timerecords={timerecords} setTimerecords={setTimerecords}
+                    scales={scales} setScales={setScales}
+                    weather={weather} setWeather={setWeather}s
+                    analytics={analytics} setAnalytics={setAnalytics}
+                    setDeleteVisible={setDeleteVisible} deleteVisible={deleteVisible}
+                />
+            </ScrollView>
         </SafeAreaView>
      
     );

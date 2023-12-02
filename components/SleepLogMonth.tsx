@@ -81,6 +81,7 @@ const SleeplogMonth = ({ sleep, year, month}) => {
                 keyExtractor={(_, index) => index.toString()}
                 horizontal={true}
                 scrollEnabled={false}
+                contentContainerStyle={{paddingLeft:2}}
               />
             </View>
             <View style={{height:20, width:'100%', justifyContent:'center', alignItems:'center'}}>

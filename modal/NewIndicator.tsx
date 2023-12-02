@@ -7,10 +7,9 @@ import NewTime from './NewTime';
 import { container } from '../styles';
 
 
-function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, habits, setHabits, tracks, setTracks, states, setStates, staterecords, setStaterecords, scales, setScales, scalerecords, setScalerecords, times, setTimes, timerecords, setTimerecords}) {
+function NewIndicator({addModalVisible, setAddModalVisible, db, habits, setHabits, states, setStates, staterecords, setStaterecords, 
+  scales, setScales, scalerecords, setScalerecords, times, setTimes, timerecords, setTimerecords ,load, loadx}) {
 
-
-  const [isLoading, setIsLoading] = useState(true);
 
   const [newHabitVisible, setNewHabitVisible] = useState(false);
   const [newStateVisible, setNewStateVisible] = useState(false);
@@ -32,7 +31,6 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
       visible={addModalVisible}
       onRequestClose={() => {
         setAddModalVisible(!addModalVisible);
-        loadx(!load);
       }}
     > 
       <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible)}} activeOpacity={1}>
@@ -51,14 +49,50 @@ function NewIndicator({addModalVisible, setAddModalVisible, load, loadx, db, hab
               <Pressable onPress={()=>setNewTimeVisible(true)} style={container.button}>
                 <Text style={container.buttontext}>TIME</Text>
               </Pressable>
-              <NewHabit newHabitVisible={newHabitVisible} setNewHabitVisible={setNewHabitVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} habits={habits} setHabits={setHabits}/>
-              <NewState newStateVisible={newStateVisible} setNewStateVisible={setNewStateVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} states={states} setStates={setStates} staterecords={staterecords} setStaterecords={setStaterecords}/>
-              <NewScale newScaleVisible={newScaleVisible} setNewScaleVisible={setNewScaleVisible} addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} loadx={loadx} db={db} 
-                scales={scales} setScales={setScales} scalerecords={scalerecords} setScalerecords={setScalerecords}/>
-              <NewTime newTimeVisible={newTimeVisible} setNewTimeVisible={setNewTimeVisible} 
-              addModalVisible={addModalVisible} setAddModalVisible={setAddModalVisible} load={load} 
-              loadx={loadx} db={db} times={times} setTimes={setTimes} timerecords={timerecords} 
-              setTimerecords={setTimerecords}/>
+              <NewHabit 
+                newHabitVisible={newHabitVisible} 
+                setNewHabitVisible={setNewHabitVisible} 
+                addModalVisible={addModalVisible} 
+                setAddModalVisible={setAddModalVisible} 
+                db={db} 
+                habits={habits} 
+                setHabits={setHabits}
+                load={load} loadx={loadx}
+              />
+              <NewState 
+                newStateVisible={newStateVisible} 
+                setNewStateVisible={setNewStateVisible} 
+                addModalVisible={addModalVisible} 
+                setAddModalVisible={setAddModalVisible} 
+                db={db} states={states} setStates={setStates} 
+                staterecords={staterecords} 
+                setStaterecords={setStaterecords}
+                load={load} loadx={loadx}
+              />
+              <NewScale 
+                newScaleVisible={newScaleVisible} 
+                setNewScaleVisible={setNewScaleVisible} 
+                addModalVisible={addModalVisible} 
+                setAddModalVisible={setAddModalVisible} 
+                db={db} 
+                scales={scales} 
+                setScales={setScales} 
+                scalerecords={scalerecords} 
+                setScalerecords={setScalerecords}
+                load={load} loadx={loadx}
+              />
+              <NewTime 
+                newTimeVisible={newTimeVisible} 
+                setNewTimeVisible={setNewTimeVisible} 
+                addModalVisible={addModalVisible} 
+                setAddModalVisible={setAddModalVisible} 
+                db={db} 
+                times={times} 
+                setTimes={setTimes} 
+                timerecords={timerecords} 
+                setTimerecords={setTimerecords}
+                load={load} loadx={loadx}
+              />
           </View> 
         </TouchableWithoutFeedback>
       </TouchableOpacity>

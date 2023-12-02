@@ -4,7 +4,7 @@ import { colors, container } from '../../styles';
 
 const width = Dimensions.get('window').width;
 
-const HabitsStats = ({ habits, month, year, tracks }) => {
+const HabitsStats = ({ habits, month, year }) => {
 
     const DaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
     const firstMonth= habits.filter(c=>(c.day==1 && c.month==month && c.year==year)).map(c=>c.month)[0];

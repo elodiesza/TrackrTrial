@@ -1,18 +1,15 @@
 import { FlatList, StyleSheet, Text, View, SafeAreaView,Dimensions, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
-import Swiper from 'react-native-swiper';
-import TodayTasks from '../components/TodayTasks';
 import TodayScreen from '../components/TodayScreen';
-import { container } from '../styles';
+import { container, text } from '../styles';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 
 
-const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, 
-  setSleep, load, loadx, scales, setScales, scalerecords, setScalerecords, diary, setDiary, setStaterecords, 
-  staterecords, states, setStates, sections, times, setTimes, timerecords, setTimerecords, weather, setWeather, 
-  stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
-  statusrecords, setStatusrecords, statuslist, setStatuslist}) => {
+const Today = ({db, habits, setHabits, moods, setMoods, sleep, 
+  setSleep, scales, setScales, scalerecords, setScalerecords, diary, setDiary, setStaterecords, 
+  staterecords, states, setStates,  times, setTimes, timerecords, setTimerecords, weather, setWeather, 
+  analytics, setAnalytics, load, loadx}) => {
 
   var today = new Date();
   const [isLoading, setIsLoading] = useState(false);
@@ -37,23 +34,25 @@ const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods
   return (
     <SafeAreaView style={container.container}>
       <View style={container.header}>
-        <Pressable onPress={PreviousDay}>
-          <Feather name='chevron-left' size={40} />
-        </Pressable>
-        <Text style={container.headerdate}>
-          {moment(date).format('dddd, DD MMMM YYYY')}
-        </Text>
-        <Pressable onPress={NextDay}>
-          <Feather name='chevron-right' size={40}/>
-        </Pressable>
-      </View>
-      <Swiper horizontal={false} showsButtons={false} showsPagination={false} loop={false}>
-        <TodayScreen db={db} tasks={tasks} setTasks={setTasks} 
-        tracks={tracks} setTracks={setTracks} 
+            <Pressable onPress={PreviousDay}>
+              <Feather name='chevron-left' size={30} />
+            </Pressable>
+            <View style={{alignItems:'center', marginHorizontal:20}}>
+              <Text style={[text.title,{display: (date.getDate()==today.getDate() && date.getMonth()==today.getMonth() && date.getFullYear()==today.getFullYear())? 'flex':'none'}]}>
+                TODAY
+              </Text>
+              <Text style={text.regular}>
+                {moment(date).format('dddd, DD MMMM YYYY')}
+              </Text>
+            </View>
+            <Pressable onPress={NextDay}>
+              <Feather name='chevron-right' size={30}/>
+            </Pressable>
+          </View>
+        <TodayScreen db={db}  
         habits={habits} setHabits={setHabits} 
         moods={moods} setMoods={setMoods} 
         sleep={sleep} setSleep={setSleep} 
-        load={load} loadx={loadx} 
         year={date.getFullYear()} month={date.getMonth()} day={date.getDate()}
         scalerecords={scalerecords} setScalerecords={setScalerecords}
         diary={diary} setDiary={setDiary}
@@ -63,19 +62,9 @@ const Today = ({db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods
         timerecords={timerecords} setTimerecords={setTimerecords}
         scales={scales} setScales={setScales}
         weather={weather} setWeather={setWeather}
-        stickers={stickers} setStickers={setStickers}
-        stickerrecords={stickerrecords} setStickerrecords={setStickerrecords}
         analytics={analytics} setAnalytics={setAnalytics}
-        statusrecords={statusrecords} setStatusrecords={setStatusrecords}
-        statuslist={statuslist} setStatuslist={setStatuslist}
+        load={load} loadx={loadx}
         />
-        <TodayTasks db={db} 
-        tasks={tasks} setTasks={setTasks} 
-        tracks={tracks} setTracks={setTracks} load={load} 
-        loadx={loadx} date={date} setDate={setDate}
-        sections={sections}
-        />
-      </Swiper>
     </SafeAreaView>
   );
 }

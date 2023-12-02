@@ -1,42 +1,106 @@
-import { FlatList, Pressable, Button, TouchableOpacity, Image, StyleSheet, Text, View, SafeAreaView,Dimensions } from 'react-native';
-import { useState, useEffect } from 'react';
-import IndicatorTableTitleToday from './IndicatorTableTitleToday';
+import { Animated, Easing, Keyboard, TouchableWithoutFeedback, FlatList, Pressable, TouchableOpacity, Text, View, SafeAreaView,Dimensions } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 import AddSleepLog from './AddSleepLog';
-import AddMood from './AddMood';
-import { container,colors } from '../styles';
+import { container,colors, text } from '../styles';
 import DiaryElement from './DiaryElement';
 import AddScale from './AddScale';
 import AddTime from './AddTime';
 import UpdateState from '../modal/UpdateState';
 import UpdateWeather from './UpdateWeather';
-import StickerList from './StickerList';
-import NewSticker from '../modal/NewSticker';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons,MaterialCommunityIcons } from '@expo/vector-icons';
 import uuid from 'react-native-uuid';
-import * as Font from 'expo-font';
+import NewIndicator from '../modal/NewIndicator';
+import StickerList from './StickerList';
+import UpdateHabit from '../modal/UpdateHabit';
+import UpdateStatelist from '../modal/UpdateStatelist';
+
 
 const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
-const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits, moods, setMoods, sleep, setSleep, load, loadx, year, month, day, scalerecords, setScalerecords, diary, setDiary, staterecords, setStaterecords, states, times, timerecords, scales, setStates, setTimes, setTimerecords, setScales, weather, setWeather, stickers, setStickers, stickerrecords, setStickerrecords, analytics, setAnalytics,
-                    statuslist, setStatuslist, statusrecords, setStatusrecords}) => {
+const TodayScreen = ({ db, habits, setHabits, moods, setMoods, sleep, setSleep, 
+  year, month, day, scalerecords, setScalerecords, diary, setDiary, 
+  staterecords, setStaterecords, states, times, timerecords, scales, setStates, 
+  setTimes, setTimerecords, setScales, weather, setWeather, analytics, setAnalytics, load, loadx}) => {
+
+  const referenceElementRef = useRef(null);
+  const [referenceElementPosition, setReferenceElementPosition] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const onReferenceElementLayout = () => {
+    if (referenceElementRef.current) {
+      referenceElementRef.current.measure((x, y, width, height, pageX, pageY) => {
+        setReferenceElementPosition({ x: pageX, y: pageY, width, height });
+      });
+    }
+  };
+
+  const completedHabitsLength = habits.filter(c=>(c.productive==true && c.state==true && c.year==year && c.month==month && c.day==day)).length;  
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedName, setSelectedName] = useState('');
+  const [updateStateVisible, setUpdateStateVisible] = useState(false);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [changeModalVisible, setChangeModalVisible] = useState(false);
+  const [goodpct, setGoodpct] = useState(habits.filter(c=>(c.productive==true && c.state==true && c.type==1 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
+  const [badpct, setBadpct] = useState(habits.filter(c=>(c.productive==true && c.state==true && c.type==2 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
+  const [neutralpct, setNeutralpct] = useState(habits.filter(c=>(c.productive==true && c.state==true && c.type==0 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
+  const [selectedHabit, setSelectedHabit] = useState(null);
+  const [updateStatelistVisible, setUpdateStatelistVisible] = useState(false);
+
+  useEffect(() => {
+    setGoodpct(habits.filter(c=>(c.productive==true && c.state==true && c.type==1 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
+    setBadpct(habits.filter(c=>(c.productive==true && c.state==true && c.type==2 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
+    setNeutralpct(habits.filter(c=>(c.productive==true && c.state==true && c.type==0 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
+  },[habits,day]);
+
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const openKeyboardAnimationValue = new Animated.Value(0);
+  const closeKeyboardAnimationValue = new Animated.Value(1);
+
+  const startOpenAnimation = () => {
+    Animated.timing(openKeyboardAnimationValue, {
+      toValue: 1,
+      duration: 300,
+      easing: Easing.ease,
+      useNativeDriver: false,
+    }).start();
+  };
+  
+  const startCloseAnimation = () => {
+    Animated.timing(closeKeyboardAnimationValue, {
+      toValue: 1,
+      duration: 300,
+      easing: Easing.ease,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  useEffect(() => {
+    if (isKeyboardOpen) {
+      startOpenAnimation();
+    } else {
+      startCloseAnimation();
+    }
+  }, [isKeyboardOpen]);
+
+useEffect(() => {
+  const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+    setIsKeyboardOpen(true);
+  });
+
+  const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+    setIsKeyboardOpen(false);
+  });
+
+  return () => {
+    keyboardDidShowListener.remove();
+    keyboardDidHideListener.remove();
+  };
+}, []);
 
 
-                      async function loadFonts() {
-                        await Font.loadAsync({
-                          'MyFont': require('../assets/fonts/AvenirNextCondensed.ttf'),
-                          // ... other fonts
-                        });
-                      }
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [selectedName, setSelectedName] = useState('');
-    const [updateStateVisible, setUpdateStateVisible] = useState(false);
-    const [newStickerVisible, setNewStickerVisible] = useState(false);
-
-
-
-    const allNames = habits.filter(c => (c.day==1, c.year==year, c.month==month)).map((c) => c.name);
-    const uniqueNames = [...new Set (allNames)];
+  const allNames = habits.filter(c => (c.productive==true &&c.day==1&& c.year==year&& c.month==month)).map((c) => c.name);
+  const uniqueNames = [...new Set (allNames)];
 
 
     if (isLoading) {
@@ -79,34 +143,56 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
         }
       };
 
-    const showTitle = (ind) => {
-      return (
-        <View>
-          <Pressable onPress={()=>updateState(habits.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.id)[0])} style={{ height: 75, width:25*1.25, transform: [{ skewX: '-45deg' },{scale: 1.25}], left: 60 }}>
-            <IndicatorTableTitleToday name={ind.item} state={habits.filter(c=>(c.name==ind.item && c.year==year && c.month==month && c.day==day)).map(c=>c.state)[0]} tracks={tracks} habits={habits} year={year} month={month}/>
-          </Pressable>
-        </View>
-      );
-    };
-
     const scaleNames= [... new Set(scalerecords.map(c=>c.name))];
     const timeNames= [... new Set(timerecords.map(c=>c.name))];
     const scaleCounts= scaleNames.length;
 
 
-  return (
-    <SafeAreaView style={container.body}>
-      <Text style={{fontFamily:'MyFont'}}>TODAY</Text>
-      <View style={{width:width, height :60}}>
-        <AddMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} load={load} loadx={loadx} setMoodModalVisible={undefined}/>
+
+  const HabitGauge = () => {
+    return(
+      <View style={{width:5, height:'100%', marginHorizontal:10}}>
+        <View style={{height:`${badpct * 100}%`, backgroundColor:colors.primary.bad}}/>
+        <View style={{height:`${neutralpct * 100}%`, backgroundColor:colors.primary.neutral}}/>
+        <View style={{height:`${goodpct * 100}%`, backgroundColor:colors.primary.good}}/>
       </View>
-      <View style={{height:90, width:width, flexDirection:'row'}}>
-        <FlatList
-          horizontal
-          data={uniqueNames}
-          renderItem={uniqueNames!==null?(name)=>showTitle(name):undefined}
-          keyExtractor={(_, index) => index.toString()}
-        />
+    )
+  }
+
+  const ClickableParallelogram = ({item}) => {
+    return (
+      <TouchableWithoutFeedback onPress={()=>updateState(item.id)} onLongPress={()=>{setSelectedHabit(item.name);setChangeModalVisible(true);}}>
+        <View style={{marginRight:8}}>
+          <View style={[container.parallelogram,{backgroundColor:item.state==false?colors.primary.white:item.type==2?colors.primary.bad:item.type==0?colors.primary.neutral:colors.primary.good,
+          borderWidth:item.state==false?1:0, borderColor:colors.primary.blue}]}/>
+          <View style={container.parallelogramTextLayer}>
+            <Ionicons name={item.icon} size={16} color={colors.primary.white} style={{margin:2}}/>
+            <Ionicons name={`${item.icon}`+'-outline'} size={16} color={item.state==false?colors.primary.blue:colors.primary.black} style={{margin:2, position:'absolute',display:item.state==true?'none':'flex'}}/>
+            <Text style={[text.regular,{color:item.state==true?colors.primary.white:colors.primary.blue, textAlign:'left', fontSize:10}]} numberOfLines={1}>{item.name}</Text>
+          </View>
+          <UpdateHabit
+            changeModalVisible={changeModalVisible}
+            setChangeModalVisible={setChangeModalVisible}
+            db={db}
+            data={habits.filter(c=>(c.name==selectedHabit))[0]}
+            type={'habit'}
+            update={habits}
+            setUpdate={setHabits}
+            update2={undefined}
+            setUpdate2={undefined}
+            load={load}
+            loadx={loadx}
+          />
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
+  return (
+    <SafeAreaView style={[container.body,{justifyContent:'center', alignItems:'center'}]}>
+      <View style={{width:width, flexDirection:'row', left:5, justifyContent:'center', alignItems:'center'}}>
+        <MaterialCommunityIcons name="emoticon-outline" size={40} color={colors.primary.blue} style={{marginLeft:10}}/>
+        <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
         {weather.length!==0 &&
           <UpdateWeather db={db} weather={weather} setWeather={setWeather} year={year} month={month} day={day}/>    
         } 
@@ -124,36 +210,32 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
               );
           });
           }} style={{width:100, justifyContent:'center', alignItems:'center'}}>
-            <Ionicons name={'add-circle-outline'} size={60} color={colors.primary.blue}/>
+            <Ionicons name={'add-circle-outline'} size={50} color={colors.primary.blue}/>
           </TouchableOpacity>
         }
+      </View>
+      <View style={{height:110,width:'90%',flexDirection:'row'}}>
+          <FlatList
+            data={habits.filter(c=>(c.productive==true && c.year==year && c.month==month && c.day==day))}
+            renderItem={({item})=>ClickableParallelogram({item})}
+            keyExtractor={(item) => item.id.toString()}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            contentContainerStyle={{paddingHorizontal: 30}}
+          />
+        <View style={{height:100,width:10,justifyContent:'center'}}>
+          <HabitGauge/>
         </View>
-      <View style={{height:110, width:width}}>
-        <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} load={load} loadx={loadx} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
       </View>
       <View style={{flex:1, width:width, flexDirection:'row'}}>
-        <View style={{flex:2,marginLeft:20, marginBottom:10}}>
-          <FlatList
-            data={[...scaleNames, ...timeNames]}
-            renderItem={[...scaleNames, ...timeNames].length!==0?({item,index})=>
-            index<scaleCounts? 
-            <AddScale name={item} scales={scales} scalerecords={scalerecords} 
-            setScalerecords={setScalerecords} db={db} year={year} month={month} day={day} load={load} 
-            loadx={loadx} setScaleModalVisible={undefined}/> : <AddTime name={item} times={times} timerecords={timerecords} 
-            setTimerecords={setTimerecords} db={db} year={year} month={month} day={day} load={load} 
-            loadx={loadx} setTimeModalVisible={undefined}/>
-            :undefined}
-            keyExtractor={(_, index) => index.toString()} 
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
-        <View style={{flex:3}}>
+        <View style={{flex:1,marginLeft:10, marginBottom:10}}>
           <FlatList
             data={[... new Set(states.map(c=>c.name))]}
             renderItem={(item)=>
-              <View style={{flexDirection:'row', height:40, marginRight:20, justifyContent:'flex-end', alignContent:'center', alignItems:'center'}}>
-                <Text>{item.item}</Text>
-                <Pressable onPress={()=>{setUpdateStateVisible(true);setSelectedName(item.item)}} style={{width:30, height:30, marginLeft:10, borderWidth:1, borderColor: colors.primary.blue, borderRadius:10, backgroundColor: states.filter(c=>c.item==staterecords.filter(c=>(c.year==year && c.month==month && c.day==day && c.name==item.item)).map(c=>c.item)[0]).map(c=>c.color)[0]}}/>
+              <View style={{flexDirection:'row', height:40, marginRight:20, justifyContent:'flex-start', alignContent:'center', alignItems:'center'}}>
+                <Pressable ref={referenceElementRef} onPress={()=>{setUpdateStateVisible(true);setSelectedName(item.item); onReferenceElementLayout();}}  
+                style={[container.color,{marginLeft:10, borderWidth:1, borderColor: colors.primary.blue,
+                backgroundColor: states.filter(c=>c.item==staterecords.filter(c=>(c.year==year && c.month==month && c.day==day && c.name==item.item)).map(c=>c.item)[0]).map(c=>c.color)[0]}]}/>
                 <View style={{display: updateStateVisible? 'flex':'none'}}>
                   <UpdateState 
                     db={db}
@@ -167,18 +249,80 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
                     year={year}
                     month={month}
                     day={day}
+                    referenceElementPosition={referenceElementPosition}
                   />
                 </View>
+                <Pressable onLongPress={()=>{setSelectedHabit(item.item);setUpdateStatelistVisible(true);}}>
+                  <Text style={[text.regular,{left:5}]}>{item.item}</Text>
+                </Pressable>
+                <UpdateStatelist
+                  updateStatelistVisible={updateStatelistVisible}
+                  setUpdateStatelistVisible={setUpdateStatelistVisible}
+                  db={db}
+                  data={states.filter(c=>(c.name==selectedHabit))[0]}
+                  states={states}
+                  setStates={setStates}
+                  staterecords={staterecords}
+                  setStaterecords={setStaterecords}
+                  load={load}
+                  loadx={loadx}
+                />
               </View>}
             keyExtractor={(name) => (name!==null && name!==undefined) ? name.toString():''} 
           />
         </View>
-      </View>
-      <View style={{height:180, width:width, marginBottom:10}}>
-        <View style={{bottom:5,height:30, marginHorizontal:20, flexDirection:'row'}}>
-          <StickerList db={db} stickers={stickers} setStickers={setStickers} stickerrecords={stickerrecords} setStickerrecords={setStickerrecords} year={year} month={month} day={day}/>
-          <Ionicons onPress={()=>setNewStickerVisible(true)} name="add-circle-outline" size={30} color={colors.primary.blue}/>
+        <View style={{flex:1}}>
+          <FlatList
+            data={[...scaleNames, ...timeNames]}
+            renderItem={[...scaleNames, ...timeNames].length!==0?({item,index})=>
+            index<scaleCounts? 
+            <AddScale name={item} scales={scales} scalerecords={scalerecords} 
+            setScalerecords={setScalerecords} db={db} year={year} month={month} day={day}
+            setScaleModalVisible={undefined} load={load} loadx={loadx}/> : <AddTime name={item} times={times} timerecords={timerecords} 
+            setTimerecords={setTimerecords} db={db} year={year} month={month} day={day} 
+             setTimeModalVisible={undefined}/>
+            :undefined}
+            keyExtractor={(_, index) => index.toString()} 
+            showsVerticalScrollIndicator={false}
+          />
         </View>
+      </View>
+      <Animated.View
+            style={
+              {
+                marginBottom: isKeyboardOpen
+                  ? openKeyboardAnimationValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [10, height * 3 / 10],
+                    })
+                  : closeKeyboardAnimationValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [height * 3 / 10, 10],
+                    }),
+                height:180, width:width
+              }
+            }
+          >
+        <View style={{bottom:5,height:30, marginHorizontal:20, flexDirection:'row'}}>
+          <StickerList db={db} habits={habits} setHabits={setHabits} year={year} month={month} day={day} load={load} loadx={loadx}/>
+          <Ionicons onPress={()=>setAddModalVisible(true)} name="add-circle-outline" size={30} color={colors.primary.blue}/>
+        </View>
+        <NewIndicator
+          addModalVisible={addModalVisible===true}
+          setAddModalVisible={setAddModalVisible}
+          db={db}
+          habits={habits}
+          setHabits={setHabits}
+          states={states}
+          setStates={setStates}
+          staterecords={staterecords}
+          setStaterecords={setStaterecords}
+          scales={scales} setScales={setScales} 
+          scalerecords={scalerecords} setScalerecords={setScalerecords}
+          times={times} setTimes={setTimes}
+          timerecords={timerecords} setTimerecords={setTimerecords}
+          load={load} loadx={loadx}
+        />
         <DiaryElement 
           db={db}
           diary={diary}
@@ -189,8 +333,7 @@ const TodayScreen = ({ db, tasks, setTasks, tracks, setTracks, habits, setHabits
           load={load}
           loadx={loadx}
         />
-      </View>
-      <NewSticker db={db} stickers={stickers} setStickers={setStickers} newStickerVisible={newStickerVisible} setNewStickerVisible={setNewStickerVisible}/>
+      </Animated.View>
     </SafeAreaView>
   );
 }

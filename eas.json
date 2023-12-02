@@ -16,6 +16,12 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "elodie.sza@gmail.com",
+        "ascAppId": "6469999798",
+        "appleTeamId": "C89W77XBU7"
+      }
+    }
   }
 }

@@ -1,12 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Platform, Modal, Alert, TouchableWithoutFeedback,TouchableOpacity, StyleSheet, TextInput, Pressable, Text, View, FlatList } from 'react-native';
 import { container,colors } from '../styles';
 import Color from '../components/Color';
 
-
-function UpdateState({db, staterecords, setStaterecords, states, setStates, name, updateStateVisible, setUpdateStateVisible, year, month, day}) {
-
+function UpdateState({db, staterecords, setStaterecords, states, setStates, name, updateStateVisible, setUpdateStateVisible, year, month, day, referenceElementPosition}) {
 
   const changeState = (item) => {
     let existingstates=[...staterecords];
@@ -28,16 +26,16 @@ function UpdateState({db, staterecords, setStaterecords, states, setStates, name
 
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       visible={updateStateVisible}
       onRequestClose={() => {
         setUpdateStateVisible(false);
       }}
     > 
-      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setUpdateStateVisible(!updateStateVisible)}} activeOpacity={1}>
+      <TouchableOpacity style={{flex:1}} onPressOut={() => {setUpdateStateVisible(!updateStateVisible)}} activeOpacity={1}>
         <TouchableWithoutFeedback>
-            <View style={container.modal}>
+          <View style={[container.picker,{width: 41*(states.filter(c=>c.name==name).length+1)-40,left: referenceElementPosition.x-8+referenceElementPosition.width+10,  top: referenceElementPosition.y-8}]}>
             <FlatList
                 horizontal={true}
                 data={[... new Set(states.filter(c=>c.name==name).map(c=>c.item))]}
@@ -49,10 +47,8 @@ function UpdateState({db, staterecords, setStaterecords, states, setStates, name
                 keyExtractor={(item, index) => index.toString()}
                 scrollEnabled={true}
                 bounces={false}
-                contentContainerStyle={{ alignItems:'center', justifyContent:'center'}}
+                contentContainerStyle={{ alignItems:'center', justifyContent:'center', borderRadius: 22}}
             />
-              <Pressable style={container.button}><Text>CREATE</Text></Pressable>
-            <Text style={{color: 'gray', fontSize: 12, marginBottom:10}}>Must be up to 16 characters</Text>
           </View> 
         </TouchableWithoutFeedback>
       </TouchableOpacity>

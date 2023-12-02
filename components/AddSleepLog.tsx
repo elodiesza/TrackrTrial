@@ -3,25 +3,31 @@ import { useState, useEffect } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import SleepColorPicker from './SleepColorPicker';
-import { container } from '../styles';
+import { container,colors } from '../styles';
 import uuid from 'react-native-uuid';
-import CircularSlider from 'react-native-circular-slider';
-
+import { Ionicons } from '@expo/vector-icons';
+import SleepTypeColors from '../constants/SleepTypeColors';
 
 const width = Dimensions.get('window').width;
 
-const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSleepModalVisible,sleepModalVisible}) => {
+const AddSleepLog = ({ db, sleep, setSleep, year, month, day, setSleepModalVisible,sleepModalVisible}) => {
 
-    const [isLoading, setIsLoading] = useState(false);
     const [sleepTime,setSleepTime] = useState(new Date(year,month-1,day,23,0,0));
     const [wakeupTime,setWakeupTime] = useState(new Date(year,month-1,day,7,0,0));
     const [showDatePicker, setShowDatePicker] = useState(true);
     const [picked, setPicked] = useState<string>('white');
     const [colorPickerVisible, setColorPickerVisible] = useState(false);
     const [selectedType, setSelectedType] = useState('white');
-    
-    const sleepTypes=[{"type":1,"color":"red"},{"type":2,"color":"orange"},{"type":3,"color":"yellow"},{"type":4,"color":"yellowgreen"},{"type":5,"color":"green"}];
+    const initialSleepTime=sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.sleep)[0];
+    const initialWakeupTime=sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.wakeup)[0];
+    const [sleepTimeExists, setSleepTimeExists] = useState(initialSleepTime!==undefined);
+    const [wakeupTimeExists, setWakeupTimeExists] = useState(initialWakeupTime!==undefined);
 
+    useEffect(()=>{
+        setSleepTimeExists(initialSleepTime!==undefined && initialSleepTime!==null);
+        setWakeupTimeExists(initialWakeupTime!==undefined && initialWakeupTime!==null);
+    },[initialSleepTime,initialWakeupTime])
+    
 
     const onChangeSleep = (event, selectedTime) => {
         const currentTime = selectedTime || sleepTime;
@@ -58,6 +64,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
                 );
             });
         }
+        setSleepTimeExists(true)
     };
 
     const addWakeup = () => {
@@ -84,13 +91,13 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
                 );
             });
         }
+        setWakeupTimeExists(true)
     };
 
 
   return (
     <SafeAreaView style={container.body}>
-        <View style={{flexDirection:'row', justifyContent:'center', height:100, marginTop:10}}>
-            <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {alignSelf:'center',backgroundColor: sleepTypes.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0]}]}/>
+        <View style={{flexDirection:'row', justifyContent:'center', height:60}}>
             <SleepColorPicker
               db={db}
               selectedType={selectedType}
@@ -106,40 +113,35 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, load, loadx,setSle
               setSleepModalVisible={setSleepModalVisible==undefined? undefined : setSleepModalVisible}
               sleepModalVisible={sleepModalVisible==undefined? undefined : setSleepModalVisible}
             />
-            <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
-                <Text>YTD SLEEP TIME</Text>
+            <View style={{marginLeft:10,width:120,alignContent:'center', alignItems:'center',justifyContent:'center', flexDirection:'row'}}>
                 <DateTimePicker
                     value={sleepTime}
                     mode="time"
                     display="default"
                     onChange={onChangeSleep}
                     minuteInterval={30}
-                    style={{marginRight:8}}
+                    style={{height:30, width:90}}
                 />
-                <Pressable onPress={addSleep} style={[container.button,{width:105}]}><Text>SAVE</Text></Pressable>
+                <View style={{left:-5, height:30, borderTopRightRadius:17,borderBottomRightRadius:17}}>
+                    <Ionicons name="moon" size={32} color={colors.primary.default} style={{transform:[{rotate:"45deg"}],top:-1}}/>
+                    <Ionicons name="moon-outline" size={36} color={colors.primary.default} style={{position:'absolute',transform:[{rotate:"45deg"}],top:-5,left:-2}}/>
+                </View>
             </View>
-            <View style={{width:120,alignContent:'center', alignItems:'center',justifyContent:'center'}}>
-                <Text>WAKE-UP TIME</Text>
+            <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {alignSelf:'center',
+            backgroundColor: SleepTypeColors.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0],
+            borderColor:SleepTypeColors.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.type)[0]==undefined?colors.primary.blue:colors.primary.gray}]}/>
+            <View style={{width:90, alignContent:'center', alignItems:'center',justifyContent:'center', flexDirection:'row'}}>
+                <View style={{left:10,width:20, height:30,justifyContent:'center',paddingLeft:30}}>
+                    <Ionicons name="sunny" size={60} color={colors.primary.default} style={{position:'absolute', marginLeft:-10}}/>
+                    <Ionicons name="sunny-outline" size={60} color={colors.primary.blue} style={{position:'absolute', marginLeft:-8}}/>
+                </View>
                 <DateTimePicker
                     value={wakeupTime}
                     mode="time"
                     display="default"
                     onChange={onChangeWakeup}
                     minuteInterval={30}
-                    style={{marginRight:8}}
-                />
-                <Pressable onPress={addWakeup} style={[container.button,{width:105}]}><Text>SAVE</Text></Pressable>
-                <CircularSlider
-                    startAngle={0}
-                    angleLength={70}
-                    segments={5}
-                    strokeWidth={40}
-                    radius={145}
-                    gradientColorFrom="#ff9800"
-                    gradientColorTo="#ffcf00"
-                    showClockFace
-                    clockFaceColor="#9d9d9d"
-                    bgCircleColor="#171717"
+                    style={{height:30, width:85, backgroundColor:colors.primary.defaultlight,borderWidth:1,borderColor:colors.primary.blue,borderRadius:10}}
                 />
             </View>
         </View>

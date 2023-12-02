@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { FlatList, ScrollView, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
+import React from 'react'
+import { FlatList, ScrollView, Text, View, Dimensions } from 'react-native';
 import { container } from '../../styles';
 import BigPie from '../../components/BigPie';
 import PieChartView from '../../components/PieChartView';
@@ -8,12 +8,20 @@ import { Ionicons } from '@expo/vector-icons';
 
 const width = Dimensions.get('window').width;
 
-const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerrecords, sleep, staterecords, month, year, tracks, moods, daysInMonth, times, timerecords }) => {
+const StatsHome = ({ moods, month, year, habits, states, scales, scalerecords, sleep, staterecords, times, timerecords, daysInMonth }) => {
+    
+    const moodCounts = [{"item":"productive", "count":0},{"item":"happy", "count":0},{"item":"stressed", "count":0},{"item":"angry", "count":0},{"item":"calm", "count":0},{"item":"bored", "count":0},{"item":"sad", "count":0}];
+    if (moods.length!==0){
+        for(var i=1; i<daysInMonth+1;i++){
+        moods.filter(c=>c.day==i).length==0? undefined: moodCounts.filter(c=>c.item==moods.filter(c=>c.day==i).map(c=>c.mood)[0])[0].count++;
+        }
+    }
 
     const today=new Date();
     const thisDay= today.getDate();
     const thisMonth= today.getMonth();
     const thisYear= today.getFullYear();
+
 
     function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -42,11 +50,12 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
         }
         return(
             <View style={{flexDirection:'row', marginVertical:2,width:width}}>
-                <View style={{width:90, justifyContent:'center', marginLeft:10}}>
-                    <Text style={{fontSize:10}}>{item}</Text>
+                <View style={{width:90, alignItems:'center', marginLeft:10, flexDirection:'row'}}>
+                    <Ionicons name={item.icon} size={10} color={item.color}/>
+                    <Text style={{fontSize:10}}>{item.name}</Text>
                 </View>
                 <View style={{width:90,height:18,borderRadius:5, borderWidth:1, borderColor:colors.primary.black, backgroundColor:colors.primary.white}}>
-                    <View style={{width:98*habitsPercentage(),height:16,backgroundColor:colors.primary.tungstene,borderRadius:4}} />
+                    <View style={{width:88*habitsPercentage(),height:16,backgroundColor:colors.primary.tungstene,borderRadius:4}} />
                 </View>
             </View>
         );
@@ -108,7 +117,7 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
         );
     }
     const stickerObject = ({item}) => {
-        const stickerCount= stickerrecords.filter(c=>(c.name==item.name&&c.year==year&&c.month==month&&c.state==true)).length;
+        const stickerCount= habits.filter(c=>(c.productive==false && c.name==item.name&&c.year==year&&c.month==month&&c.state==true)).length;
         return(
             <View style={{width:250,flexDirection:'row', alignItems:'center'}}>
                 <View style={{}}>
@@ -122,7 +131,6 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
             </View>
         );
     };
-    const moodCounts = [{"item":"productive", "count":0},{"item":"happy", "count":0},{"item":"sick", "count":0},{"item":"stressed", "count":0},{"item":"angry", "count":0},{"item":"calm", "count":0},{"item":"bored", "count":0},{"item":"sad", "count":0}];
 
 
     //Sleep gauges
@@ -149,23 +157,21 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
     }
 
     return (
-        <View style={[container.body,{marginHorizontal:10}]}>
-            <View  style={{width:'100%', height:100, alignItems:'flex-start', margin:10}}>
+        <View style={[container.body,{marginHorizontal:10}]}> 
+            <View style={{alignContent:'center',flexDirection:'row',width:width-20, height:width/5, alignItems:'flex-start', marginTop:10}}>
                 <BigPie data={moodCounts} name={"MOOD"} states={undefined} year={year} month={month} daysInMonth={daysInMonth} pieWidth={width/5}/>
-            </View>
-            <View>
                 <FlatList
                     data={[...new Set(states.map(c=>c.name))]}
                     renderItem={({ item }) => (<PieChartView name={item} year={year} month={month} states={states} staterecords={staterecords} daysInMonth={daysInMonth} pieWidth={width/5}/>)}
                     keyExtractor={states.id}
-                    contentContainerStyle={{height:100}}
                     horizontal
+                    contentContainerStyle={{height:width/5}}
                 />
             </View>
-            <View style={{flexDirection:'row', flex:1}}>
+            <View style={{flexDirection:'row', flex:1, marginTop:10}}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <FlatList
-                        data={[...new Set(habits.map(c=>c.name))]}
+                        data={habits.filter(c=>(c.productive==true && c.year==year && c.month==month && c.day==1))}
                         renderItem={({ item }) =>habitBar({item})}
                         keyExtractor={habits.id}
                         contentContainerStyle={{flex:1}}
@@ -173,9 +179,9 @@ const StatsHome = ({ habits, states, scales, scalerecords, stickers, stickerreco
                 </ScrollView>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <FlatList
-                        data={[...new Set(stickers)]}
+                        data={[...new Set(habits.filter(c=>c.productive==false))]}
                         renderItem={({ item }) =>stickerObject({item})}
-                        keyExtractor={stickers.id}
+                        keyExtractor={habits.filter(c=>c.productive==false).id}
                         contentContainerStyle={{flex:1}}
                     />
                 </ScrollView>
