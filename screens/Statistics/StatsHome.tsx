@@ -44,7 +44,7 @@ const StatsHome = ({ moods, month, year, habits, states, scales, scalerecords, s
         const habitsPercentage = () => {
             let gauge=0;
             for(let i=1; i<((year==thisYear&&month==thisMonth)?thisDay:daysInMonth)+1; i++){
-                habits.filter(c=>(c.name==item&&c.year==year&&c.month==month&&c.day==i)).map(c=>c.state)[0]==1?gauge++:undefined;
+                habits.filter(c=>(c.name==item.name && c.productive==true && c.year==year&&c.month==month&&c.day==i)).map(c=>c.state)[0]==1?gauge++:undefined;
             }
             return gauge/((year==thisYear&&month==thisMonth)?thisDay:daysInMonth);
         }
@@ -52,7 +52,7 @@ const StatsHome = ({ moods, month, year, habits, states, scales, scalerecords, s
             <View style={{flexDirection:'row', marginVertical:2,width:width}}>
                 <View style={{width:90, alignItems:'center', marginLeft:10, flexDirection:'row'}}>
                     <Ionicons name={item.icon} size={10} color={item.color}/>
-                    <Text style={{fontSize:10}}>{item.name}</Text>
+                    <Text style={{fontSize:10, left:5}}>{item.name}</Text>
                 </View>
                 <View style={{width:90,height:18,borderRadius:5, borderWidth:1, borderColor:colors.primary.black, backgroundColor:colors.primary.white}}>
                     <View style={{width:88*habitsPercentage(),height:16,backgroundColor:colors.primary.tungstene,borderRadius:4}} />
@@ -179,7 +179,7 @@ const StatsHome = ({ moods, month, year, habits, states, scales, scalerecords, s
                 </ScrollView>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <FlatList
-                        data={[...new Set(habits.filter(c=>c.productive==false))]}
+                        data={[...new Set(habits.filter(c=>(c.productive==false && c.year==year && c.month==month && c.day==1)))]}
                         renderItem={({ item }) =>stickerObject({item})}
                         keyExtractor={habits.filter(c=>c.productive==false).id}
                         contentContainerStyle={{flex:1}}

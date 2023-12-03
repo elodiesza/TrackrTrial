@@ -6,9 +6,8 @@ import { useForm, Controller } from 'react-hook-form';
 import uuid from 'react-native-uuid';
 
 
-const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => {
+const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx, updatenotesDisplay, setUpdatenotesDisplay}) => {
     const {control, handleSubmit, reset} = useForm();
-    const [updatenotesDisplay, setUpdatenotesDisplay] = useState(false);
     const [displayedDiary, setDisplayedDiary] = useState([{'year':'' , 'month':'', 'day':'', 'notes':''}]);
     const [savedNotes, setSavedNotes] = useState([{'year':'' , 'month':'', 'day':'', 'notes':''}]);
 
@@ -63,11 +62,11 @@ const DiaryElement = ({ db, year, month, day, diary, setDiary, load, loadx}) => 
 
     return (
         <View style={[container.body,{justifyContent:'center'}]}>
-            <View style={[styles.textBox,{borderColor:  updatenotesDisplay ? colors.primary.defaultdark : colors.primary.blue, backgroundColor:colors.primary.white}]}>
+            <View style={[styles.textBox,{borderColor:  diary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes).length>0 ? colors.primary.defaultdark : colors.primary.blue, backgroundColor:colors.primary.white}]}>
                 <View style={{flex:1, margin:10, flexDirection:'row'}}>
                     <ScrollView style={{flex:1}}>
                         <View style={{flex:1, display: updatenotesDisplay? "none" : "flex"}}>
-                            <Text style={{color: colors.primary.defaultdark}}>
+                            <Text style={{color: colors.primary.black}}>
                                 {displayedDiary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes).length==0?'':
                                 displayedDiary.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.notes)[0]}
                             </Text>
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
     textBox: {
         width:"90%",
         height: 150,
-        backgroundColor: colors.white,
+        backgroundColor: colors.primary.white,
         borderRadius: 15,
         justifyContent: "center",
         alignItems: "center",

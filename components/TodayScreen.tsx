@@ -1,4 +1,4 @@
-import { Animated, Easing, Keyboard, TouchableWithoutFeedback, FlatList, Pressable, TouchableOpacity, Text, View, SafeAreaView,Dimensions } from 'react-native';
+import { Animated, Easing, Keyboard, TouchableWithoutFeedback, FlatList, Pressable, TouchableOpacity, Text, View, SafeAreaView,Dimensions, Platform } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import AddSleepLog from './AddSleepLog';
 import { container,colors, text } from '../styles';
@@ -13,6 +13,8 @@ import NewIndicator from '../modal/NewIndicator';
 import StickerList from './StickerList';
 import UpdateHabit from '../modal/UpdateHabit';
 import UpdateStatelist from '../modal/UpdateStatelist';
+import UpdateMood from '../modal/UpdateMood';
+import { MoodIcons } from '../constants/MoodIcons';
 
 
 const width = Dimensions.get('window').width;
@@ -24,11 +26,21 @@ const TodayScreen = ({ db, habits, setHabits, moods, setMoods, sleep, setSleep,
   setTimes, setTimerecords, setScales, weather, setWeather, analytics, setAnalytics, load, loadx}) => {
 
   const referenceElementRef = useRef(null);
+  const referenceMoodElementRef = useRef(null);
   const [referenceElementPosition, setReferenceElementPosition] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [referenceMoodElementPosition, setReferenceMoodElementPosition] = useState({ x: 0, y: 0, width: 0, height: 0 });
+
   const onReferenceElementLayout = () => {
     if (referenceElementRef.current) {
       referenceElementRef.current.measure((x, y, width, height, pageX, pageY) => {
         setReferenceElementPosition({ x: pageX, y: pageY, width, height });
+      });
+    }
+  };
+  const onReferenceMoodElementLayout = () => {
+    if (referenceMoodElementRef.current) {
+      referenceMoodElementRef.current.measure((x, y, width, height, pageX, pageY) => {
+        setReferenceMoodElementPosition({ x: pageX, y: pageY, width, height });
       });
     }
   };
@@ -45,6 +57,21 @@ const TodayScreen = ({ db, habits, setHabits, moods, setMoods, sleep, setSleep,
   const [neutralpct, setNeutralpct] = useState(habits.filter(c=>(c.productive==true && c.state==true && c.type==0 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
   const [selectedHabit, setSelectedHabit] = useState(null);
   const [updateStatelistVisible, setUpdateStatelistVisible] = useState(false);
+  const [moodModalVisible, setMoodModalVisible] = useState(false);
+  const [selectedMood, setSelectedMood] = useState(moods.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.mood)[0]);
+  const [moodIcon, setMoodIcon] = useState(MoodIcons.filter(c=>(c.name==selectedMood)).map(c=>c.icon)[0]);
+  const [moodColor, setMoodColor] = useState(MoodIcons.filter(c=>(c.name==selectedMood)).map(c=>c.color)[0]);
+  const [updatenotesDisplay, setUpdatenotesDisplay] = useState(false);
+
+
+  useEffect(()=>{
+    setSelectedMood(moods.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.mood)[0]);
+  },[moods,day])
+
+  useEffect(()=>{
+    setMoodIcon(MoodIcons.filter(c=>(c.name==selectedMood)).map(c=>c.icon)[0]);
+    setMoodColor(MoodIcons.filter(c=>(c.name==selectedMood)).map(c=>c.color)[0]);
+  },[selectedMood, moods,day])
 
   useEffect(() => {
     setGoodpct(habits.filter(c=>(c.productive==true && c.state==true && c.type==1 && c.year==year && c.month==month && c.day==day)).length/completedHabitsLength);
@@ -55,6 +82,7 @@ const TodayScreen = ({ db, habits, setHabits, moods, setMoods, sleep, setSleep,
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const openKeyboardAnimationValue = new Animated.Value(0);
   const closeKeyboardAnimationValue = new Animated.Value(1);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const startOpenAnimation = () => {
     Animated.timing(openKeyboardAnimationValue, {
@@ -75,12 +103,15 @@ const TodayScreen = ({ db, habits, setHabits, moods, setMoods, sleep, setSleep,
   };
 
   useEffect(() => {
-    if (isKeyboardOpen) {
+    if (isKeyboardOpen && updatenotesDisplay) {
       startOpenAnimation();
-    } else {
+    } else if (!updatenotesDisplay){
       startCloseAnimation();
     }
-  }, [isKeyboardOpen]);
+    else {
+      startCloseAnimation();
+    }
+  }, [isKeyboardOpen,updatenotesDisplay]);
 
 useEffect(() => {
   const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -91,13 +122,27 @@ useEffect(() => {
     setIsKeyboardOpen(false);
   });
 
+  const keyboardDidShowListener2 = Keyboard.addListener(
+    Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+    (event) => {
+      setKeyboardHeight(event.endCoordinates.height);
+    }
+  );
+
+  const keyboardDidHideListener2 = Keyboard.addListener(
+    Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+    () => {
+      setKeyboardHeight(0);
+    }
+  );
+
   return () => {
     keyboardDidShowListener.remove();
     keyboardDidHideListener.remove();
+    keyboardDidShowListener2.remove();
+    keyboardDidHideListener2.remove();
   };
 }, []);
-
-
 
   const allNames = habits.filter(c => (c.productive==true &&c.day==1&& c.year==year&& c.month==month)).map((c) => c.name);
   const uniqueNames = [...new Set (allNames)];
@@ -190,11 +235,17 @@ useEffect(() => {
 
   return (
     <SafeAreaView style={[container.body,{justifyContent:'center', alignItems:'center'}]}>
-      <View style={{width:width, flexDirection:'row', left:5, justifyContent:'center', alignItems:'center'}}>
-        <MaterialCommunityIcons name="emoticon-outline" size={40} color={colors.primary.blue} style={{marginLeft:10}}/>
+      <View style={{width:width, flexDirection:'row', left:10, justifyContent:'center', alignItems:'center'}} ref={referenceMoodElementRef}>
+        <Pressable ref={referenceMoodElementRef} onPress={()=>{setMoodModalVisible(true); onReferenceMoodElementLayout();}} style={{marginLeft:10, justifyContent:'center', alignItems:'center'}}>
+          <View style={{width:38, height:38, backgroundColor:selectedMood==undefined?colors.primary.blue:colors.primary.black, borderRadius:20}}/>
+          <MaterialCommunityIcons name={selectedMood==undefined?'progress-question':moodIcon} size={40} color={selectedMood==undefined?colors.primary.default:moodColor} style={{position:'absolute', left:-1}}/>
+        </Pressable>
+        <UpdateMood moods={moods} setMoods={setMoods} db={db} year={year} month={month} day={day} 
+        moodModalVisible={moodModalVisible} setMoodModalVisible={setMoodModalVisible} referenceElementPosition={referenceMoodElementPosition}
+        selectedMood={selectedMood} setSelectedMood={setSelectedMood}/>
         <AddSleepLog db={db} sleep={sleep} setSleep={setSleep} year={year} month={month} day={day} setSleepModalVisible={undefined} sleepModalVisible={undefined}/>
         {weather.length!==0 &&
-          <UpdateWeather db={db} weather={weather} setWeather={setWeather} year={year} month={month} day={day}/>    
+          <UpdateWeather db={db} weather={weather} setWeather={setWeather} year={year} month={month} day={day} load={load} loadx={loadx}/>    
         } 
         {weather.length==0 &&
           <TouchableOpacity onPress={()=>{
@@ -234,9 +285,9 @@ useEffect(() => {
             renderItem={(item)=>
               <View style={{flexDirection:'row', height:40, marginRight:20, justifyContent:'flex-start', alignContent:'center', alignItems:'center'}}>
                 <Pressable ref={referenceElementRef} onPress={()=>{setUpdateStateVisible(true);setSelectedName(item.item); onReferenceElementLayout();}}  
-                style={[container.color,{marginLeft:10, borderWidth:1, borderColor: colors.primary.blue,
+                style={[container.color,{marginLeft:10, borderWidth:1, 
+                borderColor: staterecords.filter(c=>(c.year==year && c.month==month && c.day==day && c.name==item.item)).map(c=>c.item)==''?colors.primary.blue:colors.primary.black,
                 backgroundColor: states.filter(c=>c.item==staterecords.filter(c=>(c.year==year && c.month==month && c.day==day && c.name==item.item)).map(c=>c.item)[0]).map(c=>c.color)[0]}]}/>
-                <View style={{display: updateStateVisible? 'flex':'none'}}>
                   <UpdateState 
                     db={db}
                     staterecords={staterecords}
@@ -251,7 +302,6 @@ useEffect(() => {
                     day={day}
                     referenceElementPosition={referenceElementPosition}
                   />
-                </View>
                 <Pressable onLongPress={()=>{setSelectedHabit(item.item);setUpdateStatelistVisible(true);}}>
                   <Text style={[text.regular,{left:5}]}>{item.item}</Text>
                 </Pressable>
@@ -278,26 +328,29 @@ useEffect(() => {
             index<scaleCounts? 
             <AddScale name={item} scales={scales} scalerecords={scalerecords} 
             setScalerecords={setScalerecords} db={db} year={year} month={month} day={day}
-            setScaleModalVisible={undefined} load={load} loadx={loadx}/> : <AddTime name={item} times={times} timerecords={timerecords} 
+            setScaleModalVisible={undefined} load={load} loadx={loadx}/> : 
+            <AddTime name={item} times={times} timerecords={timerecords} 
             setTimerecords={setTimerecords} db={db} year={year} month={month} day={day} 
              setTimeModalVisible={undefined}/>
             :undefined}
             keyExtractor={(_, index) => index.toString()} 
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={{flex:1,alignItems:'flex-start'}}
           />
         </View>
       </View>
+      <View style={{position:'absolute', bottom:0}}>
       <Animated.View
             style={
               {
                 marginBottom: isKeyboardOpen
                   ? openKeyboardAnimationValue.interpolate({
                       inputRange: [0, 1],
-                      outputRange: [10, height * 3 / 10],
+                      outputRange: [10, keyboardHeight-70],
                     })
                   : closeKeyboardAnimationValue.interpolate({
                       inputRange: [0, 1],
-                      outputRange: [height * 3 / 10, 10],
+                      outputRange: [keyboardHeight-70, 10],
                     }),
                 height:180, width:width
               }
@@ -307,7 +360,21 @@ useEffect(() => {
           <StickerList db={db} habits={habits} setHabits={setHabits} year={year} month={month} day={day} load={load} loadx={loadx}/>
           <Ionicons onPress={()=>setAddModalVisible(true)} name="add-circle-outline" size={30} color={colors.primary.blue}/>
         </View>
-        <NewIndicator
+        <DiaryElement 
+          db={db}
+          diary={diary}
+          setDiary={setDiary}
+          year={year}
+          month={month}
+          day={day}
+          load={load}
+          loadx={loadx}
+          updatenotesDisplay={updatenotesDisplay}
+          setUpdatenotesDisplay={setUpdatenotesDisplay}
+        />
+      </Animated.View>
+      </View>
+      <NewIndicator
           addModalVisible={addModalVisible===true}
           setAddModalVisible={setAddModalVisible}
           db={db}
@@ -323,17 +390,6 @@ useEffect(() => {
           timerecords={timerecords} setTimerecords={setTimerecords}
           load={load} loadx={loadx}
         />
-        <DiaryElement 
-          db={db}
-          diary={diary}
-          setDiary={setDiary}
-          year={year}
-          month={month}
-          day={day}
-          load={load}
-          loadx={loadx}
-        />
-      </Animated.View>
     </SafeAreaView>
   );
 }

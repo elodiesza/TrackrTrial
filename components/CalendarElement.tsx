@@ -102,7 +102,7 @@ export default function CalendarElement({year, month, day, db, habits, setHabits
       <View style={[styles.calendarCell,{backgroundColor: date==0? 'lightgray' : 'white', borderColor: (date==thisDay && month==thisMonth && year==thisYear)? 'red':'gray', borderWidth: (date==thisDay && month==thisMonth && year==thisYear)? 2:0.5}]}>
         <View style={{height:15, flexDirection:'row', justifyContent:'flex-end'}}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
-            {habits.filter(c=>c.productive==false)
+            {habits.filter(c=>(c.productive==false && c.year==year && c.month==month &&c.state==true && c.day==date))
               .filter(c => thisdaySticker.includes(c.name))
               .map((item, index) => (
                 <View key={index}>

@@ -7,6 +7,7 @@ import { container,colors } from '../styles';
 import uuid from 'react-native-uuid';
 import { Ionicons } from '@expo/vector-icons';
 import SleepTypeColors from '../constants/SleepTypeColors';
+import { set } from 'react-hook-form';
 
 const width = Dimensions.get('window').width;
 
@@ -22,6 +23,11 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, setSleepModalVisib
     const initialWakeupTime=sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.wakeup)[0];
     const [sleepTimeExists, setSleepTimeExists] = useState(initialSleepTime!==undefined);
     const [wakeupTimeExists, setWakeupTimeExists] = useState(initialWakeupTime!==undefined);
+    const [sleepType, setSleepType] = useState(SleepTypeColors.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0]);
+
+    useEffect(()=>{
+        setSleepType(SleepTypeColors.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0]);
+    },[sleep,day])
 
     useEffect(()=>{
         setSleepTimeExists(initialSleepTime!==undefined && initialSleepTime!==null);
@@ -33,11 +39,19 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, setSleepModalVisib
         const currentTime = selectedTime || sleepTime;
         setShowDatePicker(Platform.OS === 'ios');
         setSleepTime(currentTime);
+        if (event.type === 'set') {
+            setSleepTime(selectedTime);
+            addSleep();
+        }
     };
     const onChangeWakeup = (event, selectedTime) => {
         const currentTime = selectedTime || wakeupTime;
         setShowDatePicker(Platform.OS === 'ios');
         setWakeupTime(currentTime);
+        if (event.type === 'set') {
+            setWakeupTime(selectedTime);
+            addWakeup();
+        }
     };
 
     const addSleep = () => {
@@ -94,6 +108,8 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, setSleepModalVisib
         setWakeupTimeExists(true)
     };
 
+    
+
 
   return (
     <SafeAreaView style={container.body}>
@@ -113,27 +129,27 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, setSleepModalVisib
               setSleepModalVisible={setSleepModalVisible==undefined? undefined : setSleepModalVisible}
               sleepModalVisible={sleepModalVisible==undefined? undefined : setSleepModalVisible}
             />
-            <View style={{marginLeft:10,width:120,alignContent:'center', alignItems:'center',justifyContent:'center', flexDirection:'row'}}>
+            <View style={{marginLeft:30,width:100,alignContent:'center', alignItems:'center',justifyContent:'center', flexDirection:'row'}}>
+                <View style={{right:-6,height:30, borderTopRightRadius:17,borderBottomRightRadius:17,position:'absolute'}}>
+                    <Ionicons name="moon" size={32} color={colors.primary.default} style={{transform:[{rotate:"45deg"}]}}/>
+                    <Ionicons name="moon-outline" size={36} color={sleepTimeExists?'transparent':colors.primary.blue} style={{position:'absolute',transform:[{rotate:"45deg"}],top:-6,left:-2}}/>
+                </View>
                 <DateTimePicker
                     value={sleepTime}
                     mode="time"
                     display="default"
                     onChange={onChangeSleep}
                     minuteInterval={30}
-                    style={{height:30, width:90}}
+                    style={{left:-15,height:30, width:90, backgroundColor:colors.primary.defaultlight,borderWidth:1,borderColor:sleepTimeExists?colors.primary.gray:colors.primary.blue,borderRadius:10}}
                 />
-                <View style={{left:-5, height:30, borderTopRightRadius:17,borderBottomRightRadius:17}}>
-                    <Ionicons name="moon" size={32} color={colors.primary.default} style={{transform:[{rotate:"45deg"}],top:-1}}/>
-                    <Ionicons name="moon-outline" size={36} color={colors.primary.default} style={{position:'absolute',transform:[{rotate:"45deg"}],top:-5,left:-2}}/>
-                </View>
             </View>
-            <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {alignSelf:'center',
-            backgroundColor: SleepTypeColors.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.color)[0],
-            borderColor:SleepTypeColors.filter(c=>c.type==sleep.filter(c=>(c.year==year && c.month==month && c.day==day)).map(c=>c.type)[0]).map(c=>c.type)[0]==undefined?colors.primary.blue:colors.primary.gray}]}/>
-            <View style={{width:90, alignContent:'center', alignItems:'center',justifyContent:'center', flexDirection:'row'}}>
+            <Pressable onPress={colorPickerVisible => setColorPickerVisible(true)} style={[styles.color, {alignSelf:'center', zIndex:2, 
+            backgroundColor: sleepType==undefined?colors.primary.white:sleepType,
+            borderColor:sleepType==undefined?colors.primary.blue:colors.primary.gray}]}/>
+            <View style={{width:90, alignContent:'center', alignItems:'center',justifyContent:'center', flexDirection:'row', zIndex:1}}>
                 <View style={{left:10,width:20, height:30,justifyContent:'center',paddingLeft:30}}>
                     <Ionicons name="sunny" size={60} color={colors.primary.default} style={{position:'absolute', marginLeft:-10}}/>
-                    <Ionicons name="sunny-outline" size={60} color={colors.primary.blue} style={{position:'absolute', marginLeft:-8}}/>
+                    <Ionicons name="sunny-outline" size={60} color={wakeupTimeExists?'transparent':colors.primary.blue} style={{position:'absolute', marginLeft:-8}}/>
                 </View>
                 <DateTimePicker
                     value={wakeupTime}
@@ -141,7 +157,7 @@ const AddSleepLog = ({ db, sleep, setSleep, year, month, day, setSleepModalVisib
                     display="default"
                     onChange={onChangeWakeup}
                     minuteInterval={30}
-                    style={{height:30, width:85, backgroundColor:colors.primary.defaultlight,borderWidth:1,borderColor:colors.primary.blue,borderRadius:10}}
+                    style={{height:30, width:85, backgroundColor:colors.primary.defaultlight,borderWidth:1,borderColor:wakeupTimeExists?colors.primary.gray:colors.primary.blue,borderRadius:10}}
                 />
             </View>
         </View>

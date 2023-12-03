@@ -8,6 +8,8 @@ import { useForm, Controller, set } from 'react-hook-form';
 
 const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, setTimeModalVisible}) => {
     const {control, handleSubmit, reset} = useForm();
+    const thisTime= timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0];
+    const [timeExists, setTimeExists] = useState(thisTime!==null);
 
     function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -84,7 +86,7 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
                             }}
                             onBlur={onBlur}
                             placeholder={timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.hours)[0]==null?'HH':timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.hours)[0].toString()}
-                            style={[container.textinput,{backgroundColor:colormix,width: 50, borderColor: error ? 'red' : '#e8e8e8'}]}
+                            style={[container.textinput,{backgroundColor:colormix,flex:1, borderColor: error ? 'red' : '#e8e8e8'}]}
                         />
                         {error && console.warn(error.message || 'Error')}
                         </>
@@ -122,7 +124,7 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
                             }}
                             onBlur={onBlur}
                             placeholder={timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.minutes)[0]==null?'mm':timerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.minutes)[0].toString()}
-                            style={[container.textinput,{backgroundColor:colormix,width: 50, borderColor: error ? 'red' : '#e8e8e8'}]}
+                            style={[container.textinput,{backgroundColor:colormix,flex:1, borderColor: error ? 'red' : '#e8e8e8'}]}
                         />
                         {error && console.warn(error.message || 'Error')}
                         </>
@@ -140,7 +142,7 @@ const AddTime = ({ name, times, timerecords, setTimerecords, db,year,month,day, 
                         },
                 }}
             />
-            <Pressable onPress={handleSubmit(updateTime)} style={[container.button,{width:40}]}>
+            <Pressable onPress={handleSubmit(updateTime)} style={[container.button,{width:30,backgroundColor:timeExists?colors.primary.defaultdark:colors.primary.blue}]}>
                 <Feather name="chevron-right" size={30} />
             </Pressable>
         </View>

@@ -49,6 +49,42 @@ function DeleteDBvalid({deleteVisible, selectedData, setDeleteVisible, db,
       (txObj, error) => console.log('error selecting logs')
       )})
     }
+    else if (selectedData=='sleep') {
+      db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS sleep', null,
+      (txObj, resultSet) => setSleep([]),
+      (txObj, error) => console.log('error selecting logs')
+      )})
+    }
+    else if (selectedData=='times') {
+      db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS times', null,
+      (txObj, resultSet) => setTimes([]),
+      (txObj, error) => console.log('error selecting logs')
+      )})
+    }
+    else if (selectedData=='timerecords') {
+      db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS timerecords', null,
+      (txObj, resultSet) => setTimerecords([]),
+      (txObj, error) => console.log('error selecting logs')
+      )})
+    }
+    else if (selectedData=='diary') {
+      db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS diary', null,
+      (txObj, resultSet) => setDiary([]),
+      (txObj, error) => console.log('error selecting logs')
+      )})
+    }
+    else if (selectedData=='weather') {
+      db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS weather', null,
+      (txObj, resultSet) => setWeather([]),
+      (txObj, error) => console.log('error selecting logs')
+      )})
+    }
+    else if (selectedData=='analytics') {
+      db.transaction(tx=>{tx.executeSql('DROP TABLE IF EXISTS analytics', null,
+      (txObj, resultSet) => setAnalytics([]),
+      (txObj, error) => console.log('error selecting logs')
+      )})
+    }
     setDeleteVisible(false);
   };
  

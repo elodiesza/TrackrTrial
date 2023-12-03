@@ -6,14 +6,12 @@ import { useForm, Controller, set } from 'react-hook-form';
 
 const AddScale = ({ name, scales, scalerecords, setScalerecords, db,year,month,day, setScaleModalVisible ,load, loadx}) => {
     const {control, handleSubmit, reset} = useForm();
-    const scale= scales.filter(c=>c.name==name);
     const thisScale= scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0];
     const [scaleExists, setScaleExists] = useState(thisScale!==null);
 
     useEffect(()=>{
         setScaleExists(thisScale!==null);
     },[thisScale])
-
 
     function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -73,7 +71,7 @@ const AddScale = ({ name, scales, scalerecords, setScalerecords, db,year,month,d
                                     onChange(intValue);}}
                                 onBlur={onBlur}
                                 placeholder={scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0]==null?'':scalerecords.filter(c=>(c.year==year&&c.month==month&&c.day==day&&c.name==name)).map(c=>c.value)[0].toString()}
-                                style={[container.textinput,{backgroundColor:colormix,width: 80, borderColor: error ? 'red' : '#e8e8e8'}]}
+                                style={[container.textinput,{backgroundColor:colormix,flex:1, borderColor: error ? 'red' : '#e8e8e8'}]}
                             />
                             {error && console.warn(error.message || 'Error')}
                             </>

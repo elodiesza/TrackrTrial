@@ -32,13 +32,21 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
   }, [newScaleVisible, reset]);
 
   const addScale = async (data) => {
+    console.warn(addValue, addColor, addUnit, data.name, data.valueMin, data.valueMax, pickedMin, pickedMax, pickedIcon);
     let existingscales = [...scales]; 
     var newPlace = existingscales.length;
         db.transaction((tx) => {
             tx.executeSql(
               'INSERT INTO scales (id,name, min, max, mincolor, maxcolor, unit, icon, place) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
-              [ uuid.v4(),data.name, addValue? data.valueMin : undefined, addValue? data.valueMax : undefined, 
-                addColor? pickedMin : undefined, addColor? pickedMax : undefined ,addUnit? data.unit : undefined, newPlace],
+              [ uuid.v4(),
+                data.name, 
+                addValue? data.valueMin : undefined, 
+                addValue? data.valueMax : undefined, 
+                addColor? pickedMin : undefined, 
+                addColor? pickedMax : undefined ,
+                addUnit? data.unit : undefined, 
+                'heart',
+                newPlace],
               (txtObj, scaleResultSet) => {
                 const newScale = {
                     id: uuid.v4(),
@@ -55,7 +63,7 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                 setScales(existingscales); 
               }
             );
-        });
+        }); 
 
     let existingrecords = [...scalerecords]; 
       for (let i = 1; i < DaysInMonth(year, month) + 1; i++) {
@@ -96,7 +104,7 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
         loadx(!load);
       }}
     > 
-      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPressOut={() => {setAddModalVisible(!addModalVisible),setNewScaleVisible(!newScaleVisible)}} activeOpacity={1}>
+      <TouchableOpacity style={{flex:1, justifyContent: 'center', alignItems: 'center',marginBottom:150}} onPressOut={() => {setAddModalVisible(!addModalVisible),setNewScaleVisible(!newScaleVisible)}} activeOpacity={1}>
         <TouchableWithoutFeedback>
             <View style={container.modal}>
                 <View style={{width:"100%",flexDirection:'row', alignItems:'center', justifyContent:'flex-start', marginBottom:10}}>
@@ -185,9 +193,8 @@ function NewScale({newScaleVisible, setNewScaleVisible, addModalVisible, setAddM
                         <TextInput
                             value={addValue? value: undefined}
                             editable={addValue? true : false}
-                            onChangeText={(text) => {// Remove any non-numeric characters using a regular expression
+                            onChangeText={(text) => {
                                 const intValue = text.replace(/\D/g, '');
-                                // Set the cleaned integer value back to the input field
                                 onChange(intValue);}}
                             onBlur={onBlur}
                             placeholder="value"
